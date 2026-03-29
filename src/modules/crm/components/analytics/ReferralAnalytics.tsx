@@ -35,9 +35,9 @@ export function ReferralAnalytics({ dateRange }: ReferralAnalyticsProps) {
       const booked = referredBookings?.length || 0;
 
       const funnelData = [
-        { name: 'Référés', value: total, fill: 'hsl(173, 58%, 39%)' },
-        { name: 'Confirmés', value: confirmed, fill: 'hsl(173, 58%, 50%)' },
-        { name: 'Réservés', value: booked, fill: 'hsl(152, 69%, 40%)' },
+        { name: 'Référés', value: total, fill: '#7C3AED' },
+        { name: 'Confirmés', value: confirmed, fill: '#06B6D4' },
+        { name: 'Réservés', value: booked, fill: '#22C55E' },
       ];
 
       // Revenue from referrals

@@ -33,9 +33,9 @@ const channelIcons: Record<string, React.ReactNode> = {
 };
 
 const channelColors: Record<string, string> = {
-  email: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-  sms: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-  phone: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+  email: 'bg-info/15 text-info',
+  sms: 'bg-success/15 text-success',
+  phone: 'bg-primary/15 text-primary',
 };
 
 export function CommunicationItem({ communication, index }: CommunicationItemProps) {
@@ -95,7 +95,7 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
             {/* Direction */}
             <span className={cn(
               "inline-flex items-center gap-0.5 text-[11px]",
-              isOutbound ? "text-blue-600 dark:text-blue-400" : "text-green-600 dark:text-green-400"
+              isOutbound ? "text-info" : "text-success"
             )}>
               {isOutbound ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownLeft className="h-3 w-3" />}
               {isOutbound ? 'Envoyé' : 'Reçu'}
@@ -151,7 +151,7 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="text-green-500">
+                      <span className="text-success">
                         <CheckCheck className="h-3.5 w-3.5" />
                       </span>
                     </TooltipTrigger>
@@ -165,7 +165,7 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="flex items-center gap-0.5 text-blue-500">
+                      <span className="flex items-center gap-0.5 text-info">
                         <Eye className="h-3.5 w-3.5" />
                         {(communication.opened_count || 0) > 1 && (
                           <span className="text-[10px]">{communication.opened_count}</span>
@@ -182,7 +182,7 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="flex items-center gap-0.5 text-purple-500">
+                      <span className="flex items-center gap-0.5 text-primary">
                         <MousePointerClick className="h-3.5 w-3.5" />
                         {(communication.clicked_count || 0) > 1 && (
                           <span className="text-[10px]">{communication.clicked_count}</span>
@@ -249,19 +249,19 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
           {hasTracking && !isBounced && (
             <div className="sm:hidden flex items-center gap-2 mt-2 pt-2 border-t border-border/30">
               {isDelivered && (
-                <Badge variant="outline" className="text-[10px] text-green-600 border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800">
+                <Badge variant="outline" className="text-[10px] text-success border-success/20 bg-success/10">
                   <CheckCheck className="h-3 w-3 mr-1" />
                   Délivré
                 </Badge>
               )}
               {isOpened && (
-                <Badge variant="outline" className="text-[10px] text-blue-600 border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+                <Badge variant="outline" className="text-[10px] text-info border-info/20 bg-info/10">
                   <Eye className="h-3 w-3 mr-1" />
                   Ouvert {communication.opened_count}x
                 </Badge>
               )}
               {isClicked && (
-                <Badge variant="outline" className="text-[10px] text-purple-600 border-purple-200 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-800">
+                <Badge variant="outline" className="text-[10px] text-primary border-primary/20 bg-primary/10">
                   <MousePointerClick className="h-3 w-3 mr-1" />
                   Cliqué {communication.clicked_count}x
                 </Badge>

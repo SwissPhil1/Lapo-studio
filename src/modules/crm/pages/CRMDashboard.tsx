@@ -322,7 +322,7 @@ export default function Dashboard() {
                 </span>
               )}
               {taskCounts.no_show_followup > 0 && (
-                <span className="px-2 py-1 rounded bg-orange-500/10 text-orange-600">
+                <span className="px-2 py-1 rounded bg-warning/10 text-warning">
                   {taskCounts.no_show_followup} no-show{taskCounts.no_show_followup !== 1 ? 's' : ''}
                 </span>
               )}

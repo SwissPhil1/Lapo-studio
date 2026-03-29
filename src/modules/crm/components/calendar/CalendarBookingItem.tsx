@@ -50,7 +50,7 @@ export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBo
               )}
             </div>
             {isRescheduled && booking.rescheduled_to_booking_id && (
-              <p className="text-xs text-amber-600 flex items-center gap-1">
+              <p className="text-xs text-warning flex items-center gap-1">
                 <ArrowRight className="h-3 w-3" />
                 RDV reporté
               </p>
@@ -68,11 +68,11 @@ export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBo
         "w-full text-left p-2 rounded-md border transition-all hover:shadow-sm",
         "bg-card hover:bg-accent/50",
         "border-l-4",
-        booking.status === 'completed' && "border-l-green-500",
+        booking.status === 'completed' && "border-l-success",
         booking.status === 'scheduled' && "border-l-primary",
         booking.status === 'cancelled' && "border-l-muted",
         booking.status === 'no_show' && "border-l-destructive",
-        booking.status === 'rescheduled' && "border-l-amber-500",
+        booking.status === 'rescheduled' && "border-l-warning",
         !booking.status && "border-l-primary"
       )}
     >
@@ -86,7 +86,7 @@ export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBo
         </span>
       </div>
       {isRescheduled && booking.rescheduled_to_booking_id && (
-        <div className="mt-1.5 flex items-center gap-1 text-xs text-amber-600">
+        <div className="mt-1.5 flex items-center gap-1 text-xs text-warning">
           <ArrowRight className="h-3 w-3" />
           <span>Voir le nouveau RDV</span>
         </div>

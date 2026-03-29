@@ -35,9 +35,9 @@ export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps)
 
       // Status breakdown for pie chart
       const statusData = [
-        { name: 'Terminés', value: completed.length, color: 'hsl(152, 69%, 40%)' },
-        { name: 'En cours', value: active.length, color: 'hsl(173, 58%, 39%)' },
-        { name: 'En pause', value: paused.length, color: 'hsl(38, 92%, 50%)' },
+        { name: 'Terminés', value: completed.length, color: '#22C55E' },
+        { name: 'En cours', value: active.length, color: '#7C3AED' },
+        { name: 'En pause', value: paused.length, color: '#FF6B6B' },
       ].filter(d => d.value > 0);
 
       // Average completion time

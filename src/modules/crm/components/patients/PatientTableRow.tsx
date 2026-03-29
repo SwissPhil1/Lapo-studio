@@ -196,7 +196,7 @@ export function PatientTableRow({
           {patient.hasNoShow && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Clock className="h-4 w-4 text-amber-500" />
+                <Clock className="h-4 w-4 text-warning" />
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <div className="space-y-1">
@@ -211,7 +211,7 @@ export function PatientTableRow({
           {patient.hasUnprocessedBooking && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <AlertTriangle className="h-4 w-4 text-orange-500" />
+                <AlertTriangle className="h-4 w-4 text-warning" />
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <div className="space-y-1">
@@ -254,16 +254,16 @@ export function PatientTableRow({
                   <AlertCircle className="h-3.5 w-3.5 text-destructive flex-shrink-0" />
                 )}
                 {actionInfo.variant === 'warning' && (
-                  <Calendar className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
+                  <Calendar className="h-3.5 w-3.5 text-warning flex-shrink-0" />
                 )}
                 {actionInfo.variant === 'info' && (
-                  <Calendar className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
+                  <Calendar className="h-3.5 w-3.5 text-info flex-shrink-0" />
                 )}
                 <div className="flex flex-col">
                   <span className={`text-sm font-medium ${
                     actionInfo.variant === 'urgent' ? 'text-destructive' :
-                    actionInfo.variant === 'warning' ? 'text-amber-600' :
-                    'text-blue-600'
+                    actionInfo.variant === 'warning' ? 'text-warning' :
+                    'text-info'
                   }`}>
                     {actionInfo.label}
                   </span>

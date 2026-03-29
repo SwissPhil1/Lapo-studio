@@ -79,9 +79,9 @@ export function PatientRetentionMetrics() {
         : 0;
 
       const pieData = [
-        { name: 'Fidèles', value: returningPatients, color: 'hsl(152, 69%, 40%)' },
-        { name: 'Nouveaux', value: newPatients - (returningPatients > newPatients ? 0 : newPatients), color: 'hsl(173, 58%, 39%)' },
-        { name: 'Inactifs', value: churnedPatients, color: 'hsl(0, 72%, 51%)' },
+        { name: 'Fidèles', value: returningPatients, color: '#22C55E' },
+        { name: 'Nouveaux', value: newPatients - (returningPatients > newPatients ? 0 : newPatients), color: '#7C3AED' },
+        { name: 'Inactifs', value: churnedPatients, color: '#FF6B6B' },
       ].filter(d => d.value > 0);
 
       return {

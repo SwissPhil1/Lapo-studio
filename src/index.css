@@ -3,17 +3,72 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Electric Sunset Palette */
+  /* ═══════════════════════════════════════════════
+     Electric Sunset Palette
+     Design: Linear (60%) × Stripe (30%) × Coverd (10%)
+     ═══════════════════════════════════════════════ */
   --color-wow-coral: #FF6B6B;
   --color-wow-pink: #FF2E93;
   --color-wow-violet: #7C3AED;
   --color-wow-lime: #BFFF00;
   --color-wow-cyan: #06B6D4;
 
-  /* Studio Dark Theme */
+  /* ═══════════════════════════════════════════════
+     Studio Dark Theme — shadcn/ui bridge
+     Maps Electric Sunset to Tailwind utility tokens
+     (bg-background, text-foreground, bg-primary, etc.)
+     ═══════════════════════════════════════════════ */
+
+  /* Base */
+  --color-background: #0F0F10;
+  --color-foreground: #FAFAFA;
+
+  /* Card */
+  --color-card: #1A1A1C;
+  --color-card-foreground: #FAFAFA;
+
+  /* Popover */
+  --color-popover: #1A1A1C;
+  --color-popover-foreground: #FAFAFA;
+
+  /* Primary — Electric Violet */
+  --color-primary: #7C3AED;
+  --color-primary-foreground: #FFFFFF;
+
+  /* Secondary */
+  --color-secondary: #242428;
+  --color-secondary-foreground: #FAFAFA;
+
+  /* Muted */
+  --color-muted: #242428;
+  --color-muted-foreground: #71717A;
+
+  /* Accent */
+  --color-accent: #2A2A2E;
+  --color-accent-foreground: #FAFAFA;
+
+  /* Destructive */
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FFFFFF;
+
+  /* Border / Input / Ring */
+  --color-border: #2E2E32;
+  --color-input: #1E1E22;
+  --color-ring: #7C3AED;
+
+  /* Sidebar (Linear-style) */
+  --color-sidebar: #141416;
+  --color-sidebar-foreground: #FAFAFA;
+  --color-sidebar-border: #2E2E32;
+  --color-sidebar-accent: #2A2A2E;
+  --color-sidebar-accent-foreground: #FAFAFA;
+  --color-sidebar-ring: #7C3AED;
+
+  /* Studio surface tokens (for custom components) */
   --color-studio-bg: #0F0F10;
-  --color-studio-sidebar: #1A1A1C;
-  --color-studio-card: #242428;
+  --color-studio-sidebar: #141416;
+  --color-studio-card: #1A1A1C;
+  --color-studio-surface: #242428;
   --color-studio-border: #2E2E32;
   --color-studio-text: #FAFAFA;
   --color-studio-muted: #71717A;
@@ -23,9 +78,21 @@
 
   /* Semantic */
   --color-success: #22C55E;
+  --color-success-foreground: #FFFFFF;
   --color-warning: #F59E0B;
+  --color-warning-foreground: #FFFFFF;
   --color-error: #EF4444;
   --color-info: #3B82F6;
+
+  /* Chart palette — Electric Sunset mapped */
+  --color-chart-1: #7C3AED;
+  --color-chart-2: #FF2E93;
+  --color-chart-3: #06B6D4;
+  --color-chart-4: #FF6B6B;
+  --color-chart-5: #BFFF00;
+
+  /* Radius */
+  --radius: 0.5rem;
 }
 
 :root {
@@ -34,10 +101,14 @@
   --gradient-lime: linear-gradient(135deg, #BFFF00, #06B6D4);
 }
 
+/* ═══════════════════════════════════════════════
+   Global base styles
+   ═══════════════════════════════════════════════ */
+
 body {
   margin: 0;
-  background-color: var(--color-studio-bg);
-  color: var(--color-studio-text);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -47,7 +118,7 @@ body {
   min-height: 100vh;
 }
 
-/* Scrollbar */
+/* Scrollbar — minimal, Linear-style */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -56,21 +127,64 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-studio-border);
+  background: var(--color-border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-studio-muted);
+  background: var(--color-muted-foreground);
 }
 
-/* Keyboard-first focus */
+/* Keyboard-first focus — Electric Violet ring */
 *:focus-visible {
-  outline: 2px solid var(--color-wow-violet);
+  outline: 2px solid var(--color-ring);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 ::selection {
-  background-color: color-mix(in srgb, #7C3AED 40%, transparent);
-  color: var(--color-studio-text);
+  background-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  color: var(--color-foreground);
+}
+
+/* ═══════════════════════════════════════════════
+   Utility classes
+   ═══════════════════════════════════════════════ */
+
+/* Sunset gradient text */
+.text-gradient-sunset {
+  background: var(--gradient-sunset);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Sunset gradient background with hover */
+.bg-gradient-sunset {
+  background: var(--gradient-sunset);
+}
+.bg-gradient-sunset:hover {
+  filter: brightness(1.1);
+}
+
+/* Electric gradient */
+.bg-gradient-electric {
+  background: var(--gradient-electric);
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: color-mix(in srgb, var(--color-card) 80%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+/* Glow effects for Electric Sunset accents */
+.glow-violet {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-wow-violet) 30%, transparent);
+}
+.glow-coral {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-wow-coral) 30%, transparent);
+}
+.glow-pink {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-wow-pink) 30%, transparent);
 }

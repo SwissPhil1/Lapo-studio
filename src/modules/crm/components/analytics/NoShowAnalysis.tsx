@@ -142,7 +142,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
               }}
               formatter={(value: any) => [`${value}%`, 'Taux']}
             />
-            <Bar dataKey="rate" fill="hsl(0, 72%, 51%)" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="rate" fill="#FF6B6B" radius={[2, 2, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -175,9 +175,9 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
             <Line 
               type="monotone" 
               dataKey="rate" 
-              stroke="hsl(0, 72%, 51%)" 
+              stroke="#FF6B6B" 
               strokeWidth={2}
-              dot={{ fill: 'hsl(0, 72%, 51%)', r: 3 }}
+              dot={{ fill: '#FF6B6B', r: 3 }}
             />
           </LineChart>
         </ResponsiveContainer>

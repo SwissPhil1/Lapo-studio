@@ -47,7 +47,7 @@ export const BOOKING_STATUS_COLORS: Record<string, { bg: string; text: string }>
   completed: { bg: 'bg-success/10', text: 'text-success' },
   cancelled: { bg: 'bg-muted', text: 'text-muted-foreground' },
   no_show: { bg: 'bg-destructive/10', text: 'text-destructive' },
-  rescheduled: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400' },
+  rescheduled: { bg: 'bg-warning/15', text: 'text-warning' },
   pending: { bg: 'bg-warning/10', text: 'text-warning' },
 };
 

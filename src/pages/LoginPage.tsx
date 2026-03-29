@@ -27,24 +27,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-studio-bg p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-wow-coral to-wow-violet">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-wow-coral to-wow-violet shadow-lg glow-violet">
             <span className="text-2xl font-bold text-white">L</span>
           </div>
-          <h1 className="text-2xl font-bold text-studio-text">
+          <h1 className="text-2xl font-bold text-foreground">
             {t('auth.welcomeBack')}
           </h1>
-          <p className="mt-1 text-sm text-studio-muted">
+          <p className="mt-1 text-sm text-muted-foreground">
             {t('auth.signInSubtitle')}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-studio-text">
+            <label className="mb-1.5 block text-sm font-medium text-foreground">
               {t('auth.email')}
             </label>
             <input
@@ -52,13 +52,13 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-lg border border-studio-border bg-studio-input px-3 py-2.5 text-sm text-studio-text placeholder:text-studio-muted focus:border-wow-violet focus:outline-none"
+              className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-studio-text">
+            <label className="mb-1.5 block text-sm font-medium text-foreground">
               {t('auth.password')}
             </label>
             <input
@@ -66,13 +66,13 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-studio-border bg-studio-input px-3 py-2.5 text-sm text-studio-text placeholder:text-studio-muted focus:border-wow-violet focus:outline-none"
+              className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <div className="rounded-lg border border-error/30 bg-error/10 px-3 py-2 text-sm text-error">
+            <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error}
             </div>
           )}
@@ -80,15 +80,15 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-gradient-to-r from-wow-coral via-wow-pink to-wow-violet px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="w-full rounded-lg bg-gradient-to-r from-wow-coral via-wow-pink to-wow-violet px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:opacity-90 hover:shadow-lg disabled:opacity-50 glow-pink"
           >
             {loading ? t('common.loading') : t('auth.signIn')}
           </button>
 
-          <p className="text-center text-sm text-studio-muted">
+          <p className="text-center text-sm text-muted-foreground">
             <button
               type="button"
-              className="text-wow-violet hover:underline"
+              className="text-primary hover:underline"
             >
               {t('auth.forgotPassword')}
             </button>

@@ -39,9 +39,9 @@ export function ChurnPrediction() {
       const low = typedPatients.filter((p) => p.churn_risk_score < 40).length;
 
       const distributionData = [
-        { name: '\u00c9lev\u00e9', count: high, color: '#ef4444' },
-        { name: 'Moyen', count: medium, color: '#f59e0b' },
-        { name: 'Faible', count: low, color: '#10b981' },
+        { name: '\u00c9lev\u00e9', count: high, color: '#FF6B6B' },
+        { name: 'Moyen', count: medium, color: '#F59E0B' },
+        { name: 'Faible', count: low, color: '#22C55E' },
       ];
 
       // Top 10 at-risk
@@ -96,9 +96,9 @@ export function ChurnPrediction() {
   }
 
   const getRiskBadgeClass = (score: number) => {
-    if (score > 70) return 'bg-red-500/15 text-red-600';
-    if (score >= 40) return 'bg-amber-500/15 text-amber-600';
-    return 'bg-emerald-500/15 text-emerald-600';
+    if (score > 70) return 'bg-destructive/15 text-destructive';
+    if (score >= 40) return 'bg-warning/15 text-warning';
+    return 'bg-success/15 text-success';
   };
 
   return (
@@ -111,7 +111,7 @@ export function ChurnPrediction() {
           <p className="text-sm text-muted-foreground">Total \u00e0 risque</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
-          <TrendingDown className="h-5 w-5 mx-auto text-amber-600 mb-2" />
+          <TrendingDown className="h-5 w-5 mx-auto text-warning mb-2" />
           <p className="text-2xl font-bold">{data.avgRiskScore}</p>
           <p className="text-sm text-muted-foreground">Score moyen</p>
         </div>

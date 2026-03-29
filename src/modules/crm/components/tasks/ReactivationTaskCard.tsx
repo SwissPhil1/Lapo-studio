@@ -56,7 +56,7 @@ const TASK_TYPE_LABELS: Record<string, { label: string; icon: React.ReactNode; c
   no_show_followup: { 
     label: 'Suivi no-show', 
     icon: <AlertTriangle className="h-4 w-4" />,
-    color: 'text-orange-500 bg-orange-500/10'
+    color: 'text-warning bg-warning/10'
   },
   manual: { 
     label: 'Suivi manuel', 
@@ -66,7 +66,7 @@ const TASK_TYPE_LABELS: Record<string, { label: string; icon: React.ReactNode; c
   cancelled_followup: { 
     label: 'Suivi annulation', 
     icon: <XCircle className="h-4 w-4" />,
-    color: 'text-slate-500 bg-slate-500/10'
+    color: 'text-muted-foreground bg-muted'
   },
 };
 
@@ -164,7 +164,7 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
           <Button
             variant="default"
             size="sm"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="bg-success hover:bg-success/90 text-success-foreground"
             onClick={() => setShowCompleteDialog(true)}
           >
             <CheckCircle className="h-4 w-4 mr-1.5" />

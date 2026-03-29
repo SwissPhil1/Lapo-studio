@@ -30,15 +30,15 @@ interface CommunicationLog {
 }
 
 const channelConfig: Record<string, { icon: typeof Mail; label: string; color: string }> = {
-  email: { icon: Mail, label: 'Email', color: 'text-blue-500' },
-  sms: { icon: MessageSquare, label: 'SMS', color: 'text-green-500' },
-  phone: { icon: Phone, label: 'Appel', color: 'text-amber-500' },
+  email: { icon: Mail, label: 'Email', color: 'text-info' },
+  sms: { icon: MessageSquare, label: 'SMS', color: 'text-success' },
+  phone: { icon: Phone, label: 'Appel', color: 'text-warning' },
 };
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  sent: { label: 'Envoyé', className: 'bg-blue-100 text-blue-800' },
-  delivered: { label: 'Livré', className: 'bg-green-100 text-green-800' },
-  opened: { label: 'Ouvert', className: 'bg-emerald-100 text-emerald-800' },
+  sent: { label: 'Envoyé', className: 'bg-info/15 text-info' },
+  delivered: { label: 'Livré', className: 'bg-success/15 text-success' },
+  opened: { label: 'Ouvert', className: 'bg-success/15 text-success' },
   clicked: { label: 'Cliqué', className: 'bg-primary/10 text-primary' },
   failed: { label: 'Échec', className: 'bg-destructive/10 text-destructive' },
   bounced: { label: 'Rejeté', className: 'bg-destructive/10 text-destructive' },
@@ -180,7 +180,7 @@ export function CommunicationsHistory({ patientId }: CommunicationsHistoryProps)
                 <div className="flex gap-4 p-3 bg-muted/50 rounded-lg text-sm">
                   {selectedMessage.opened_at && (
                     <div className="flex items-center gap-2">
-                      <Eye className="h-4 w-4 text-emerald-500" />
+                      <Eye className="h-4 w-4 text-success" />
                       <span>Ouvert le {format(parseISO(selectedMessage.opened_at), 'd MMM à HH:mm', { locale: fr })}</span>
                     </div>
                   )}

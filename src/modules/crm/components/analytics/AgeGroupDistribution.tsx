@@ -14,12 +14,12 @@ const AGE_GROUPS = [
 ];
 
 const COLORS = [
-  'hsl(173, 58%, 35%)',
-  'hsl(173, 58%, 42%)',
-  'hsl(173, 58%, 49%)',
-  'hsl(173, 58%, 56%)',
-  'hsl(173, 58%, 63%)',
-  'hsl(173, 58%, 70%)',
+  '#7C3AED',
+  '#8B5CF6',
+  '#06B6D4',
+  '#FF6B6B',
+  '#BFFF00',
+  '#22D3EE',
 ];
 
 export function AgeGroupDistribution() {

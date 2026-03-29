@@ -18,7 +18,7 @@ export function NavGroup({ label, children, defaultOpen = true }: NavGroupProps)
         className={cn(
           'flex w-full items-center justify-between px-3 py-1.5',
           'text-xs font-semibold uppercase tracking-wider',
-          'text-studio-muted hover:text-studio-text transition-colors'
+          'text-muted-foreground hover:text-foreground transition-colors'
         )}
       >
         {label}

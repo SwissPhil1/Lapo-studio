@@ -10,8 +10,8 @@ export function Breadcrumb() {
   if (segments.length === 0) return null
 
   return (
-    <nav className="flex items-center gap-1 text-sm text-studio-muted">
-      <Link to="/" className="hover:text-studio-text transition-colors">
+    <nav className="flex items-center gap-1 text-sm text-muted-foreground">
+      <Link to="/" className="hover:text-foreground transition-colors">
         <Home className="h-4 w-4" />
       </Link>
       {segments.map((segment, i) => {
@@ -23,13 +23,13 @@ export function Breadcrumb() {
           <span key={path} className="flex items-center gap-1">
             <ChevronRight className="h-3 w-3" />
             {isLast ? (
-              <span className="capitalize text-studio-text font-medium">
+              <span className="capitalize text-foreground font-medium">
                 {label}
               </span>
             ) : (
               <Link
                 to={path}
-                className="capitalize hover:text-studio-text transition-colors"
+                className="capitalize hover:text-foreground transition-colors"
               >
                 {label}
               </Link>

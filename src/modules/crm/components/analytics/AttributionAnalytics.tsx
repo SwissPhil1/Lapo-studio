@@ -7,7 +7,7 @@ interface AttributionAnalyticsProps {
   dateRange: string;
 }
 
-const COLORS = ['#0d9488', '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4', '#ccfbf1', '#f0fdfa'];
+const COLORS = ['#7C3AED', '#14b8a6', '#06B6D4', '#5eead4', '#99f6e4', '#ccfbf1', '#f0fdfa'];
 
 export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
   const { data, isLoading } = useQuery({
@@ -150,8 +150,8 @@ export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
                   borderRadius: '8px',
                 }}
               />
-              <Bar dataKey="leads" fill="#0d9488" name="Leads" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="converted" fill="#2dd4bf" name="Convertis" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="leads" fill="#7C3AED" name="Leads" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="converted" fill="#06B6D4" name="Convertis" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

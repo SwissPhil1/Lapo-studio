@@ -25,21 +25,21 @@ export function LapoCashReferrerCard({ referrerId, referrerName }: LapoCashRefer
 
   return (
     <>
-      <Card className="border-amber-200/50 bg-gradient-to-br from-amber-50/50 via-yellow-50/30 to-orange-50/30">
+      <Card className="border-warning/30 bg-card">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-wow-coral to-wow-pink flex items-center justify-center">
                 <Gift className="h-4 w-4 text-white" />
               </div>
-              <CardTitle className="text-lg text-amber-900">{t("walletCard.title")}</CardTitle>
+              <CardTitle className="text-lg text-foreground">{t("walletCard.title")}</CardTitle>
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCreditDialogOpen(true)}
-                className="text-green-600 border-green-200 hover:bg-green-50"
+                className="text-success border-success/30 hover:bg-success/10"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 {t("credit")}
@@ -49,7 +49,7 @@ export function LapoCashReferrerCard({ referrerId, referrerName }: LapoCashRefer
                 size="sm"
                 onClick={() => setDebitDialogOpen(true)}
                 disabled={balance <= 0}
-                className="text-red-600 border-red-200 hover:bg-red-50"
+                className="text-destructive border-destructive/30 hover:bg-destructive/10"
               >
                 <Minus className="h-4 w-4 mr-1" />
                 {t("debit")}
@@ -61,15 +61,15 @@ export function LapoCashReferrerCard({ referrerId, referrerName }: LapoCashRefer
           <div className="space-y-4">
             <div className="flex justify-between items-end">
               <div>
-                <p className="text-sm text-amber-700">{t("walletCard.currentBalance")}</p>
-                <p className="text-3xl font-bold text-amber-900">
+                <p className="text-sm text-muted-foreground">{t("walletCard.currentBalance")}</p>
+                <p className="text-3xl font-bold text-foreground">
                   {isLoading ? "..." : formatLapoCash(balance)}
                 </p>
               </div>
               {rateInfo && (
                 <div className="text-right">
-                  <p className="text-xs text-amber-600">{t("walletCard.yourRate")}</p>
-                  <p className="text-sm font-medium text-amber-800">1:{rateInfo.rate.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{t("walletCard.yourRate")}</p>
+                  <p className="text-sm font-medium text-foreground">1:{rateInfo.rate.toFixed(2)}</p>
                 </div>
               )}
             </div>
@@ -80,7 +80,7 @@ export function LapoCashReferrerCard({ referrerId, referrerName }: LapoCashRefer
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowHistory(!showHistory)}
-                  className="text-amber-700 hover:text-amber-900 p-0"
+                  className="text-muted-foreground hover:text-foreground p-0"
                 >
                   <History className="h-4 w-4 mr-1" />
                   {t("walletCard.viewHistory")} ({transactions.length})
@@ -91,20 +91,20 @@ export function LapoCashReferrerCard({ referrerId, referrerName }: LapoCashRefer
                     {transactions.slice(0, 10).map((tx) => (
                       <div
                         key={tx.id}
-                        className="flex items-center justify-between text-sm py-1 border-b border-amber-100 last:border-0"
+                        className="flex items-center justify-between text-sm py-1 border-b border-border last:border-0"
                       >
                         <div>
-                          <span className="text-amber-800">
+                          <span className="text-foreground">
                             {t(`transactionTypes.${tx.type}`)}
                           </span>
-                          <p className="text-xs text-amber-500">{formatDate(tx.created_at)}</p>
+                          <p className="text-xs text-muted-foreground">{formatDate(tx.created_at)}</p>
                           {tx.description && (
-                            <p className="text-xs text-amber-600">{tx.description}</p>
+                            <p className="text-xs text-muted-foreground">{tx.description}</p>
                           )}
                         </div>
                         <span
                           className={`font-medium ${
-                            tx.amount >= 0 ? "text-green-600" : "text-red-600"
+                            tx.amount >= 0 ? "text-success" : "text-destructive"
                           }`}
                         >
                           {tx.amount >= 0 ? "+" : ""}

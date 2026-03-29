@@ -20,12 +20,12 @@ export function getTierBadgeStyles(tierCode: string | null | undefined, tierName
   switch (code) {
     case "vip":
       return {
-        className: "bg-gradient-to-r from-purple-500 to-amber-500 text-white border-transparent",
+        className: "bg-gradient-to-r from-wow-violet to-wow-coral text-white border-transparent",
         label,
       };
     case "premium":
       return {
-        className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800",
+        className: "bg-info/15 text-info border-info/30",
         label,
       };
     case "standard":

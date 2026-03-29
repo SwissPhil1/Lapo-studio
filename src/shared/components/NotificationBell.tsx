@@ -22,7 +22,7 @@ export function NotificationBell() {
         onClick={() => setOpen(!open)}
         className={cn(
           'relative rounded-lg p-2 transition-colors',
-          'text-studio-muted hover:bg-studio-hover hover:text-studio-text'
+          'text-muted-foreground hover:bg-accent hover:text-foreground'
         )}
       >
         <Bell className="h-5 w-5" />
@@ -34,8 +34,8 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 rounded-lg border border-studio-border bg-studio-card p-4 shadow-xl">
-          <p className="text-sm text-studio-muted">No new notifications</p>
+        <div className="absolute right-0 top-full mt-2 w-80 rounded-lg border border-border bg-card p-4 shadow-xl">
+          <p className="text-sm text-muted-foreground">No new notifications</p>
         </div>
       )}
     </div>

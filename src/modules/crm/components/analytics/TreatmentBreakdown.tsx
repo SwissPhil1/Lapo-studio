@@ -15,9 +15,9 @@ const COLORS = [
   'hsl(var(--chart-3))',
   'hsl(var(--chart-4))',
   'hsl(var(--chart-5))',
-  'hsl(221, 83%, 53%)',
-  'hsl(262, 83%, 58%)',
-  'hsl(330, 81%, 60%)',
+  '#9F5AFF',
+  '#FF5CAD',
+  '#22D3EE',
 ];
 
 function getDateRange(range: string): Date {

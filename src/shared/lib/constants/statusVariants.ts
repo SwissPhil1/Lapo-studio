@@ -21,7 +21,7 @@ export const commissionStatusVariants: Record<CommissionStatus, VariantStyle> = 
   paid: "bg-success-bg text-success border-success/20",
   cancelled: "bg-muted text-muted-foreground border-border",
   reversed: "bg-muted text-muted-foreground border-border",
-  converted: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800",
+  converted: "bg-warning/15 text-warning border-warning/30",
 };
 
 export const batchStatusVariants: Record<PayoutBatchStatus, VariantStyle> = {
@@ -31,9 +31,9 @@ export const batchStatusVariants: Record<PayoutBatchStatus, VariantStyle> = {
 };
 
 export const lapoCashStatusVariants: Record<LapoCashTransactionType, VariantStyle> = {
-  commission_conversion: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800",
-  birthday_gift: "bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-800",
-  workshop_reward: "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800",
+  commission_conversion: "bg-warning/15 text-warning border-warning/30",
+  birthday_gift: "bg-wow-pink/15 text-wow-pink border-wow-pink/30",
+  workshop_reward: "bg-primary/15 text-primary border-primary/30",
   referral_bonus: "bg-success-bg text-success border-success/20",
   redemption: "bg-info-bg text-info border-info/20",
   adjustment: "bg-muted text-muted-foreground border-border",
@@ -46,5 +46,5 @@ export const bookingStatusVariants: Record<BookingStatus, VariantStyle> = {
   completed: "bg-success-bg text-success border-success/20",
   cancelled: "bg-muted text-muted-foreground border-border",
   no_show: "bg-destructive-bg text-destructive border-destructive/20",
-  rescheduled: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800",
+  rescheduled: "bg-warning/15 text-warning border-warning/30",
 };

@@ -28,16 +28,16 @@ export function StudioLayout() {
   const { t } = useTranslation()
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
-      <aside className="flex w-64 shrink-0 flex-col border-r border-studio-border bg-studio-sidebar">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
         {/* Logo */}
-        <div className="flex h-14 items-center gap-2 border-b border-studio-border px-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-wow-coral to-wow-violet">
+        <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-wow-coral to-wow-violet shadow-md glow-violet">
             <span className="text-sm font-bold text-white">L</span>
           </div>
-          <span className="text-lg font-bold text-studio-text">
-            LAPO <span className="font-normal text-studio-muted">Studio</span>
+          <span className="text-lg font-bold text-foreground">
+            LAPO <span className="font-normal text-muted-foreground">Studio</span>
           </span>
         </div>
 
@@ -49,11 +49,11 @@ export function StudioLayout() {
                 new KeyboardEvent('keydown', { key: 'k', metaKey: true })
               )
             }
-            className="flex w-full items-center gap-2 rounded-lg border border-studio-border bg-studio-input px-3 py-2 text-sm text-studio-muted transition-colors hover:border-studio-muted"
+            className="flex w-full items-center gap-2 rounded-lg border border-border bg-input px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-muted-foreground"
           >
             <Search className="h-4 w-4" />
             <span className="flex-1 text-left">{t('nav.search')}</span>
-            <kbd className="text-[10px]">⌘K</kbd>
+            <kbd className="text-[10px] text-muted-foreground/60">⌘K</kbd>
           </button>
         </div>
 
@@ -141,7 +141,7 @@ export function StudioLayout() {
         </nav>
 
         {/* User Menu */}
-        <div className="border-t border-studio-border p-3">
+        <div className="border-t border-sidebar-border p-3">
           <UserMenu />
         </div>
       </aside>
@@ -149,7 +149,7 @@ export function StudioLayout() {
       {/* Main content */}
       <main className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-studio-border px-6">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-6">
           <Breadcrumb />
           <div className="flex items-center gap-2">
             <NotificationBell />

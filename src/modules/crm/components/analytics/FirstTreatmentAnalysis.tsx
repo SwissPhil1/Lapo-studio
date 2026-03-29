@@ -93,12 +93,12 @@ export function FirstTreatmentAnalysis() {
   }
 
   const colors = [
-    'hsl(173, 58%, 35%)',
-    'hsl(173, 58%, 42%)',
-    'hsl(173, 58%, 49%)',
-    'hsl(173, 58%, 56%)',
-    'hsl(173, 58%, 63%)',
-    'hsl(173, 58%, 70%)',
+    '#7C3AED', // violet
+    '#FF2E93', // pink
+    '#06B6D4', // cyan
+    '#FF6B6B', // coral
+    '#BFFF00', // lime
+    '#9F5AFF', // violet-light
   ];
 
   return (

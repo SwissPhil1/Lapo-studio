@@ -90,14 +90,14 @@ export function PatientLifetimeValue() {
           ltv: genderLTV.female.count > 0 
             ? Math.round(genderLTV.female.total / genderLTV.female.count) 
             : 0,
-          color: 'hsl(330, 65%, 55%)',
+          color: '#FF2E93',
         },
         { 
           name: 'Hommes', 
           ltv: genderLTV.male.count > 0 
             ? Math.round(genderLTV.male.total / genderLTV.male.count) 
             : 0,
-          color: 'hsl(210, 65%, 55%)',
+          color: '#06B6D4',
         },
       ];
 
@@ -106,7 +106,7 @@ export function PatientLifetimeValue() {
         ltv: ageLTV[g.label].count > 0 
           ? Math.round(ageLTV[g.label].total / ageLTV[g.label].count) 
           : 0,
-        color: ['hsl(173, 58%, 35%)', 'hsl(173, 58%, 45%)', 'hsl(173, 58%, 55%)'][i],
+        color: ['#7C3AED', '#9F5AFF', '#22D3EE'][i],
       }));
 
       // Overall average LTV

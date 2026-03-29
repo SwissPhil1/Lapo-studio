@@ -76,16 +76,16 @@ const activityConfig: Record<string, {
     textClass: 'text-success',
     label: 'Pipeline'
   },
-  pipeline_stage_changed: { 
-    icon: ArrowRightLeft, 
-    bgClass: 'bg-purple-100', 
-    textClass: 'text-purple-600',
+  pipeline_stage_changed: {
+    icon: ArrowRightLeft,
+    bgClass: 'bg-primary/15',
+    textClass: 'text-primary',
     label: 'Pipeline'
   },
-  task_created: { 
-    icon: ListTodo, 
-    bgClass: 'bg-blue-100', 
-    textClass: 'text-blue-600',
+  task_created: {
+    icon: ListTodo,
+    bgClass: 'bg-info/15',
+    textClass: 'text-info',
     label: 'Tâche'
   },
   task_status_changed: { 
@@ -94,16 +94,16 @@ const activityConfig: Record<string, {
     textClass: 'text-success',
     label: 'Tâche'
   },
-  note_added: { 
-    icon: StickyNote, 
-    bgClass: 'bg-amber-100', 
-    textClass: 'text-amber-600',
+  note_added: {
+    icon: StickyNote,
+    bgClass: 'bg-warning/15',
+    textClass: 'text-warning',
     label: 'Note'
   },
-  note_created: { 
-    icon: StickyNote, 
-    bgClass: 'bg-amber-100', 
-    textClass: 'text-amber-600',
+  note_created: {
+    icon: StickyNote,
+    bgClass: 'bg-warning/15',
+    textClass: 'text-warning',
     label: 'Note'
   },
   communication_sent: { 
@@ -118,16 +118,16 @@ const activityConfig: Record<string, {
     textClass: 'text-accent-foreground',
     label: 'Communication'
   },
-  email_opened: { 
-    icon: Eye, 
-    bgClass: 'bg-blue-500/10', 
-    textClass: 'text-blue-600',
+  email_opened: {
+    icon: Eye,
+    bgClass: 'bg-info/15',
+    textClass: 'text-info',
     label: 'Email ouvert'
   },
-  email_clicked: { 
-    icon: MousePointerClick, 
-    bgClass: 'bg-purple-500/10', 
-    textClass: 'text-purple-600',
+  email_clicked: {
+    icon: MousePointerClick,
+    bgClass: 'bg-primary/15',
+    textClass: 'text-primary',
     label: 'Lien cliqué'
   },
 };
@@ -188,9 +188,9 @@ const categoryLabels: Record<string, string> = {
 const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
   booking: { bg: 'bg-primary/10', text: 'text-primary', border: 'border-primary/30' },
   note: { bg: 'bg-accent', text: 'text-accent-foreground', border: 'border-accent' },
-  email: { bg: 'bg-blue-500/10', text: 'text-blue-600', border: 'border-blue-500/30' },
-  sms: { bg: 'bg-green-500/10', text: 'text-green-600', border: 'border-green-500/30' },
-  call: { bg: 'bg-purple-500/10', text: 'text-purple-600', border: 'border-purple-500/30' },
+  email: { bg: 'bg-info/15', text: 'text-info', border: 'border-info/30' },
+  sms: { bg: 'bg-success/15', text: 'text-success', border: 'border-success/30' },
+  call: { bg: 'bg-primary/15', text: 'text-primary', border: 'border-primary/30' },
   task: { bg: 'bg-warning/10', text: 'text-warning', border: 'border-warning/30' },
 };
 
@@ -429,13 +429,13 @@ export function ActivityFeedWidget({
             {(emailEngagementCounts.opened > 0 || emailEngagementCounts.clicked > 0) && (
               <div className="flex items-center gap-2">
                 {emailEngagementCounts.opened > 0 && (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-600 text-xs font-medium">
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-wow-cyan/15 text-wow-cyan text-xs font-medium">
                     <Eye className="h-3 w-3" />
                     <span>{emailEngagementCounts.opened}</span>
                   </div>
                 )}
                 {emailEngagementCounts.clicked > 0 && (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-medium">
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/15 text-success text-xs font-medium">
                     <MousePointerClick className="h-3 w-3" />
                     <span>{emailEngagementCounts.clicked}</span>
                   </div>
@@ -587,7 +587,7 @@ export function ActivityFeedWidget({
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="text-blue-500">
+                                <span className="text-info">
                                   <Eye className="h-3 w-3" />
                                 </span>
                               </TooltipTrigger>
@@ -601,7 +601,7 @@ export function ActivityFeedWidget({
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="text-purple-500">
+                                <span className="text-primary">
                                   <MousePointerClick className="h-3 w-3" />
                                 </span>
                               </TooltipTrigger>
@@ -625,7 +625,7 @@ export function ActivityFeedWidget({
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className="text-green-500">
+                              <span className="text-success">
                                 <CheckCheck className="h-3.5 w-3.5" />
                               </span>
                             </TooltipTrigger>

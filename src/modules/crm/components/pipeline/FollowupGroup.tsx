@@ -35,14 +35,14 @@ const followupConfig = {
   in_sequence: {
     label: 'Rappel en cours',
     icon: Zap,
-    className: 'text-purple-600',
-    bgClassName: 'bg-purple-100',
+    className: 'text-primary',
+    bgClassName: 'bg-primary/15',
   },
   needs_contact: {
     label: 'À contacter',
     icon: Phone,
-    className: 'text-orange-600',
-    bgClassName: 'bg-orange-100',
+    className: 'text-warning',
+    bgClassName: 'bg-warning/15',
   },
 };
 
@@ -79,7 +79,7 @@ export function FollowupGroup({ followupType, patients, stageId, activeEnrollmen
           ref={setNodeRef}
           className={cn(
             'ml-4 pl-3 border-l-2 border-border/50 space-y-2 min-h-[60px] transition-colors duration-200 rounded-r-lg',
-            isOver && 'border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/20'
+            isOver && 'border-l-primary bg-primary/5'
           )}
         >
           <SortableContext

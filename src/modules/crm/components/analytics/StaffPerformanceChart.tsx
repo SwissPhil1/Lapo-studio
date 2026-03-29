@@ -87,11 +87,11 @@ export function StaffPerformanceChart({ dateRange }: StaffPerformanceChartProps)
   }
 
   const colors = [
-    'hsl(173, 58%, 39%)',
-    'hsl(173, 58%, 45%)',
-    'hsl(173, 58%, 52%)',
-    'hsl(173, 58%, 58%)',
-    'hsl(173, 58%, 65%)',
+    '#7C3AED', // violet
+    '#FF2E93', // pink
+    '#06B6D4', // cyan
+    '#FF6B6B', // coral
+    '#BFFF00', // lime
   ];
 
   return (

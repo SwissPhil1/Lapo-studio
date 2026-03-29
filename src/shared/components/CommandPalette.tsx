@@ -214,10 +214,10 @@ export function CommandPalette() {
       />
 
       {/* Palette */}
-      <div className="relative w-full max-w-lg rounded-xl border border-studio-border bg-studio-card shadow-2xl">
+      <div className="relative w-full max-w-lg rounded-xl border border-border bg-card shadow-2xl">
         {/* Input */}
-        <div className="flex items-center gap-3 border-b border-studio-border px-4">
-          <Search className="h-5 w-5 text-studio-muted" />
+        <div className="flex items-center gap-3 border-b border-border px-4">
+          <Search className="h-5 w-5 text-muted-foreground" />
           <input
             ref={inputRef}
             value={query}
@@ -227,9 +227,9 @@ export function CommandPalette() {
             }}
             onKeyDown={handleInputKeyDown}
             placeholder={t('commandPalette.placeholder')}
-            className="h-14 flex-1 bg-transparent text-studio-text placeholder:text-studio-muted outline-none"
+            className="h-14 flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none"
           />
-          <kbd className="rounded border border-studio-border px-1.5 py-0.5 text-[10px] text-studio-muted">
+          <kbd className="rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
             ESC
           </kbd>
         </div>
@@ -237,13 +237,13 @@ export function CommandPalette() {
         {/* Results */}
         <div className="max-h-80 overflow-y-auto p-2">
           {filtered.length === 0 ? (
-            <p className="p-4 text-center text-sm text-studio-muted">
+            <p className="p-4 text-center text-sm text-muted-foreground">
               {t('commandPalette.noResults')}
             </p>
           ) : (
             sections.map((section) => (
               <div key={section}>
-                <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-studio-muted">
+                <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {section}
                 </p>
                 {filtered
@@ -258,8 +258,8 @@ export function CommandPalette() {
                         className={cn(
                           'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                           idx === selected
-                            ? 'bg-wow-violet/20 text-studio-text'
-                            : 'text-studio-muted hover:text-studio-text'
+                            ? 'bg-primary/15 text-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
                         )}
                       >
                         {cmd.icon}

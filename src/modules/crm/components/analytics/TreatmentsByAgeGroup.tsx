@@ -89,11 +89,11 @@ export function TreatmentsByAgeGroup() {
   }
 
   const colors = [
-    'hsl(173, 58%, 39%)',
-    'hsl(210, 65%, 55%)',
-    'hsl(330, 65%, 55%)',
-    'hsl(38, 92%, 50%)',
-    'hsl(152, 69%, 40%)',
+    '#7C3AED', // violet
+    '#FF2E93', // pink
+    '#06B6D4', // cyan
+    '#FF6B6B', // coral
+    '#BFFF00', // lime
   ];
 
   return (

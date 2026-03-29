@@ -11,10 +11,10 @@ const GENDER_LABELS: Record<string, string> = {
 };
 
 const COLORS = {
-  female: 'hsl(330, 65%, 55%)',
-  male: 'hsl(210, 65%, 55%)',
-  other: 'hsl(173, 58%, 45%)',
-  unknown: 'hsl(215, 15%, 65%)',
+  female: '#FF2E93',
+  male: '#06B6D4',
+  other: '#9F5AFF',
+  unknown: '#71717A',
 };
 
 export function GenderDistribution() {

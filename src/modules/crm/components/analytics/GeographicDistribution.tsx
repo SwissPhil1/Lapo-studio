@@ -58,14 +58,14 @@ export function GeographicDistribution() {
   }
 
   const colors = [
-    'hsl(173, 58%, 35%)',
-    'hsl(173, 58%, 40%)',
-    'hsl(173, 58%, 45%)',
-    'hsl(173, 58%, 50%)',
-    'hsl(173, 58%, 55%)',
-    'hsl(173, 58%, 60%)',
-    'hsl(173, 58%, 65%)',
-    'hsl(173, 58%, 70%)',
+    '#7C3AED', // violet
+    '#FF2E93', // pink
+    '#06B6D4', // cyan
+    '#FF6B6B', // coral
+    '#BFFF00', // lime
+    '#9F5AFF', // violet-light
+    '#FF5CAD', // pink-light
+    '#22D3EE', // cyan-light
   ];
 
   return (

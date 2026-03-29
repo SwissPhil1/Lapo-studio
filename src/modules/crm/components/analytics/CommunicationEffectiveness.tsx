@@ -29,28 +29,28 @@ export function CommunicationEffectiveness({ dateRange }: CommunicationEffective
           name: 'Délivrés', 
           value: total > 0 ? Math.round((delivered / total) * 100) : 0,
           count: delivered,
-          color: 'hsl(173, 58%, 39%)',
+          color: '#7C3AED',
           icon: CheckCircle,
         },
         { 
           name: 'Ouverts', 
           value: delivered > 0 ? Math.round((opened / delivered) * 100) : 0,
           count: opened,
-          color: 'hsl(173, 58%, 50%)',
+          color: '#06B6D4',
           icon: Mail,
         },
         { 
           name: 'Cliqués', 
           value: opened > 0 ? Math.round((clicked / opened) * 100) : 0,
           count: clicked,
-          color: 'hsl(152, 69%, 40%)',
+          color: '#22C55E',
           icon: MousePointer,
         },
         { 
           name: 'Rebonds', 
           value: total > 0 ? Math.round((bounced / total) * 100) : 0,
           count: bounced,
-          color: 'hsl(0, 72%, 51%)',
+          color: '#FF6B6B',
           icon: AlertTriangle,
         },
       ];
@@ -132,7 +132,7 @@ export function CommunicationEffectiveness({ dateRange }: CommunicationEffective
                 borderRadius: '8px',
               }}
             />
-            <Bar dataKey="count" fill="hsl(173, 58%, 39%)" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="count" fill="#7C3AED" radius={[2, 2, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

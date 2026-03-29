@@ -37,10 +37,10 @@ export function UserMenu() {
         onClick={() => setOpen(!open)}
         className={cn(
           'flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-colors',
-          'hover:bg-studio-hover'
+          'hover:bg-accent'
         )}
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-wow-violet text-xs font-bold text-white">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
           {user.avatar_url ? (
             <img
               src={user.avatar_url}
@@ -52,21 +52,21 @@ export function UserMenu() {
           )}
         </div>
         <div className="flex-1 text-left">
-          <p className="text-sm font-medium text-studio-text truncate">
+          <p className="text-sm font-medium text-foreground truncate">
             {user.full_name}
           </p>
-          <p className="text-xs text-studio-muted capitalize">{role}</p>
+          <p className="text-xs text-muted-foreground capitalize">{role}</p>
         </div>
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-lg border border-studio-border bg-studio-card p-1 shadow-xl">
+        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-lg border border-border bg-card p-1 shadow-xl">
           <button
             onClick={() => {
               navigate('/settings/profile')
               setOpen(false)
             }}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-studio-muted hover:bg-studio-hover hover:text-studio-text"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             <User className="h-4 w-4" />
             {t('nav.profile')}
@@ -76,15 +76,15 @@ export function UserMenu() {
               navigate('/settings')
               setOpen(false)
             }}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-studio-muted hover:bg-studio-hover hover:text-studio-text"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             <Settings className="h-4 w-4" />
             {t('nav.settings')}
           </button>
-          <div className="my-1 border-t border-studio-border" />
+          <div className="my-1 border-t border-border" />
           <button
             onClick={() => signOut()}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-500/10"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
           >
             <LogOut className="h-4 w-4" />
             {t('nav.signOut')}

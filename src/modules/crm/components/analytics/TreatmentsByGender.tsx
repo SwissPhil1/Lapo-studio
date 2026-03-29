@@ -97,12 +97,12 @@ export function TreatmentsByGender() {
         />
         <Bar 
           dataKey="Femmes" 
-          fill="hsl(330, 65%, 55%)"
+          fill="#FF2E93"
           radius={[4, 4, 0, 0]}
         />
         <Bar 
           dataKey="Hommes" 
-          fill="hsl(210, 65%, 55%)"
+          fill="#06B6D4"
           radius={[4, 4, 0, 0]}
         />
       </BarChart>

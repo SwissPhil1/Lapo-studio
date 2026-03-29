@@ -18,30 +18,30 @@ export default function SettingsPage() {
 
       <div className="space-y-4">
         {/* Profile */}
-        <div className="rounded-xl border border-studio-border bg-studio-card p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <h2 className="mb-4 text-lg font-semibold">{t('nav.profile')}</h2>
           <div className="space-y-2 text-sm">
             <p>
-              <span className="text-studio-muted">Name:</span>{' '}
-              <span className="text-studio-text">{user?.full_name ?? '—'}</span>
+              <span className="text-muted-foreground">Name:</span>{' '}
+              <span className="text-foreground">{user?.full_name ?? '—'}</span>
             </p>
             <p>
-              <span className="text-studio-muted">Email:</span>{' '}
-              <span className="text-studio-text">{user?.email ?? '—'}</span>
+              <span className="text-muted-foreground">Email:</span>{' '}
+              <span className="text-foreground">{user?.email ?? '—'}</span>
             </p>
             <p>
-              <span className="text-studio-muted">Role:</span>{' '}
-              <span className="capitalize text-studio-text">{user?.role ?? '—'}</span>
+              <span className="text-muted-foreground">Role:</span>{' '}
+              <span className="capitalize text-foreground">{user?.role ?? '—'}</span>
             </p>
           </div>
         </div>
 
         {/* Language */}
-        <div className="rounded-xl border border-studio-border bg-studio-card p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <h2 className="mb-4 text-lg font-semibold">Language</h2>
           <button
             onClick={toggleLang}
-            className="flex items-center gap-2 rounded-lg border border-studio-border px-4 py-2 text-sm text-studio-text hover:bg-studio-hover"
+            className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm text-foreground hover:bg-accent"
           >
             <Globe className="h-4 w-4" />
             {i18n.language === 'en' ? 'Switch to French' : 'Passer en anglais'}
