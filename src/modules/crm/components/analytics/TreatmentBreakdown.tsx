@@ -1,8 +1,7 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { subDays, subMonths } from 'date-fns';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Loader2 } from 'lucide-react';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 
@@ -110,7 +109,7 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
               paddingAngle={2}
               dataKey="revenue"
             >
-              {chartData.map((entry, index) => (
+              {chartData.map((_entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -120,7 +119,7 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: number) => [`${value.toLocaleString()}€`, 'Revenus']}
+              formatter={(value: any) => [`${value.toLocaleString()}€`, 'Revenus']}
             />
           </PieChart>
         </ResponsiveContainer>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import {
@@ -247,7 +246,7 @@ export function SatisfactionAnalytics() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value: number) => [`${value}`, 'NPS']}
+                formatter={(value: any) => [`${value}`, 'NPS']}
               />
               <Line
                 type="monotone"
@@ -286,7 +285,7 @@ export function SatisfactionAnalytics() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: number) => [`${value}`, 'R\u00e9ponses']}
+              formatter={(value: any) => [`${value}`, 'R\u00e9ponses']}
             />
             <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
           </BarChart>

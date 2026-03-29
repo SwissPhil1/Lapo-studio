@@ -47,7 +47,7 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: segments = [], isLoading } = useQuery({
+  const { data: segments = [] } = useQuery({
     queryKey: ['crm_segments'],
     queryFn: async () => {
       const { data, error } = await supabase

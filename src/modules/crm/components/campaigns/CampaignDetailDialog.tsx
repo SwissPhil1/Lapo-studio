@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Check, Eye, MousePointerClick, AlertTriangle, Clock } from 'lucide-react';
-import { CampaignWithMetrics } from './CampaignTable';
+import type { CampaignWithMetrics } from './CampaignTable';
 
 interface CampaignDetailDialogProps {
   open: boolean;

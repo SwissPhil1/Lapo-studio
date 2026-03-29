@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useNavigate } from 'react-router-dom';
@@ -40,7 +40,7 @@ function getPriorityInfo(priority: string | number | null): { label: string; cla
 }
 
 export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
-  function PipelineCard({ patient, hasActiveWorkflow = false }, ref) {
+  function PipelineCard({ patient, hasActiveWorkflow = false }, _ref) {
     const navigate = useNavigate();
     
     const {

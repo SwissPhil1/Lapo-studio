@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -39,7 +38,7 @@ export function PatientRetentionMetrics() {
 
       const avgIntervals: number[] = [];
 
-      patientBookings.forEach((dates, patientId) => {
+      patientBookings.forEach((dates, _patientId) => {
         const sortedDates = dates.sort((a, b) => a.getTime() - b.getTime());
         const firstBooking = sortedDates[0];
         const lastBooking = sortedDates[sortedDates.length - 1];

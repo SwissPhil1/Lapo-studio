@@ -1,4 +1,4 @@
-import { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
+import type { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
 import { REPORT_SOURCES, RELATIVE_PERIODS } from '@/shared/lib/reportSources';
 import { ReportChart } from './ReportChart';
 import { Skeleton } from '@/components/ui/skeleton';

@@ -9,7 +9,7 @@ import { SendMessageDialog } from '@/modules/crm/components/communications/SendM
 import { CommunicationItem } from '@/modules/crm/components/communications/CommunicationItem';
 import { CommunicationMetrics } from '@/modules/crm/components/communications/CommunicationMetrics';
 import { CommunicationFilters } from '@/modules/crm/components/communications/CommunicationFilters';
-import { CommunicationLog, ChannelFilter, StatusFilter, DirectionFilter, PeriodFilter } from '@/shared/types/communications';
+import type { CommunicationLog, ChannelFilter, StatusFilter, DirectionFilter, PeriodFilter } from '@/shared/types/communications';
 import { useDebounce } from '@/shared/hooks/useDebounce';
 
 const ITEMS_PER_PAGE = 50;

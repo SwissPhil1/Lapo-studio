@@ -1,13 +1,8 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Loader2 } from 'lucide-react';
 
-const GENDER_LABELS: Record<string, string> = {
-  female: 'Femmes',
-  male: 'Hommes',
-};
 
 export function TreatmentsByGender() {
   const { data, isLoading } = useQuery({

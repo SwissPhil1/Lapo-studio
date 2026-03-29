@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalendarDay } from './CalendarDay';
 import { useCalendarBookings, type BookingsByDate } from '@/shared/hooks/useCalendarBookings';
-import { BOOKING_STATUS_LABELS_FR, BOOKING_STATUS_COLORS } from '@/shared/lib/bookingStatus';
+
 
 interface InternalCalendarProps {
   defaultView?: 'month' | 'week';

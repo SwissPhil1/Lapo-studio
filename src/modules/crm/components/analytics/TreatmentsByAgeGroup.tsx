@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -11,13 +10,7 @@ const AGE_GROUPS = [
   { label: '50+', min: 50, max: 150 },
 ];
 
-const TREATMENT_COLORS: Record<string, string> = {
-  'Botox': 'hsl(173, 58%, 39%)',
-  'Filler': 'hsl(210, 65%, 55%)',
-  'Laser': 'hsl(330, 65%, 55%)',
-  'Peeling': 'hsl(38, 92%, 50%)',
-  'Autre': 'hsl(152, 69%, 40%)',
-};
+
 
 export function TreatmentsByAgeGroup() {
   const { data, isLoading } = useQuery({

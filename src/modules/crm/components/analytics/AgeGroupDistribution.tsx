@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -101,7 +100,7 @@ export function AgeGroupDistribution() {
               border: '1px solid hsl(var(--border))',
               borderRadius: '8px',
             }}
-            formatter={(value: number, name: string, props: any) => [
+            formatter={(value: any, _name: any, props: any) => [
               `${value} patients (${props.payload.percentage}%)`,
               'Patients'
             ]}

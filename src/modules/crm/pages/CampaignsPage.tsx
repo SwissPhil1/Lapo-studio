@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
@@ -9,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Search, Plus, Megaphone, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { CampaignMetrics } from '@/modules/crm/components/campaigns/CampaignMetrics';
-import { CampaignTable } from '@/modules/crm/components/campaigns/CampaignTable';
+import { CampaignTable, type CampaignWithMetrics } from '@/modules/crm/components/campaigns/CampaignTable';
 import { CampaignDetailDialog } from '@/modules/crm/components/campaigns/CampaignDetailDialog';
 import { useNavigate } from 'react-router-dom';
 
@@ -37,7 +36,7 @@ const CAMPAIGNS_PER_PAGE = 20;
 export default function Campaigns() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<CampaignWithMetrics | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -133,15 +132,15 @@ export default function Campaigns() {
     }
   });
 
-  const handleDuplicate = (campaign: Campaign) => {
-    duplicateMutation.mutate(campaign);
+  const handleDuplicate = (campaign: CampaignWithMetrics) => {
+    duplicateMutation.mutate(campaign as Campaign);
   };
 
   const handleArchive = (campaignId: string) => {
     archiveMutation.mutate(campaignId);
   };
 
-  const handleViewDetails = (campaign: Campaign) => {
+  const handleViewDetails = (campaign: CampaignWithMetrics) => {
     setSelectedCampaign(campaign);
     setDetailOpen(true);
   };

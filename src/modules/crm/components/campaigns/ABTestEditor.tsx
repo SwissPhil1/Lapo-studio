@@ -22,7 +22,7 @@ interface ABTestEditorProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function ABTestEditor({ campaignId, channel, onSave, open, onOpenChange }: ABTestEditorProps) {
+export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, onOpenChange }: ABTestEditorProps) {
   const [subjectA, setSubjectA] = useState('');
   const [messageA, setMessageA] = useState('');
   const [subjectB, setSubjectB] = useState('');

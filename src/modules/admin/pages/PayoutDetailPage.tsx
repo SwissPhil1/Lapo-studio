@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/shared/lib/supabase";
-import { DataTable, Column } from "@/modules/admin/components/DataTable";
+import { DataTable, type Column } from "@/modules/admin/components/DataTable";
 import { StatusBadge } from "@/modules/admin/components/StatusBadge";
 import { formatCurrency, formatDate } from "@/shared/lib/format";
 import { toNumber } from "@/shared/lib/toNumber";
@@ -411,7 +411,7 @@ export default function PayoutDetail() {
       const pageHeight = doc.internal.pageSize.getHeight();
       const pageWidth = doc.internal.pageSize.getWidth();
       const margin = 20;
-      const contentWidth = pageWidth - 2 * margin;
+
 
       // Header - Apple-style minimal
       doc.setFontSize(24);
@@ -434,7 +434,7 @@ export default function PayoutDetail() {
       doc.setFont("helvetica", "normal");
 
       // Process each referrer with minimal cards
-      Array.from(aggregatedByReferrer.entries()).forEach(([referrerId, totalAmount], index) => {
+      Array.from(aggregatedByReferrer.entries()).forEach(([referrerId, totalAmount], _index) => {
         const referrer = referrerMap.get(referrerId);
         if (!referrer) return;
 

@@ -1,4 +1,4 @@
-import { ReferralStatus, CommissionStatus, PayoutBatchStatus, LapoCashTransactionType, BookingStatus } from "./statusTypes";
+import type { ReferralStatus, CommissionStatus, PayoutBatchStatus, LapoCashTransactionType, BookingStatus } from "./statusTypes";
 
 /**
  * Central configuration for status badge variants (colors)

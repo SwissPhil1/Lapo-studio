@@ -4,7 +4,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { Gift, Wallet, TrendingUp, TrendingDown, Settings, HelpCircle, Filter } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -13,15 +12,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { KPICard } from "@/modules/admin/components/KPICard";
-import { DataTable, Column } from "@/modules/admin/components/DataTable";
+import { DataTable, type Column } from "@/modules/admin/components/DataTable";
 import { EmptyState } from "@/modules/admin/components/EmptyState";
 import { StatusBadge } from "@/modules/admin/components/StatusBadge";
-import { formatCurrency, formatDate, formatLapoCash } from "@/shared/lib/format";
+import { formatDate, formatLapoCash } from "@/shared/lib/format";
 import {
   useLapoCashStats,
   useAllLapoCashTransactions,
   useTierConversionRates,
-  LapoCashTransaction,
+  type LapoCashTransaction,
 } from "@/shared/hooks/useLapoCashWallet";
 import { getTierBadgeStyles } from "@/shared/lib/referrerTierBadge";
 

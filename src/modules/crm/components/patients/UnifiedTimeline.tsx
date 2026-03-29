@@ -133,7 +133,6 @@ interface TimelineItemProps {
 }
 
 function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) {
-  const navigate = useNavigate();
   const Icon = eventIcons[event.type] || FileText;
   const colors = eventColors[event.type] || eventColors.note;
   const StatusIcon = event.status ? statusIcons[event.status] : null;

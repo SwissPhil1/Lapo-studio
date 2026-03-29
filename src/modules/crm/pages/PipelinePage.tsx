@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { Loader2, User, Users } from 'lucide-react';
+import { Loader2, User } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   DndContext,
-  DragEndEvent,
+  type DragEndEvent,
   DragOverlay,
-  DragStartEvent,
+  type DragStartEvent,
   closestCenter,
   PointerSensor,
   useSensor,

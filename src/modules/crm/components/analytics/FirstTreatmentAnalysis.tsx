@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -129,7 +128,7 @@ export function FirstTreatmentAnalysis() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: number) => [`${value} patients`, 'Premiers RDV']}
+              formatter={(value: any) => [`${value} patients`, 'Premiers RDV']}
               labelFormatter={(_, payload) => payload?.[0]?.payload?.fullName || ''}
             />
             <Bar dataKey="count" radius={[0, 4, 4, 0]}>

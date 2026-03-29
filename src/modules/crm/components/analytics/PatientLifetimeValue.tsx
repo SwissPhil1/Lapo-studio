@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -172,7 +171,7 @@ export function PatientLifetimeValue() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value: number) => [formatCurrency(value), 'LTV moyen']}
+                formatter={(value: any) => [formatCurrency(value), 'LTV moyen']}
               />
               <Bar dataKey="ltv" radius={[4, 4, 0, 0]}>
                 {data.genderData.map((entry, index) => (
@@ -206,7 +205,7 @@ export function PatientLifetimeValue() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value: number) => [formatCurrency(value), 'LTV moyen']}
+                formatter={(value: any) => [formatCurrency(value), 'LTV moyen']}
               />
               <Bar dataKey="ltv" radius={[4, 4, 0, 0]}>
                 {data.ageData.map((entry, index) => (

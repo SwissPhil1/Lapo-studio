@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/shared/lib/utils';
-import { CommunicationLog, channelLabels, statusColors, statusLabels } from '@/shared/types/communications';
+import { type CommunicationLog, channelLabels, statusColors, statusLabels } from '@/shared/types/communications';
 
 interface CommunicationItemProps {
   communication: CommunicationLog;

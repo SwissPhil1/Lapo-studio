@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -245,7 +244,7 @@ export function ROICalculator() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value: number, name: string) => [formatCHF(value), name]}
+                formatter={(value: any, name: any) => [formatCHF(value), name]}
               />
               <Legend />
               <Bar dataKey="Co\u00fbt/Lead" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />

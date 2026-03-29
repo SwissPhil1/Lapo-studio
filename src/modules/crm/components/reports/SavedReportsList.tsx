@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { CustomReport, ReportConfig } from '@/shared/types/reports';
+import type { CustomReport, ReportConfig } from '@/shared/types/reports';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Star, StarOff, Trash2, ExternalLink, BarChart3, LineChart, PieChart, Table, AreaChart } from 'lucide-react';
@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Json } from '@/shared/types/supabase';
+
 
 const chartIcons: Record<string, React.ElementType> = {
   bar: BarChart3,

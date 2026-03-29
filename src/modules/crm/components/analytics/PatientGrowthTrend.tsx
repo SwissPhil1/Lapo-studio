@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -93,7 +92,7 @@ export function PatientGrowthTrend({ months = 12 }: PatientGrowthTrendProps) {
             border: '1px solid hsl(var(--border))',
             borderRadius: '8px',
           }}
-          formatter={(value: number, name: string) => [
+          formatter={(value: any, name: any) => [
             value,
             name === 'nouveaux' ? 'Nouveaux patients' : 'Total cumulé'
           ]}

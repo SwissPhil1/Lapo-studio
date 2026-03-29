@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/shared/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,7 +42,7 @@ import {
 import { formatCurrency, formatDate, formatLapoCash } from "@/shared/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/modules/admin/components/StatusBadge";
-import { DataTable, Column } from "@/modules/admin/components/DataTable";
+import { DataTable, type Column } from "@/modules/admin/components/DataTable";
 import { toast } from "sonner";
 import { ReferrerActivityDot } from "@/modules/admin/components/ReferrerActivityDot";
 import { PayoutProfileIndicator } from "@/modules/admin/components/PayoutProfileIndicator";

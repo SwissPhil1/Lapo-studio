@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
+import type { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
 import { REPORT_SOURCES } from '@/shared/lib/reportSources';
 import {
   BarChart,
@@ -113,14 +112,14 @@ export function ReportChart({ config, data }: ReportChartProps) {
             cx="50%"
             cy="50%"
             outerRadius={150}
-            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+            label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
           >
             {data.map((_, index) => (
               <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number) => formatValue(value, primaryMetric)}
+            formatter={(value: any) => formatValue(value, primaryMetric)}
           />
           <Legend />
         </PieChart>
@@ -154,7 +153,7 @@ export function ReportChart({ config, data }: ReportChartProps) {
             border: '1px solid hsl(var(--border))',
             borderRadius: '8px',
           }}
-          formatter={(value: number, name: string) => [
+          formatter={(value: any, name: any) => [
             formatValue(value, name),
             getMetricLabel(name),
           ]}

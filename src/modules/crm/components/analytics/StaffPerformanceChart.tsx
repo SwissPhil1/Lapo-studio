@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -120,7 +119,7 @@ export function StaffPerformanceChart({ dateRange }: StaffPerformanceChartProps)
               border: '1px solid hsl(var(--border))',
               borderRadius: '8px',
             }}
-            formatter={(value: number, name: string) => [formatCurrency(value), 'Revenus']}
+            formatter={(value: any, _name: any) => [formatCurrency(value), 'Revenus']}
             labelFormatter={(label) => label}
           />
           <Bar dataKey="revenue" radius={[0, 4, 4, 0]}>

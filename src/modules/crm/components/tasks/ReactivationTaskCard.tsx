@@ -28,9 +28,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  ReactivationTask, 
-  TaskOutcome,
+import {
+  type ReactivationTask,
+  type TaskOutcome,
   useCompleteTask,
   useSnoozeTask,
   useLogAttempt

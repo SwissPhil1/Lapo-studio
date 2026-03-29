@@ -1,4 +1,4 @@
-import { ReportSources } from '@/shared/types/reports';
+import type { ReportSources } from '@/shared/types/reports';
 
 export const REPORT_SOURCES: ReportSources = {
   bookings: {

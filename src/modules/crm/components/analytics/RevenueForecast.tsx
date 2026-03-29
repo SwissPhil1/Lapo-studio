@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import {
@@ -24,26 +23,18 @@ interface PipelineSnapshot {
   conversion_probability: number;
 }
 
-interface PipelineStage {
-  id: string;
-  name: string;
-  order_index: number;
-}
-
 export function RevenueForecast() {
   const { data, isLoading } = useQuery({
     queryKey: ['revenue-forecast'],
     queryFn: async () => {
       // Fetch pipeline stages
-      const { data: stages, error: stagesError } = await supabase
+      const { error: stagesError } = await supabase
         .from('pipeline_stages')
         .select('id, name, order_index')
         .eq('is_active', true)
         .order('order_index');
 
       if (stagesError) throw stagesError;
-      const typedStages = (stages || []) as PipelineStage[];
-
       // Fetch pipeline snapshots
       const { data: snapshots, error: snapshotsError } = await supabase
         .from('crm_pipeline_snapshots')
@@ -250,7 +241,7 @@ export function RevenueForecast() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value: number) => [formatCHF(value), 'Valeur']}
+                formatter={(value: any) => [formatCHF(value), 'Valeur']}
               />
               <Line
                 type="monotone"

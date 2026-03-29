@@ -36,9 +36,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { useCreateReactivationTask, TaskPriority } from '@/shared/hooks/useReactivationTasks';
+import { useCreateReactivationTask, type TaskPriority } from '@/shared/hooks/useReactivationTasks';
 import { toast } from 'sonner';
-import { cn } from '@/shared/lib/utils';
+
 
 interface StaffMember {
   id: string;

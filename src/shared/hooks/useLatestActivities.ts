@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/shared/lib/supabase";
-import { ActivityItem, ActivityCategory } from "@/shared/types/activity";
+import type { ActivityItem, ActivityCategory } from "@/shared/types/activity";
 
 export function useLatestActivities(limit = 10) {
   return useQuery({

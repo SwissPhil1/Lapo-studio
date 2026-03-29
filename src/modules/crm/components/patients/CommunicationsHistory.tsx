@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { Mail, Phone, MessageSquare, CheckCircle, AlertCircle, Eye, Clock } from 'lucide-react';
+import { Mail, Phone, MessageSquare, CheckCircle, Eye, Clock } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';

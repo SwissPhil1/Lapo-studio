@@ -2,7 +2,7 @@ import { Search, Filter, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChannelFilter, StatusFilter, DirectionFilter, PeriodFilter } from '@/shared/types/communications';
+import type { ChannelFilter, StatusFilter, DirectionFilter, PeriodFilter } from '@/shared/types/communications';
 
 interface CommunicationFiltersProps {
   searchQuery: string;

@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { format, subDays, subMonths, eachDayOfInterval, eachMonthOfInterval, parseISO, startOfDay, startOfMonth } from 'date-fns';
+import { format, subDays, subMonths, eachDayOfInterval, eachMonthOfInterval, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader2 } from 'lucide-react';
@@ -136,7 +135,7 @@ export function RevenueChart({ dateRange }: RevenueChartProps) {
               borderRadius: '8px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             }}
-            formatter={(value: number) => [`${value.toLocaleString()}€`, 'Revenus']}
+            formatter={(value: any) => [`${value.toLocaleString()}€`, 'Revenus']}
             labelFormatter={(label) => label}
           />
           <Area

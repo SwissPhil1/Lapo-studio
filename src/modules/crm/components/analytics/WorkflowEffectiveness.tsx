@@ -1,8 +1,7 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Loader2, Zap, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Loader2, Zap, CheckCircle, Clock } from 'lucide-react';
 import { differenceInDays } from 'date-fns';
 
 interface WorkflowEffectivenessProps {

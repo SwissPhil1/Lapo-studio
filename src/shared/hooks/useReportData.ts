@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
+import type { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
 import { REPORT_SOURCES } from '@/shared/lib/reportSources';
 import { subDays, subMonths, format, startOfMonth, startOfWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';

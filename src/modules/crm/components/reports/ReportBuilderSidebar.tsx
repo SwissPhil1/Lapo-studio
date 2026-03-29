@@ -1,4 +1,4 @@
-import { ReportConfig, ReportSource, ChartType, RelativePeriod } from '@/shared/types/reports';
+import type { ReportConfig, ReportSource, ChartType, RelativePeriod } from '@/shared/types/reports';
 import { REPORT_SOURCES, CHART_TYPES, RELATIVE_PERIODS } from '@/shared/lib/reportSources';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

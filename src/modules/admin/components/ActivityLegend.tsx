@@ -13,7 +13,7 @@ interface ActivityLegendProps {
 }
 
 export function ActivityLegend({ compact = true }: ActivityLegendProps) {
-  const { t, i18n } = useTranslation(["referrers"]);
+  const { i18n } = useTranslation(["referrers"]);
   const isEnglish = i18n.language === "en";
 
   const statuses: ReferrerActivityStatus[] = ["active", "dormant", "cold"];

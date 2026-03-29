@@ -1,8 +1,7 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { Loader2, CheckCircle, AlertCircle, Database } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+
 
 interface FieldStat {
   label: string;

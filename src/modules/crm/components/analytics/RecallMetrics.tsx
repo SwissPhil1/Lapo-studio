@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -179,7 +178,7 @@ export function RecallMetrics() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: number) => [value, 'Patients']}
+              formatter={(value: any) => [value, 'Patients']}
             />
           </PieChart>
         </ResponsiveContainer>

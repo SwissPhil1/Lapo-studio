@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
@@ -141,7 +140,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: number) => [`${value}%`, 'Taux']}
+              formatter={(value: any) => [`${value}%`, 'Taux']}
             />
             <Bar dataKey="rate" fill="hsl(0, 72%, 51%)" radius={[2, 2, 0, 0]} />
           </BarChart>
@@ -171,7 +170,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: number) => [`${value}%`, 'Taux no-show']}
+              formatter={(value: any) => [`${value}%`, 'Taux no-show']}
             />
             <Line 
               type="monotone" 

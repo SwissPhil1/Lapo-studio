@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/shared/lib/supabase";
-import { DataTable, Column } from "@/modules/admin/components/DataTable";
+import { DataTable, type Column } from "@/modules/admin/components/DataTable";
 import { StatusBadge } from "@/modules/admin/components/StatusBadge";
 import { KPICard } from "@/modules/admin/components/KPICard";
 import { EmptyState } from "@/modules/admin/components/EmptyState";
@@ -34,7 +34,6 @@ interface PayoutBatch {
   closed_at: string | null;
 }
 
-type StatusFilter = "open" | "closed" | "all";
 
 export default function Payouts() {
   const { t } = useTranslation(["payouts", "common"]);
@@ -141,7 +140,7 @@ export default function Payouts() {
   });
 
   // Check for payable commissions without batch
-  const { data: payableCommissions } = useQuery({
+  const { data: _payableCommissions } = useQuery({
     queryKey: ["payable-commissions-check"],
     queryFn: async () => {
       const { data: commissions } = await supabase

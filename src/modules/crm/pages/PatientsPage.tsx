@@ -51,9 +51,9 @@ import { BulkEmailDialog } from '@/modules/crm/components/patients/BulkEmailDial
 import { SaveSegmentDialog } from '@/modules/crm/components/patients/SaveSegmentDialog';
 import { CreateCampaignDialog } from '@/modules/crm/components/patients/CreateCampaignDialog';
 import { SavedSegmentsList } from '@/modules/crm/components/patients/SavedSegmentsList';
-import { getOverallRecallStatusWithMappings, getRecallDueDate, getRecallContext, type ServiceMapping, type TreatmentProtocol, type FollowupContext, type RecallContext } from '@/shared/lib/recallUtils';
+import { getOverallRecallStatusWithMappings, getRecallContext, type ServiceMapping, type TreatmentProtocol, type FollowupContext } from '@/shared/lib/recallUtils';
 import { isBookingForRecall, isPastBookingUnprocessed, BOOKING_STATUS } from '@/shared/lib/bookingStatus';
-import { differenceInDays } from 'date-fns';
+
 
 type PatientFilter = 'all' | 'to_contact' | 'in_followup' | 'scheduled' | 'new_leads' | 'overdue';
 
@@ -352,7 +352,7 @@ export default function Patients() {
         query = query.or(`first_name.ilike.%${debouncedSearch}%,last_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`);
       }
 
-      const { data: patientsData, error: patientsError, count } = await query;
+      const { data: patientsData, error: patientsError } = await query;
       if (patientsError) throw patientsError;
 
       if (!patientsData || patientsData.length === 0) {
@@ -409,11 +409,6 @@ export default function Patients() {
       const pipelineData = pipelineResult.data;
       const communicationsData = communicationsResult.data;
       const snoozedTasksData = snoozedTasksResult.data;
-
-      const today = new Date().toISOString().split('T')[0];
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-      const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0];
 
       // Map data together
       const enrichedPatients: PatientWithDetails[] = patientsData.map(patient => {
@@ -617,7 +612,7 @@ export default function Patients() {
   };
 
   const allSelected = patients.length > 0 && patients.every(p => selectedPatientIds.has(p.id));
-  const someSelected = selectedPatientIds.size > 0;
+
 
   // Check if segment filter is active
   const isSegmentActive = !!staticPatientIds || !!aiSearchResults;

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/shared/lib/supabase";
-import { DataTable, Column } from "@/modules/admin/components/DataTable";
+import { DataTable, type Column } from "@/modules/admin/components/DataTable";
 import { StatusBadge } from "@/modules/admin/components/StatusBadge";
 import { EmptyState } from "@/modules/admin/components/EmptyState";
 import { QuickFilters } from "@/modules/admin/components/QuickFilters";
@@ -47,7 +47,7 @@ export default function Referrals() {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const { t, i18n } = useTranslation(['referrals', 'common', 'status']);
+  const { t } = useTranslation(['referrals', 'common', 'status']);
 
   const toggleRow = (referralId: string) => {
     setExpandedRows(prev => {

@@ -114,7 +114,7 @@ export default function Analytics() {
   const { start, end } = getDateRange(dateRange);
   
   // Fetch performance metrics
-  const { data: metrics, isLoading: metricsLoading, refetch } = useQuery({
+  const { data: metrics, refetch } = useQuery({
     queryKey: ['analytics-metrics', dateRange],
     queryFn: async () => {
       const startStr = start.toISOString();

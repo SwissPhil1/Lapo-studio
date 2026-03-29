@@ -1,6 +1,6 @@
 import { cn } from "@/shared/lib/utils";
 import { useTranslation } from "react-i18next";
-import { StatusEntityType } from "@/shared/lib/constants/statusTypes";
+import type { StatusEntityType } from "@/shared/lib/constants/statusTypes";
 import { referralStatusVariants, commissionStatusVariants, batchStatusVariants, lapoCashStatusVariants } from "@/shared/lib/constants/statusVariants";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 

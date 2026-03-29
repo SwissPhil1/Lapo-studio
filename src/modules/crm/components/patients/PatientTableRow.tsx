@@ -1,4 +1,4 @@
-import { format, parseISO, differenceInDays } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '@/shared/lib/constants';
 import { fr } from 'date-fns/locale';
 import { Gift, Clock, AlertTriangle, Calendar, AlertCircle } from 'lucide-react';
@@ -121,9 +121,9 @@ function getActionRequiredInfo(
 }
 
 export function PatientTableRow({ 
-  patient, 
+  patient,
   recallStatus,
-  recallDueDate,
+  recallDueDate: _recallDueDate,
   daysOverdue,
   recallContext,
   onClick,

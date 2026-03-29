@@ -3,19 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/shared/lib/supabase";
-import { DataTable, Column } from "@/modules/admin/components/DataTable";
+import { DataTable, type Column } from "@/modules/admin/components/DataTable";
 import { StatusBadge } from "@/modules/admin/components/StatusBadge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Download, Plus, Trash2, Send, Gift } from "lucide-react";
+import { Search, Plus, Trash2, Send, Gift } from "lucide-react";
 import { formatCurrency, formatDate } from "@/shared/lib/format";
 import { toNumber } from "@/shared/lib/toNumber";
 import { toast } from "sonner";
-import { PayoutProfileIndicator } from "@/modules/admin/components/PayoutProfileIndicator";
 import { checkPayoutProfileStatus, formatMissingFields } from "@/shared/lib/payoutProfile";
 import { KPICard } from "@/modules/admin/components/KPICard";
 import { DollarSign } from "lucide-react";
@@ -62,9 +60,6 @@ export default function Commissions() {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [showAddToBatchDialog, setShowAddToBatchDialog] = useState(false);
-  const [selectedBatchId, setSelectedBatchId] = useState<string>("");
   const [isAdding, setIsAdding] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
@@ -119,7 +114,7 @@ export default function Commissions() {
   });
 
   // Fetch commissions
-  const { data: commissions, isLoading, refetch } = useQuery({
+  const { data: commissions, isLoading } = useQuery({
     queryKey: ["commissions", statusFilter],
     queryFn: async () => {
       let query = supabase
@@ -367,15 +362,6 @@ export default function Commissions() {
     });
   }, [commissions]);
 
-  // Apply search filter
-  const filteredPayables = useMemo(() => {
-    return payableCommissions?.filter(
-      (c) =>
-        c.referrer_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.referrer_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.referred_email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [payableCommissions, searchTerm]);
 
   const filteredBlocked = useMemo(() => {
     return blockedCommissions?.filter(

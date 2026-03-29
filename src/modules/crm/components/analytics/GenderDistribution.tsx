@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Loader2 } from 'lucide-react';
 
 const GENDER_LABELS: Record<string, string> = {
@@ -98,7 +97,7 @@ export function GenderDistribution() {
               border: '1px solid hsl(var(--border))',
               borderRadius: '8px',
             }}
-            formatter={(value: number, name: string) => [value, name]}
+            formatter={(value: any, name: any) => [value, name]}
           />
         </PieChart>
       </ResponsiveContainer>

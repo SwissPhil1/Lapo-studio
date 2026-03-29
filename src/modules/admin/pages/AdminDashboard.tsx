@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/shared/lib/supabase";
 
 import { KPICard } from "@/modules/admin/components/KPICard";
-import { DataTable, Column } from "@/modules/admin/components/DataTable";
+import { DataTable, type Column } from "@/modules/admin/components/DataTable";
 import { EmptyState } from "@/modules/admin/components/EmptyState";
 import { Users, DollarSign, RefreshCw, Gift, UserPlus, ArrowRightLeft, ShoppingBag } from "lucide-react";
 import { formatCurrency, formatDate, formatLapoCash } from "@/shared/lib/format";
@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useLatestActivities, filterActivities } from "@/shared/hooks/useLatestActivities";
-import { ActivityCategory, ActivityItem } from "@/shared/types/activity";
+import type { ActivityCategory, ActivityItem } from "@/shared/types/activity";
 import {
   Select,
   SelectContent,

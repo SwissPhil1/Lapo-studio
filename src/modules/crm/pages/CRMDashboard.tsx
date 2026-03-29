@@ -9,7 +9,7 @@ import { useReactivationTaskCounts, useReactivationTasks } from '@/shared/hooks/
 import { ReactivationTaskCard } from '@/modules/crm/components/tasks/ReactivationTaskCard';
 import { CreateTaskDialog } from '@/modules/crm/components/tasks/CreateTaskDialog';
 import { ActivityFeedWidget } from '@/modules/crm/components/dashboard/ActivityFeedWidget';
-import { format, parseISO, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isToday } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
 interface StatCardProps {
   title: string;

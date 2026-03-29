@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/shared/lib/supabase";
-import { DataTable, Column } from "@/modules/admin/components/DataTable";
+import { DataTable, type Column } from "@/modules/admin/components/DataTable";
 import { EmptyState } from "@/modules/admin/components/EmptyState";
 import { ActivityLegend } from "@/modules/admin/components/ActivityLegend";
 import { Input } from "@/components/ui/input";

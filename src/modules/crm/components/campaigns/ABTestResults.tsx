@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
@@ -163,7 +162,7 @@ export function ABTestResults({ campaignId }: ABTestResultsProps) {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: number, name: string) => {
+              formatter={(value: any, name: any) => {
                 const labels: Record<string, string> = {
                   openRateNum: "Taux d'ouverture",
                   clickRateNum: 'Taux de clic',
