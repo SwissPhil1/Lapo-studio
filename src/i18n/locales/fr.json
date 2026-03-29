@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "admin": "Admin",
+    "crm": "CRM",
+    "system": "Système",
+    "dashboard": "Tableau de bord",
+    "referrers": "Référents",
+    "commissions": "Commissions",
+    "payouts": "Versements",
+    "giftLapoCash": "Offrir LAPO Cash",
+    "prizes": "Prix",
+    "crmDashboard": "Tableau de bord CRM",
+    "patients": "Patients",
+    "pipeline": "Pipeline",
+    "appointments": "Rendez-vous",
+    "communications": "Communications",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "signOut": "Se déconnecter",
+    "search": "Rechercher..."
+  },
+  "commandPalette": {
+    "placeholder": "Tapez une commande ou recherchez...",
+    "noResults": "Aucun résultat trouvé."
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "email": "Courriel",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié?",
+    "welcomeBack": "Bon retour",
+    "signInSubtitle": "Connectez-vous à LAPO Studio"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Tableau de bord Admin",
+      "totalReferrers": "Total Référents",
+      "activeReferrers": "Référents Actifs",
+      "totalCommissions": "Total Commissions",
+      "pendingPayouts": "Versements en attente"
+    }
+  },
+  "crm": {
+    "dashboard": {
+      "title": "Tableau de bord CRM",
+      "totalPatients": "Total Patients",
+      "newThisMonth": "Nouveaux ce mois",
+      "appointments": "Rendez-vous",
+      "conversionRate": "Taux de conversion"
+    }
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "noData": "Aucune donnée disponible"
+  }
+}

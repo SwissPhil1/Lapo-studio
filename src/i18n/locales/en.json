@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "admin": "Admin",
+    "crm": "CRM",
+    "system": "System",
+    "dashboard": "Dashboard",
+    "referrers": "Referrers",
+    "commissions": "Commissions",
+    "payouts": "Payouts",
+    "giftLapoCash": "Gift LAPO Cash",
+    "prizes": "Prizes",
+    "crmDashboard": "CRM Dashboard",
+    "patients": "Patients",
+    "pipeline": "Pipeline",
+    "appointments": "Appointments",
+    "communications": "Communications",
+    "settings": "Settings",
+    "profile": "Profile",
+    "signOut": "Sign Out",
+    "search": "Search..."
+  },
+  "commandPalette": {
+    "placeholder": "Type a command or search...",
+    "noResults": "No results found."
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "welcomeBack": "Welcome back",
+    "signInSubtitle": "Sign in to LAPO Studio"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "totalReferrers": "Total Referrers",
+      "activeReferrers": "Active Referrers",
+      "totalCommissions": "Total Commissions",
+      "pendingPayouts": "Pending Payouts"
+    }
+  },
+  "crm": {
+    "dashboard": {
+      "title": "CRM Dashboard",
+      "totalPatients": "Total Patients",
+      "newThisMonth": "New This Month",
+      "appointments": "Appointments",
+      "conversionRate": "Conversion Rate"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "noData": "No data available"
+  }
+}
