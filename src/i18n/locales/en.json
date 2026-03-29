@@ -9,11 +9,14 @@
     "payouts": "Payouts",
     "giftLapoCash": "Gift LAPO Cash",
     "prizes": "Prizes",
+    "referrals": "Referrals",
     "crmDashboard": "CRM Dashboard",
     "patients": "Patients",
     "pipeline": "Pipeline",
     "appointments": "Appointments",
     "communications": "Communications",
+    "analytics": "Analytics",
+    "campaigns": "Campaigns",
     "settings": "Settings",
     "profile": "Profile",
     "signOut": "Sign Out",
@@ -58,6 +61,162 @@
     "edit": "Edit",
     "create": "Create",
     "search": "Search",
-    "noData": "No data available"
+    "noData": "No data available",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "of": "of",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "lapoCash": {
+    "pageTitle": "Gift LAPO Cash",
+    "pageDescription": "Manage LAPO Cash wallets, transactions, and conversion rates",
+    "totalIssued": "Total Issued",
+    "totalRedeemed": "Total Redeemed",
+    "activeBalance": "Active Balance",
+    "ratesByTier": "Rates by Tier",
+    "ratesByTierTooltip": "Conversion rates vary by referrer tier",
+    "allTransactions": "All Transactions",
+    "filterByType": "Filter by type",
+    "allTypes": "All types",
+    "noTransactions": "No transactions yet",
+    "noTransactionsDescription": "LAPO Cash transactions will appear here when referrers earn or redeem their rewards.",
+    "date": "Date",
+    "referrer": "Referrer",
+    "type": "Type",
+    "amount": "Amount",
+    "description": "Description",
+    "credit": "Credit",
+    "debit": "Debit",
+    "walletCard": {
+      "title": "LAPO Cash Wallet",
+      "currentBalance": "Current Balance",
+      "yourRate": "Your Rate",
+      "viewHistory": "View History"
+    },
+    "creditDialog": {
+      "title": "Credit LAPO Cash",
+      "description": "Add LAPO Cash to {{name}}'s wallet",
+      "amountLabel": "Amount",
+      "typeLabel": "Transaction Type",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional note about this transaction",
+      "cancel": "Cancel",
+      "submit": "Credit"
+    },
+    "debitDialog": {
+      "title": "Debit LAPO Cash",
+      "description": "Deduct LAPO Cash from {{name}}'s wallet",
+      "amountLabel": "Amount",
+      "typeLabel": "Transaction Type",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional note about this transaction",
+      "cancel": "Cancel",
+      "submit": "Debit"
+    },
+    "toast": {
+      "creditSuccess": "LAPO Cash credited successfully",
+      "debitSuccess": "LAPO Cash debited successfully"
+    },
+    "transactionTypes": {
+      "commission_conversion": "Commission Conversion",
+      "birthday_gift": "Birthday Gift",
+      "workshop_reward": "Workshop Reward",
+      "referral_bonus": "Referral Bonus",
+      "redemption": "Redemption",
+      "adjustment": "Adjustment",
+      "expiration": "Expiration",
+      "other": "Other"
+    }
+  },
+  "prizes": {
+    "pageTitle": "Prize Management",
+    "pageDescription": "Create and manage prizes that referrers can redeem with LAPO Cash",
+    "createPrize": "Create Prize",
+    "editPrize": "Edit Prize",
+    "noPrizes": "No prizes yet",
+    "noPrizesDescription": "Create your first prize to start rewarding your referrers.",
+    "name": "Name",
+    "cost": "Cost (LAPO Cash)",
+    "category": "Category",
+    "stock": "Stock",
+    "status": "Status",
+    "redeemed": "Redeemed",
+    "description": "Description",
+    "imageUrl": "Image URL",
+    "unlimited": "Unlimited",
+    "active": "Active",
+    "inactive": "Inactive",
+    "outOfStock": "Out of Stock",
+    "categories": {
+      "all": "All Categories",
+      "gift_card": "Gift Cards",
+      "experience": "Experiences",
+      "product": "Products",
+      "discount": "Discounts",
+      "other": "Other"
+    },
+    "dialog": {
+      "createTitle": "Create Prize",
+      "editTitle": "Edit Prize",
+      "nameLabel": "Prize Name",
+      "namePlaceholder": "e.g. CHF 50 Gift Card",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe this prize...",
+      "costLabel": "LAPO Cash Cost",
+      "categoryLabel": "Category",
+      "stockLabel": "Stock Quantity",
+      "stockPlaceholder": "Leave empty for unlimited",
+      "imageLabel": "Image URL",
+      "imagePlaceholder": "https://...",
+      "activeLabel": "Active",
+      "save": "Save Prize",
+      "create": "Create Prize"
+    },
+    "toast": {
+      "created": "Prize created successfully",
+      "updated": "Prize updated successfully",
+      "deleted": "Prize deleted successfully",
+      "deleteConfirm": "Are you sure you want to delete this prize?"
+    },
+    "stats": {
+      "totalPrizes": "Total Prizes",
+      "totalRedemptions": "Total Redemptions",
+      "activePrizes": "Active Prizes",
+      "lapoCashSpent": "LAPO Cash Spent"
+    }
+  },
+  "status": {
+    "referral": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "commission": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "cancelled": "Cancelled",
+      "reversed": "Reversed",
+      "converted": "Converted"
+    },
+    "batch": {
+      "open": "Open",
+      "closed": "Closed",
+      "paid": "Paid"
+    },
+    "lapoCash": {
+      "commission_conversion": "Conversion",
+      "birthday_gift": "Birthday Gift",
+      "workshop_reward": "Workshop Reward",
+      "referral_bonus": "Referral Bonus",
+      "redemption": "Redemption",
+      "adjustment": "Adjustment",
+      "expiration": "Expiration",
+      "other": "Other"
+    }
   }
 }

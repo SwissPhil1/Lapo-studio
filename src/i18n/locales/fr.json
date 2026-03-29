@@ -9,11 +9,14 @@
     "payouts": "Versements",
     "giftLapoCash": "Offrir LAPO Cash",
     "prizes": "Prix",
+    "referrals": "Parrainages",
     "crmDashboard": "Tableau de bord CRM",
     "patients": "Patients",
     "pipeline": "Pipeline",
     "appointments": "Rendez-vous",
     "communications": "Communications",
+    "analytics": "Analytique",
+    "campaigns": "Campagnes",
     "settings": "Paramètres",
     "profile": "Profil",
     "signOut": "Se déconnecter",
@@ -58,6 +61,162 @@
     "edit": "Modifier",
     "create": "Créer",
     "search": "Rechercher",
-    "noData": "Aucune donnée disponible"
+    "noData": "Aucune donnée disponible",
+    "actions": "Actions",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "of": "de",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "lapoCash": {
+    "pageTitle": "Offrir LAPO Cash",
+    "pageDescription": "Gérez les portefeuilles LAPO Cash, transactions et taux de conversion",
+    "totalIssued": "Total Émis",
+    "totalRedeemed": "Total Échangé",
+    "activeBalance": "Solde Actif",
+    "ratesByTier": "Taux par Niveau",
+    "ratesByTierTooltip": "Les taux de conversion varient selon le niveau du référent",
+    "allTransactions": "Toutes les Transactions",
+    "filterByType": "Filtrer par type",
+    "allTypes": "Tous les types",
+    "noTransactions": "Aucune transaction",
+    "noTransactionsDescription": "Les transactions LAPO Cash apparaîtront ici lorsque les référents gagneront ou échangeront leurs récompenses.",
+    "date": "Date",
+    "referrer": "Référent",
+    "type": "Type",
+    "amount": "Montant",
+    "description": "Description",
+    "credit": "Créditer",
+    "debit": "Débiter",
+    "walletCard": {
+      "title": "Portefeuille LAPO Cash",
+      "currentBalance": "Solde Actuel",
+      "yourRate": "Votre Taux",
+      "viewHistory": "Voir l'historique"
+    },
+    "creditDialog": {
+      "title": "Créditer LAPO Cash",
+      "description": "Ajouter du LAPO Cash au portefeuille de {{name}}",
+      "amountLabel": "Montant",
+      "typeLabel": "Type de transaction",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Note optionnelle sur cette transaction",
+      "cancel": "Annuler",
+      "submit": "Créditer"
+    },
+    "debitDialog": {
+      "title": "Débiter LAPO Cash",
+      "description": "Retirer du LAPO Cash du portefeuille de {{name}}",
+      "amountLabel": "Montant",
+      "typeLabel": "Type de transaction",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Note optionnelle sur cette transaction",
+      "cancel": "Annuler",
+      "submit": "Débiter"
+    },
+    "toast": {
+      "creditSuccess": "LAPO Cash crédité avec succès",
+      "debitSuccess": "LAPO Cash débité avec succès"
+    },
+    "transactionTypes": {
+      "commission_conversion": "Conversion de commission",
+      "birthday_gift": "Cadeau d'anniversaire",
+      "workshop_reward": "Récompense atelier",
+      "referral_bonus": "Bonus parrainage",
+      "redemption": "Échange",
+      "adjustment": "Ajustement",
+      "expiration": "Expiration",
+      "other": "Autre"
+    }
+  },
+  "prizes": {
+    "pageTitle": "Gestion des Prix",
+    "pageDescription": "Créez et gérez les prix que les référents peuvent échanger avec du LAPO Cash",
+    "createPrize": "Créer un Prix",
+    "editPrize": "Modifier le Prix",
+    "noPrizes": "Aucun prix",
+    "noPrizesDescription": "Créez votre premier prix pour commencer à récompenser vos référents.",
+    "name": "Nom",
+    "cost": "Coût (LAPO Cash)",
+    "category": "Catégorie",
+    "stock": "Stock",
+    "status": "Statut",
+    "redeemed": "Échangés",
+    "description": "Description",
+    "imageUrl": "URL de l'image",
+    "unlimited": "Illimité",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "outOfStock": "Rupture de stock",
+    "categories": {
+      "all": "Toutes les catégories",
+      "gift_card": "Cartes cadeaux",
+      "experience": "Expériences",
+      "product": "Produits",
+      "discount": "Réductions",
+      "other": "Autre"
+    },
+    "dialog": {
+      "createTitle": "Créer un Prix",
+      "editTitle": "Modifier le Prix",
+      "nameLabel": "Nom du prix",
+      "namePlaceholder": "ex. Carte cadeau CHF 50",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Décrivez ce prix...",
+      "costLabel": "Coût en LAPO Cash",
+      "categoryLabel": "Catégorie",
+      "stockLabel": "Quantité en stock",
+      "stockPlaceholder": "Laisser vide pour illimité",
+      "imageLabel": "URL de l'image",
+      "imagePlaceholder": "https://...",
+      "activeLabel": "Actif",
+      "save": "Enregistrer",
+      "create": "Créer le Prix"
+    },
+    "toast": {
+      "created": "Prix créé avec succès",
+      "updated": "Prix mis à jour avec succès",
+      "deleted": "Prix supprimé avec succès",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce prix?"
+    },
+    "stats": {
+      "totalPrizes": "Total des Prix",
+      "totalRedemptions": "Total des Échanges",
+      "activePrizes": "Prix Actifs",
+      "lapoCashSpent": "LAPO Cash Dépensé"
+    }
+  },
+  "status": {
+    "referral": {
+      "pending": "En attente",
+      "confirmed": "Confirmé",
+      "completed": "Complété",
+      "cancelled": "Annulé",
+      "expired": "Expiré"
+    },
+    "commission": {
+      "pending": "En attente",
+      "paid": "Payé",
+      "cancelled": "Annulé",
+      "reversed": "Inversé",
+      "converted": "Converti"
+    },
+    "batch": {
+      "open": "Ouvert",
+      "closed": "Fermé",
+      "paid": "Payé"
+    },
+    "lapoCash": {
+      "commission_conversion": "Conversion",
+      "birthday_gift": "Cadeau d'anniversaire",
+      "workshop_reward": "Récompense atelier",
+      "referral_bonus": "Bonus parrainage",
+      "redemption": "Échange",
+      "adjustment": "Ajustement",
+      "expiration": "Expiration",
+      "other": "Autre"
+    }
   }
 }
