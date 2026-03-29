@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import jsPDF from "jspdf";
 
 interface BatchCommission {
   id: string;
@@ -397,8 +396,9 @@ export default function PayoutDetail() {
         return;
       }
 
-      // Create PDF
-      const doc = new jsPDF({
+      // Dynamically import jsPDF to reduce initial bundle
+      const { default: JsPDF } = await import("jspdf");
+      const doc = new JsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",

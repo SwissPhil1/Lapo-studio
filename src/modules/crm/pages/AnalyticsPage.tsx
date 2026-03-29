@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/shared/lib/supabase';
@@ -7,34 +7,44 @@ import { TrendingUp, TrendingDown, Users, Banknote, Calendar, Target, Download, 
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RevenueChart } from '@/modules/crm/components/analytics/RevenueChart';
-import { TreatmentBreakdown } from '@/modules/crm/components/analytics/TreatmentBreakdown';
-import { PipelineFunnel } from '@/modules/crm/components/analytics/PipelineFunnel';
-import { CampaignPerformance } from '@/modules/crm/components/analytics/CampaignPerformance';
-import { RecallMetrics } from '@/modules/crm/components/analytics/RecallMetrics';
-import { StaffPerformanceChart } from '@/modules/crm/components/analytics/StaffPerformanceChart';
-import { ReferralAnalytics } from '@/modules/crm/components/analytics/ReferralAnalytics';
-import { CommunicationEffectiveness } from '@/modules/crm/components/analytics/CommunicationEffectiveness';
-import { NoShowAnalysis } from '@/modules/crm/components/analytics/NoShowAnalysis';
-import { WorkflowEffectiveness } from '@/modules/crm/components/analytics/WorkflowEffectiveness';
-import { GenderDistribution } from '@/modules/crm/components/analytics/GenderDistribution';
-import { AgeGroupDistribution } from '@/modules/crm/components/analytics/AgeGroupDistribution';
-import { TreatmentsByAgeGroup } from '@/modules/crm/components/analytics/TreatmentsByAgeGroup';
-import { TreatmentsByGender } from '@/modules/crm/components/analytics/TreatmentsByGender';
-import { GeographicDistribution } from '@/modules/crm/components/analytics/GeographicDistribution';
-import { PatientGrowthTrend } from '@/modules/crm/components/analytics/PatientGrowthTrend';
-import { PatientLifetimeValue } from '@/modules/crm/components/analytics/PatientLifetimeValue';
-import { PatientRetentionMetrics } from '@/modules/crm/components/analytics/PatientRetentionMetrics';
-import { FirstTreatmentAnalysis } from '@/modules/crm/components/analytics/FirstTreatmentAnalysis';
-import { DatabaseHealthMetrics } from '@/modules/crm/components/analytics/DatabaseHealthMetrics';
-import { SavedReportsList } from '@/modules/crm/components/reports/SavedReportsList';
-import { AttributionAnalytics } from '@/modules/crm/components/analytics/AttributionAnalytics';
-import { SatisfactionAnalytics } from '@/modules/crm/components/analytics/SatisfactionAnalytics';
-import { RevenueForecast } from '@/modules/crm/components/analytics/RevenueForecast';
-import { ChurnPrediction } from '@/modules/crm/components/analytics/ChurnPrediction';
-import { ROICalculator } from '@/modules/crm/components/analytics/ROICalculator';
 import { formatCurrency } from '@/shared/lib/constants';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
+
+// Lazy-load chart components by tab to reduce initial bundle
+const RevenueChart = lazy(() => import('@/modules/crm/components/analytics/RevenueChart').then(m => ({ default: m.RevenueChart })));
+const TreatmentBreakdown = lazy(() => import('@/modules/crm/components/analytics/TreatmentBreakdown').then(m => ({ default: m.TreatmentBreakdown })));
+const PipelineFunnel = lazy(() => import('@/modules/crm/components/analytics/PipelineFunnel').then(m => ({ default: m.PipelineFunnel })));
+const CampaignPerformance = lazy(() => import('@/modules/crm/components/analytics/CampaignPerformance').then(m => ({ default: m.CampaignPerformance })));
+const RecallMetrics = lazy(() => import('@/modules/crm/components/analytics/RecallMetrics').then(m => ({ default: m.RecallMetrics })));
+const StaffPerformanceChart = lazy(() => import('@/modules/crm/components/analytics/StaffPerformanceChart').then(m => ({ default: m.StaffPerformanceChart })));
+const ReferralAnalytics = lazy(() => import('@/modules/crm/components/analytics/ReferralAnalytics').then(m => ({ default: m.ReferralAnalytics })));
+const CommunicationEffectiveness = lazy(() => import('@/modules/crm/components/analytics/CommunicationEffectiveness').then(m => ({ default: m.CommunicationEffectiveness })));
+const NoShowAnalysis = lazy(() => import('@/modules/crm/components/analytics/NoShowAnalysis').then(m => ({ default: m.NoShowAnalysis })));
+const WorkflowEffectiveness = lazy(() => import('@/modules/crm/components/analytics/WorkflowEffectiveness').then(m => ({ default: m.WorkflowEffectiveness })));
+const GenderDistribution = lazy(() => import('@/modules/crm/components/analytics/GenderDistribution').then(m => ({ default: m.GenderDistribution })));
+const AgeGroupDistribution = lazy(() => import('@/modules/crm/components/analytics/AgeGroupDistribution').then(m => ({ default: m.AgeGroupDistribution })));
+const TreatmentsByAgeGroup = lazy(() => import('@/modules/crm/components/analytics/TreatmentsByAgeGroup').then(m => ({ default: m.TreatmentsByAgeGroup })));
+const TreatmentsByGender = lazy(() => import('@/modules/crm/components/analytics/TreatmentsByGender').then(m => ({ default: m.TreatmentsByGender })));
+const GeographicDistribution = lazy(() => import('@/modules/crm/components/analytics/GeographicDistribution').then(m => ({ default: m.GeographicDistribution })));
+const PatientGrowthTrend = lazy(() => import('@/modules/crm/components/analytics/PatientGrowthTrend').then(m => ({ default: m.PatientGrowthTrend })));
+const PatientLifetimeValue = lazy(() => import('@/modules/crm/components/analytics/PatientLifetimeValue').then(m => ({ default: m.PatientLifetimeValue })));
+const PatientRetentionMetrics = lazy(() => import('@/modules/crm/components/analytics/PatientRetentionMetrics').then(m => ({ default: m.PatientRetentionMetrics })));
+const FirstTreatmentAnalysis = lazy(() => import('@/modules/crm/components/analytics/FirstTreatmentAnalysis').then(m => ({ default: m.FirstTreatmentAnalysis })));
+const DatabaseHealthMetrics = lazy(() => import('@/modules/crm/components/analytics/DatabaseHealthMetrics').then(m => ({ default: m.DatabaseHealthMetrics })));
+const SavedReportsList = lazy(() => import('@/modules/crm/components/reports/SavedReportsList').then(m => ({ default: m.SavedReportsList })));
+const AttributionAnalytics = lazy(() => import('@/modules/crm/components/analytics/AttributionAnalytics').then(m => ({ default: m.AttributionAnalytics })));
+const SatisfactionAnalytics = lazy(() => import('@/modules/crm/components/analytics/SatisfactionAnalytics').then(m => ({ default: m.SatisfactionAnalytics })));
+const RevenueForecast = lazy(() => import('@/modules/crm/components/analytics/RevenueForecast').then(m => ({ default: m.RevenueForecast })));
+const ChurnPrediction = lazy(() => import('@/modules/crm/components/analytics/ChurnPrediction').then(m => ({ default: m.ChurnPrediction })));
+const ROICalculator = lazy(() => import('@/modules/crm/components/analytics/ROICalculator').then(m => ({ default: m.ROICalculator })));
+
+function ChartLoader() {
+  return (
+    <div className="flex h-48 items-center justify-center">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    </div>
+  );
+}
 
 type DateRange = '7d' | '30d' | '90d' | '12m' | 'ytd';
 
@@ -304,6 +314,7 @@ export default function Analytics() {
             <MetricCard title="Rendez-vous" value={metrics?.appointments || 0} change={metrics?.appointmentsChange} icon={Calendar} />
             <MetricCard title="Taux de conversion" value={`${metrics?.conversionRate?.toFixed(1) || 0}%`} icon={Target} subtitle="RDV terminés / total" />
           </div>
+          <Suspense fallback={<ChartLoader />}>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
@@ -357,17 +368,20 @@ export default function Analytics() {
             <h3 className="text-lg font-semibold text-foreground mb-4">Performance des campagnes</h3>
             <CampaignPerformance dateRange={dateRange} />
           </div>
+          </Suspense>
         </TabsContent>
 
         {/* Demographics Tab */}
         <TabsContent value="demographics" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
             <MetricCard title="Total Patients" value={demoMetrics?.total || 0} icon={Users} />
             <MetricCard title="% Femmes" value={`${demoMetrics?.femalePercent || 0}%`} icon={UserCheck} />
             <MetricCard title="Âge moyen" value={`${demoMetrics?.avgAge || 0} ans`} icon={Calendar} />
             <MetricCard title="Top ville" value={demoMetrics?.topCity || '-'} icon={MapPin} />
           </div>
 
+          <Suspense fallback={<ChartLoader />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">Répartition par genre</h3>
@@ -422,10 +436,12 @@ export default function Analytics() {
               <DatabaseHealthMetrics />
             </div>
           </div>
+          </Suspense>
         </TabsContent>
 
         {/* Attribution Tab */}
         <TabsContent value="attribution" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Attribution & Sources</h3>
             <p className="text-sm text-muted-foreground mb-6">
@@ -433,10 +449,12 @@ export default function Analytics() {
             </p>
             <AttributionAnalytics dateRange={dateRange} />
           </div>
+          </Suspense>
         </TabsContent>
 
         {/* Satisfaction Tab */}
         <TabsContent value="satisfaction" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Satisfaction Patients (NPS & CSAT)</h3>
             <p className="text-sm text-muted-foreground mb-6">
@@ -444,10 +462,12 @@ export default function Analytics() {
             </p>
             <SatisfactionAnalytics />
           </div>
+          </Suspense>
         </TabsContent>
 
         {/* Revenue Forecast Tab */}
         <TabsContent value="revenue" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Prévisions de revenus</h3>
             <p className="text-sm text-muted-foreground mb-6">
@@ -455,10 +475,12 @@ export default function Analytics() {
             </p>
             <RevenueForecast />
           </div>
+          </Suspense>
         </TabsContent>
 
         {/* AI Predictions Tab */}
         <TabsContent value="predictions" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Prédictions IA - Risque de perte</h3>
             <p className="text-sm text-muted-foreground mb-6">
@@ -466,10 +488,12 @@ export default function Analytics() {
             </p>
             <ChurnPrediction />
           </div>
+          </Suspense>
         </TabsContent>
 
         {/* ROI Tab */}
         <TabsContent value="roi" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">ROI Publicitaire</h3>
             <p className="text-sm text-muted-foreground mb-6">
@@ -477,10 +501,12 @@ export default function Analytics() {
             </p>
             <ROICalculator />
           </div>
+          </Suspense>
         </TabsContent>
 
         {/* Custom Reports Tab */}
         <TabsContent value="custom" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">Mes rapports personnalisés</h2>
@@ -492,6 +518,7 @@ export default function Analytics() {
             </Button>
           </div>
           <SavedReportsList />
+          </Suspense>
         </TabsContent>
       </Tabs>
     </div>
