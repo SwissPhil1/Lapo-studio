@@ -16,13 +16,19 @@ const CommissionsPage = lazy(() => import('@/modules/admin/pages/CommissionsPage
 const PayoutsPage = lazy(() => import('@/modules/admin/pages/PayoutsPage'))
 const GiftLapoCashPage = lazy(() => import('@/modules/admin/pages/GiftLapoCashPage'))
 const PrizesPage = lazy(() => import('@/modules/admin/pages/PrizesPage'))
+const ReferrerDetailPage = lazy(() => import('@/modules/admin/pages/ReferrerDetailPage'))
+const PayoutDetailPage = lazy(() => import('@/modules/admin/pages/PayoutDetailPage'))
+const ReferralsPage = lazy(() => import('@/modules/admin/pages/ReferralsPage'))
 
 // CRM pages
 const CRMDashboard = lazy(() => import('@/modules/crm/pages/CRMDashboard'))
 const PatientsPage = lazy(() => import('@/modules/crm/pages/PatientsPage'))
+const PatientDetailPage = lazy(() => import('@/modules/crm/pages/PatientDetailPage'))
 const PipelinePage = lazy(() => import('@/modules/crm/pages/PipelinePage'))
 const AppointmentsPage = lazy(() => import('@/modules/crm/pages/AppointmentsPage'))
 const CommunicationsPage = lazy(() => import('@/modules/crm/pages/CommunicationsPage'))
+const AnalyticsPage = lazy(() => import('@/modules/crm/pages/AnalyticsPage'))
+const CampaignsPage = lazy(() => import('@/modules/crm/pages/CampaignsPage'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -111,6 +117,30 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="admin/referrers/:id"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <ReferrerDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/payouts/:id"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <PayoutDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/referrals"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <ReferralsPage />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* CRM routes */}
                 <Route
@@ -146,10 +176,34 @@ export default function App() {
                   }
                 />
                 <Route
+                  path="crm/patients/:id"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <PatientDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="crm/communications"
                   element={
                     <ProtectedRoute requireCRM>
                       <CommunicationsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="crm/analytics"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <AnalyticsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="crm/campaigns"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <CampaignsPage />
                     </ProtectedRoute>
                   }
                 />

@@ -1,14 +1,12 @@
-import { useTranslation } from 'react-i18next'
+import { InternalCalendar } from '@/modules/crm/components/calendar/InternalCalendar';
 
-export default function AppointmentsPage() {
-  const { t } = useTranslation()
-
+export default function Calendar() {
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-bold">{t('nav.appointments')}</h1>
-      <div className="rounded-xl border border-studio-border bg-studio-card p-6">
-        <p className="text-studio-muted">Appointments management — migrating from harmony-hub.</p>
-      </div>
+    <div className="space-y-4 h-[calc(100vh-180px)]">
+      <p className="text-muted-foreground">
+        Calendrier des rendez-vous sécurisé depuis la base de données.
+      </p>
+      <InternalCalendar defaultView="month" className="flex-1 min-h-0" />
     </div>
-  )
+  );
 }
