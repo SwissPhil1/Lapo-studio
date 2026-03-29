@@ -68,7 +68,11 @@
     "next": "Next",
     "of": "of",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "language": "Language"
   },
   "lapoCash": {
     "pageTitle": "Gift LAPO Cash",

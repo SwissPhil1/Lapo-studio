@@ -68,7 +68,11 @@
     "next": "Suivant",
     "of": "de",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "name": "Nom",
+    "email": "Courriel",
+    "role": "Rôle",
+    "language": "Langue"
   },
   "lapoCash": {
     "pageTitle": "Offrir LAPO Cash",
