@@ -27,11 +27,11 @@ export function ProtectedRoute({
   }
 
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/" replace />
+    return <Navigate to={isCRM ? '/crm/dashboard' : '/settings'} replace />
   }
 
   if (requireCRM && !isCRM) {
-    return <Navigate to="/" replace />
+    return <Navigate to={isAdmin ? '/admin/dashboard' : '/settings'} replace />
   }
 
   return <>{children}</>

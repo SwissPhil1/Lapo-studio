@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { AuthProvider } from '@/contexts/AuthContext'
+import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { StudioLayout } from '@/shared/components/StudioLayout'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary'
@@ -65,6 +65,13 @@ function NotFound() {
   )
 }
 
+function RoleBasedRedirect() {
+  const { isAdmin, isCRM } = useAuth()
+  if (isAdmin) return <Navigate to="/admin/dashboard" replace />
+  if (isCRM) return <Navigate to="/crm/dashboard" replace />
+  return <Navigate to="/settings" replace />
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -84,8 +91,8 @@ export default function App() {
                   </ProtectedRoute>
                 }
               >
-                {/* Default redirect */}
-                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                {/* Default redirect based on role */}
+                <Route index element={<RoleBasedRedirect />} />
 
                 {/* Admin routes */}
                 <Route
