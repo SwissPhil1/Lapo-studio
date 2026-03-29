@@ -1,0 +1,13 @@
+{
+  "name": "LAPO Studio",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "postCreateCommand": "npm install && cp .env.example .env.local",
+  "postStartCommand": "npm run dev",
+  "forwardPorts": [5173],
+  "portsAttributes": {
+    "5173": {
+      "label": "LAPO Studio",
+      "onAutoForward": "openBrowser"
+    }
+  }
+}
