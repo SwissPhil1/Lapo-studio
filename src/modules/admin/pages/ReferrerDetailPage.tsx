@@ -1021,7 +1021,7 @@ export default function ReferrerDetail() {
           referrals={referrals || []}
           referralsLoading={referralsLoading}
           referralColumns={referralColumns}
-          onReferralClick={() => {}}
+          onReferralClick={(row) => navigate(`/admin/referrals/${row.id}`)}
         />
 
       {/* Edit Profile Dialog */}

@@ -21,6 +21,7 @@ const PrizesPage = lazy(() => import('@/modules/admin/pages/PrizesPage'))
 const ReferrerDetailPage = lazy(() => import('@/modules/admin/pages/ReferrerDetailPage'))
 const PayoutDetailPage = lazy(() => import('@/modules/admin/pages/PayoutDetailPage'))
 const ReferralsPage = lazy(() => import('@/modules/admin/pages/ReferralsPage'))
+const ReferralDetailPage = lazy(() => import('@/modules/admin/pages/ReferralDetailPage'))
 
 // CRM pages
 const CRMDashboard = lazy(() => import('@/modules/crm/pages/CRMDashboard'))
@@ -166,6 +167,14 @@ export default function App() {
                   element={
                     <ProtectedRoute requireAdmin>
                       <ReferralsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/referrals/:id"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <ReferralDetailPage />
                     </ProtectedRoute>
                   }
                 />

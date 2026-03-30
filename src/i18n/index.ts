@@ -24,6 +24,7 @@ i18n.use(initReactI18next).init({
       communications: (en as any).communications,
       analytics: (en as any).analytics,
       campaigns: (en as any).campaigns,
+      referralDetail: (en as any).referralDetail,
       notFound: (en as any).notFound,
     },
     fr: {
@@ -45,6 +46,7 @@ i18n.use(initReactI18next).init({
       communications: (fr as any).communications,
       analytics: (fr as any).analytics,
       campaigns: (fr as any).campaigns,
+      referralDetail: (fr as any).referralDetail,
       notFound: (fr as any).notFound,
     },
   },
