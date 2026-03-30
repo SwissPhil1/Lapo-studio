@@ -2,9 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Loader2, AlertTriangle, XCircle, TrendingDown } from 'lucide-react';
-import { formatCurrency } from '@/shared/lib/constants';
+import { formatCurrency } from '@/shared/lib/format';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
 
 interface NoShowAnalysisProps {
   dateRange: string;
@@ -13,6 +16,7 @@ interface NoShowAnalysisProps {
 const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
 export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['noshow-analysis', dateRange],
     queryFn: async () => {
@@ -58,7 +62,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
         const monthNoShows = monthBookings.filter(b => b.status === 'no_show').length;
         
         monthlyData.push({
-          month: format(month, 'MMM', { locale: fr }),
+          month: format(month, 'MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
           rate: monthBookings.length > 0 ? Math.round((monthNoShows / monthBookings.length) * 100) : 0,
         });
       }
@@ -89,7 +93,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
   if (!data) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

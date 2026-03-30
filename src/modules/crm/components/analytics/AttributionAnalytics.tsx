@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Loader2, TrendingUp, MousePointerClick, Users, Target } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AttributionAnalyticsProps {
   dateRange: string;
@@ -10,6 +11,7 @@ interface AttributionAnalyticsProps {
 const COLORS = ['#7C3AED', '#14b8a6', '#06B6D4', '#5eead4', '#99f6e4', '#ccfbf1', '#f0fdfa'];
 
 export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['attribution-analytics', dateRange],
     queryFn: async () => {
@@ -102,8 +104,8 @@ export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <MousePointerClick className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">Aucune donnée d'attribution</p>
-        <p className="text-sm mt-1">Les leads capturés avec des paramètres UTM apparaîtront ici.</p>
+        <p className="font-medium">{t('analytics:noAttributionData')}</p>
+        <p className="text-sm mt-1">{t('analytics:attributionEmptyDescription')}</p>
       </div>
     );
   }

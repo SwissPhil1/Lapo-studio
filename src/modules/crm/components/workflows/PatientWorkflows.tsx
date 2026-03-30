@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { Badge } from '@/components/ui/badge';
@@ -5,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Zap, Pause, Play, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 interface PatientWorkflowsProps {
   patientId: string;
@@ -29,6 +31,8 @@ interface WorkflowStep {
 }
 
 export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
+  const { t, i18n } = useTranslation(['tasks', 'common']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   const queryClient = useQueryClient();
 
   const { data: enrollments, isLoading } = useQuery({
@@ -60,9 +64,9 @@ export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
       const { data, error } = await supabase
         .from('crm_workflow_steps')
         .select('workflow_id');
-      
+
       if (error) throw error;
-      
+
       const counts: Record<string, number> = {};
       (data as WorkflowStep[]).forEach((step) => {
         counts[step.workflow_id] = (counts[step.workflow_id] || 0) + 1;
@@ -83,14 +87,14 @@ export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['patient-enrollments', patientId] });
       const messages: Record<string, string> = {
-        paused: 'Workflow mis en pause',
-        active: 'Workflow réactivé',
-        cancelled: 'Workflow annulé',
+        paused: t('tasks:workflowPaused'),
+        active: t('tasks:workflowReactivated'),
+        cancelled: t('tasks:workflowCancelled'),
       };
-      toast.success(messages[status] || 'Statut mis à jour');
+      toast.success(messages[status] || t('tasks:statusUpdated'));
     },
     onError: () => {
-      toast.error('Erreur lors de la mise à jour');
+      toast.error(t('tasks:updateError'));
     },
   });
 
@@ -111,12 +115,12 @@ export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
     <div className="space-y-3">
       <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
         <Zap className="h-4 w-4" />
-        Workflows actifs
+        {t('tasks:activeWorkflows')}
       </h3>
-      
+
       {enrollments.map((enrollment) => {
         const totalSteps = stepsCounts?.[enrollment.workflow_id] || 0;
-        
+
         return (
           <div
             key={enrollment.id}
@@ -124,19 +128,19 @@ export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">
-                {enrollment.workflow?.name || 'Workflow'}
+                {enrollment.workflow?.name || t('tasks:workflow')}
               </span>
               <Badge variant={enrollment.status === 'active' ? 'default' : 'secondary'}>
-                {enrollment.status === 'active' ? 'Actif' : 'Pause'}
+                {enrollment.status === 'active' ? t('tasks:active') : t('tasks:paused')}
               </Badge>
             </div>
-            
+
             <div className="text-xs text-muted-foreground">
-              Étape {enrollment.current_step}/{totalSteps}
+              {t('tasks:step')} {enrollment.current_step}/{totalSteps}
               {enrollment.next_action_at && (
-                <> • Prochaine action {formatDistanceToNow(new Date(enrollment.next_action_at), { 
-                  addSuffix: true, 
-                  locale: fr 
+                <> • {t('tasks:nextAction')} {formatDistanceToNow(new Date(enrollment.next_action_at), {
+                  addSuffix: true,
+                  locale: dateLocale
                 })}</>
               )}
             </div>
@@ -150,7 +154,7 @@ export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
                   onClick={() => updateStatusMutation.mutate({ id: enrollment.id, status: 'paused' })}
                 >
                   <Pause className="h-3 w-3 mr-1" />
-                  Pause
+                  {t('tasks:pause')}
                 </Button>
               ) : (
                 <Button
@@ -160,7 +164,7 @@ export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
                   onClick={() => updateStatusMutation.mutate({ id: enrollment.id, status: 'active' })}
                 >
                   <Play className="h-3 w-3 mr-1" />
-                  Reprendre
+                  {t('tasks:resume')}
                 </Button>
               )}
               <Button
@@ -170,7 +174,7 @@ export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
                 onClick={() => updateStatusMutation.mutate({ id: enrollment.id, status: 'cancelled' })}
               >
                 <X className="h-3 w-3 mr-1" />
-                Annuler
+                {t('common:cancel')}
               </Button>
             </div>
           </div>

@@ -2,9 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 
 export function TreatmentsByGender() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['treatments-by-gender'],
     queryFn: async () => {
@@ -61,7 +63,7 @@ export function TreatmentsByGender() {
   if (!data || data.length === 0) {
     return (
       <div className="h-[280px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

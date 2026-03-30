@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const COLORS = [
   'hsl(var(--primary))',
@@ -12,6 +13,7 @@ const COLORS = [
 ];
 
 export function PipelineFunnel() {
+  const { t } = useTranslation(['analytics']);
   const { data: funnelData, isLoading } = useQuery({
     queryKey: ['pipeline-funnel'],
     queryFn: async () => {
@@ -56,8 +58,8 @@ export function PipelineFunnel() {
     return (
       <div className="h-[250px] flex items-center justify-center text-muted-foreground">
         <div className="text-center">
-          <p>Aucun stage de pipeline configuré</p>
-          <p className="text-sm mt-1">Configurez votre pipeline dans les paramètres</p>
+          <p>{t('analytics:noPipelineStages')}</p>
+          <p className="text-sm mt-1">{t('analytics:configurePipelineInSettings')}</p>
         </div>
       </div>
     );

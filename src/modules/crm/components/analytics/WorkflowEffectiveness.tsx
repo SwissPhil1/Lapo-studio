@@ -3,12 +3,14 @@ import { supabase } from '@/shared/lib/supabase';
 import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Loader2, Zap, CheckCircle, Clock } from 'lucide-react';
 import { differenceInDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface WorkflowEffectivenessProps {
   dateRange: string;
 }
 
 export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['workflow-effectiveness', dateRange],
     queryFn: async () => {
@@ -97,7 +99,7 @@ export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps)
   if (!data || data.total === 0) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucun workflow actif
+        {t('analytics:noActiveWorkflows')}
       </div>
     );
   }
@@ -187,7 +189,7 @@ export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps)
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Aucun workflow</p>
+            <p className="text-sm text-muted-foreground">{t('analytics:noWorkflows')}</p>
           )}
         </div>
       </div>

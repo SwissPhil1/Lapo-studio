@@ -43,7 +43,7 @@ import {
 import { useToast } from '@/shared/hooks/use-toast';
 import { useDebounce } from '@/shared/hooks/useDebounce';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Search, Loader2, Filter, HelpCircle, Sparkles } from 'lucide-react';
+import { Plus, Search, Loader2, Filter, HelpCircle, Sparkles, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { PatientTableRow } from '@/modules/crm/components/patients/PatientTableRow';
 import { AISearchInput } from '@/modules/crm/components/patients/AISearchInput';
 import { BulkActionBar } from '@/modules/crm/components/patients/BulkActionBar';
@@ -150,15 +150,30 @@ export default function Patients() {
   // Segment for campaign creation
   const [segmentForCampaign, setSegmentForCampaign] = useState<Segment | null>(null);
   
+  // Sorting state
+  const [sortBy, setSortBy] = useState<'last_name' | 'first_name' | 'created_at'>('last_name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+
   // Track if we've processed URL params
   const hasProcessedUrlParams = useRef(false);
-  
+
   // Debounce search input
   const debouncedSearch = useDebounce(search, 300);
+
+  // Toggle sort handler for column headers
+  const handleSort = (column: 'last_name' | 'first_name' | 'created_at') => {
+    if (sortBy === column) {
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+    setPage(1);
+  };
 
   // Sync filter, page, and AI query from URL params on mount
   useEffect(() => {
@@ -302,7 +317,7 @@ export default function Patients() {
   };
 
   const { data, isLoading, error } = useQuery<PatientsQueryResult>({
-    queryKey: ['patients-list', debouncedSearch, filter, page, aiSearchResults, staticPatientIds],
+    queryKey: ['patients-list', debouncedSearch, filter, page, aiSearchResults, staticPatientIds, sortBy, sortOrder],
     queryFn: async () => {
       // Session guard: ensure user is authenticated before querying
       const { data: sessionData } = await supabase.auth.getSession();
@@ -323,11 +338,15 @@ export default function Patients() {
       const serviceMappings: ServiceMapping[] = (serviceMappingsResult.data || []) as ServiceMapping[];
       const treatmentProtocols: TreatmentProtocol[] = (protocolsResult.data || []) as TreatmentProtocol[];
 
+      // Determine if we can use server-side pagination
+      // (only when filter is 'all' and no client-side filtering is needed)
+      const canServerPaginate = filter === 'all';
+
       // Fetch patients with count
       let query = supabase
         .from('patients')
-        .select('id, first_name, last_name, email, phone, date_of_birth, tags, created_at', { count: 'exact' })
-        .order('last_name', { ascending: true });
+        .select('id, first_name, last_name, email, phone, date_of_birth, tags, created_at', { count: 'exact', head: false })
+        .order(sortBy, { ascending: sortOrder === 'asc' });
 
       // If AI search is active, filter by those IDs
       if (aiSearchResults && aiSearchResults.length > 0) {
@@ -346,7 +365,14 @@ export default function Patients() {
         query = query.or(`first_name.ilike.%${debouncedSearch}%,last_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`);
       }
 
-      const { data: patientsData, error: patientsError } = await query;
+      // Apply server-side pagination when possible
+      if (canServerPaginate) {
+        const from = (page - 1) * PATIENTS_PER_PAGE;
+        const to = from + PATIENTS_PER_PAGE - 1;
+        query = query.range(from, to);
+      }
+
+      const { data: patientsData, error: patientsError, count: serverCount } = await query;
       if (patientsError) throw patientsError;
 
       if (!patientsData || patientsData.length === 0) {
@@ -520,13 +546,24 @@ export default function Patients() {
         }
       }
 
-      // Apply pagination
-      const startIndex = (page - 1) * PATIENTS_PER_PAGE;
-      const paginatedPatients = filteredPatients.slice(startIndex, startIndex + PATIENTS_PER_PAGE);
+      // Apply pagination: server-side if canServerPaginate, client-side otherwise
+      let paginatedPatients: PatientWithDetails[];
+      let totalCount: number;
 
-      return { 
-        patients: paginatedPatients, 
-        totalCount: filteredPatients.length,
+      if (canServerPaginate) {
+        // Already paginated server-side via .range()
+        paginatedPatients = filteredPatients;
+        totalCount = serverCount ?? filteredPatients.length;
+      } else {
+        // Client-side pagination for filtered views
+        const startIndex = (page - 1) * PATIENTS_PER_PAGE;
+        paginatedPatients = filteredPatients.slice(startIndex, startIndex + PATIENTS_PER_PAGE);
+        totalCount = filteredPatients.length;
+      }
+
+      return {
+        patients: paginatedPatients,
+        totalCount,
         serviceMappings,
         treatmentProtocols,
       };
@@ -783,8 +820,8 @@ export default function Patients() {
 
       {/* Patients Table */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex h-64 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : patients.length > 0 ? (
           <div className="space-y-4">
@@ -799,7 +836,20 @@ export default function Patients() {
                         aria-label={t('patients:table.selectAll')}
                       />
                     </TableHead>
-                    <TableHead className="w-[220px]">{t('patients:table.patient')}</TableHead>
+                    <TableHead className="w-[220px]">
+                      <button
+                        type="button"
+                        className="flex items-center gap-1 hover:text-foreground transition-colors"
+                        onClick={() => handleSort('last_name')}
+                      >
+                        {t('patients:table.patient')}
+                        {sortBy === 'last_name' ? (
+                          sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                        ) : (
+                          <ArrowUpDown className="h-3 w-3 opacity-50" />
+                        )}
+                      </button>
+                    </TableHead>
                     <TableHead className="w-[80px]">{t('patients:table.signals')}</TableHead>
                     <TableHead className="w-[140px]">
                       <Tooltip>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { subDays, subMonths } from 'date-fns';
@@ -10,7 +11,7 @@ interface CampaignPerformanceProps {
 
 function getDateRange(range: string): Date {
   const end = new Date();
-  
+
   switch (range) {
     case '7d':
       return subDays(end, 7);
@@ -28,38 +29,36 @@ function getDateRange(range: string): Date {
 }
 
 export function CampaignPerformance({ dateRange }: CampaignPerformanceProps) {
+  const { t } = useTranslation(['analytics']);
   const start = getDateRange(dateRange);
-  
+
   const { data, isLoading } = useQuery({
     queryKey: ['campaign-performance', dateRange],
     queryFn: async () => {
-      // Fetch campaigns with their communication logs
       const { data: campaigns } = await supabase
         .from('crm_campaigns')
         .select('id, name, channel, status, created_at')
         .gte('created_at', start.toISOString())
         .order('created_at', { ascending: false })
         .limit(10);
-      
+
       if (!campaigns || campaigns.length === 0) {
         return { campaigns: [], totals: null };
       }
-      
-      // Fetch communication logs for these campaigns
+
       const campaignIds = campaigns.map(c => c.id);
       const { data: logs } = await supabase
         .from('crm_communication_logs')
         .select('campaign_id, status, opened_at, clicked_at, bounced_at')
         .in('campaign_id', campaignIds);
-      
-      // Calculate metrics per campaign
+
       const campaignMetrics = campaigns.map(campaign => {
         const campaignLogs = logs?.filter(l => l.campaign_id === campaign.id) || [];
         const sent = campaignLogs.length;
         const opened = campaignLogs.filter(l => l.opened_at).length;
         const clicked = campaignLogs.filter(l => l.clicked_at).length;
         const bounced = campaignLogs.filter(l => l.bounced_at).length;
-        
+
         return {
           name: campaign.name.length > 20 ? campaign.name.substring(0, 20) + '...' : campaign.name,
           fullName: campaign.name,
@@ -72,14 +71,13 @@ export function CampaignPerformance({ dateRange }: CampaignPerformanceProps) {
           bounceRate: sent > 0 ? ((bounced / sent) * 100).toFixed(1) : '0',
         };
       });
-      
-      // Calculate totals
+
       const allLogs = logs || [];
       const totalSent = allLogs.length;
       const totalOpened = allLogs.filter(l => l.opened_at).length;
       const totalClicked = allLogs.filter(l => l.clicked_at).length;
       const totalBounced = allLogs.filter(l => l.bounced_at).length;
-      
+
       return {
         campaigns: campaignMetrics,
         totals: {
@@ -94,7 +92,7 @@ export function CampaignPerformance({ dateRange }: CampaignPerformanceProps) {
       };
     },
   });
-  
+
   if (isLoading) {
     return (
       <div className="h-[300px] flex items-center justify-center">
@@ -102,18 +100,18 @@ export function CampaignPerformance({ dateRange }: CampaignPerformanceProps) {
       </div>
     );
   }
-  
+
   if (!data?.campaigns || data.campaigns.length === 0) {
     return (
       <div className="h-[200px] flex items-center justify-center text-muted-foreground">
         <div className="text-center">
           <Mail className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>Aucune campagne sur cette période</p>
+          <p>{t('analytics:noCampaignsPeriod')}</p>
         </div>
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-6">
       {/* Summary Stats */}
@@ -122,42 +120,42 @@ export function CampaignPerformance({ dateRange }: CampaignPerformanceProps) {
           <div className="bg-muted/30 rounded-lg p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Mail className="h-4 w-4" />
-              <span className="text-sm">Envoyés</span>
+              <span className="text-sm">{t('analytics:campaignSent')}</span>
             </div>
             <p className="text-2xl font-bold text-foreground">{data.totals.sent}</p>
           </div>
           <div className="bg-blue-500/5 rounded-lg p-4">
             <div className="flex items-center gap-2 text-blue-600 mb-1">
               <Eye className="h-4 w-4" />
-              <span className="text-sm">Taux d'ouverture</span>
+              <span className="text-sm">{t('analytics:openRate')}</span>
             </div>
             <p className="text-2xl font-bold text-foreground">{data.totals.openRate}%</p>
           </div>
           <div className="bg-green-500/5 rounded-lg p-4">
             <div className="flex items-center gap-2 text-green-600 mb-1">
               <MousePointerClick className="h-4 w-4" />
-              <span className="text-sm">Taux de clic</span>
+              <span className="text-sm">{t('analytics:clickRate')}</span>
             </div>
             <p className="text-2xl font-bold text-foreground">{data.totals.clickRate}%</p>
           </div>
           <div className="bg-destructive/5 rounded-lg p-4">
             <div className="flex items-center gap-2 text-destructive mb-1">
               <AlertTriangle className="h-4 w-4" />
-              <span className="text-sm">Taux de rebond</span>
+              <span className="text-sm">{t('analytics:bounceRate')}</span>
             </div>
             <p className="text-2xl font-bold text-foreground">{data.totals.bounceRate}%</p>
           </div>
         </div>
       )}
-      
+
       {/* Chart */}
       {data.campaigns.length > 0 && (
         <div className="h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.campaigns} margin={{ left: 0, right: 20 }}>
-              <XAxis 
-                dataKey="name" 
-                stroke="hsl(var(--muted-foreground))" 
+              <XAxis
+                dataKey="name"
+                stroke="hsl(var(--muted-foreground))"
                 fontSize={11}
                 tickLine={false}
                 axisLine={false}
@@ -165,8 +163,8 @@ export function CampaignPerformance({ dateRange }: CampaignPerformanceProps) {
                 textAnchor="end"
                 height={60}
               />
-              <YAxis 
-                stroke="hsl(var(--muted-foreground))" 
+              <YAxis
+                stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
@@ -179,19 +177,19 @@ export function CampaignPerformance({ dateRange }: CampaignPerformanceProps) {
                 }}
                 formatter={(value: any, name: any) => {
                   const labels: Record<string, string> = {
-                    sent: 'Envoyés',
-                    opened: 'Ouverts',
-                    clicked: 'Cliqués',
+                    sent: t('analytics:campaignSent'),
+                    opened: t('analytics:campaignOpened'),
+                    clicked: t('analytics:campaignClicked'),
                   };
                   return [value, labels[name] || name];
                 }}
               />
-              <Legend 
+              <Legend
                 formatter={(value) => {
                   const labels: Record<string, string> = {
-                    sent: 'Envoyés',
-                    opened: 'Ouverts',
-                    clicked: 'Cliqués',
+                    sent: t('analytics:campaignSent'),
+                    opened: t('analytics:campaignOpened'),
+                    clicked: t('analytics:campaignClicked'),
                   };
                   return labels[value] || value;
                 }}

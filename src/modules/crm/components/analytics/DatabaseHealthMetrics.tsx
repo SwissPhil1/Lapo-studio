@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { Loader2, CheckCircle, AlertCircle, Database } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 
 interface FieldStat {
@@ -11,6 +12,7 @@ interface FieldStat {
 }
 
 export function DatabaseHealthMetrics() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['database-health'],
     queryFn: async () => {
@@ -89,7 +91,7 @@ export function DatabaseHealthMetrics() {
   if (!data) {
     return (
       <div className="h-[200px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

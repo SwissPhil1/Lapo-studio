@@ -3,13 +3,17 @@ import { supabase } from '@/shared/lib/supabase';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader2 } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
 
 interface PatientGrowthTrendProps {
   months?: number;
 }
 
 export function PatientGrowthTrend({ months = 12 }: PatientGrowthTrendProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['patient-growth-trend', months],
     queryFn: async () => {
@@ -38,7 +42,7 @@ export function PatientGrowthTrend({ months = 12 }: PatientGrowthTrendProps) {
         cumulative += monthPatients.length;
 
         monthlyData.push({
-          month: format(month, 'MMM yy', { locale: fr }),
+          month: format(month, 'MMM yy', { locale: i18n.language === 'fr' ? frLocale : enUS }),
           nouveaux: monthPatients.length,
           cumul: cumulative,
         });
@@ -59,7 +63,7 @@ export function PatientGrowthTrend({ months = 12 }: PatientGrowthTrendProps) {
   if (!data || data.length === 0) {
     return (
       <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

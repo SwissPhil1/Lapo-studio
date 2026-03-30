@@ -13,7 +13,10 @@ import {
 } from 'recharts';
 import { Loader2, ThumbsUp, TrendingUp, Users, MessageSquare } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
 
 interface SurveyResponse {
   id: string;
@@ -25,6 +28,7 @@ interface SurveyResponse {
 }
 
 export function SatisfactionAnalytics() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['satisfaction-analytics'],
     queryFn: async () => {
@@ -98,7 +102,7 @@ export function SatisfactionAnalytics() {
       const trendData = Array.from(monthMap.entries())
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([month, d]) => ({
-          month: format(parseISO(`${month}-01`), 'MMM yy', { locale: fr }),
+          month: format(parseISO(`${month}-01`), 'MMM yy', { locale: i18n.language === 'fr' ? frLocale : enUS }),
           nps: d.total > 0 ? Math.round(((d.promoters - d.detractors) / d.total) * 100) : 0,
         }));
 
@@ -149,7 +153,7 @@ export function SatisfactionAnalytics() {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <ThumbsUp className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">Aucune r\u00e9ponse de satisfaction</p>
+        <p className="font-medium">{t('analytics:noSatisfactionData')}</p>
         <p className="text-sm mt-1">
           Les r\u00e9ponses aux enqu\u00eates NPS et CSAT appara\u00eetront ici.
         </p>

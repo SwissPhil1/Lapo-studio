@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { checkPayoutProfileStatus, formatMissingFields } from "@/shared/lib/payoutProfile";
+import { useTranslation } from "react-i18next";
 
 interface PayoutProfileIndicatorProps {
   referrerId: string;
@@ -9,6 +10,7 @@ interface PayoutProfileIndicatorProps {
 }
 
 export function PayoutProfileIndicator({ referrerId, size = "sm" }: PayoutProfileIndicatorProps) {
+  const { t } = useTranslation(['common']);
   const { data: status } = useQuery({
     queryKey: ["payout-profile-status", referrerId],
     queryFn: () => checkPayoutProfileStatus(referrerId),
@@ -26,7 +28,7 @@ export function PayoutProfileIndicator({ referrerId, size = "sm" }: PayoutProfil
           <CheckCircle2 className={`${iconSize} text-green-600`} />
         </TooltipTrigger>
         <TooltipContent>
-          <p className="text-sm">Informations bancaires complètes</p>
+          <p className="text-sm">{t('common:bankInfoComplete')}</p>
         </TooltipContent>
       </Tooltip>
     );
@@ -38,9 +40,9 @@ export function PayoutProfileIndicator({ referrerId, size = "sm" }: PayoutProfil
         <AlertCircle className={`${iconSize} text-amber-600`} />
       </TooltipTrigger>
       <TooltipContent className="max-w-xs">
-        <p className="text-sm font-medium mb-1">Informations bancaires incomplètes</p>
+        <p className="text-sm font-medium mb-1">{t('common:bankInfoIncomplete')}</p>
         <p className="text-xs text-muted-foreground">
-          Informations manquantes: {formatMissingFields(status.missingFields)}
+          {t('common:missingInfo', { fields: formatMissingFields(status.missingFields) })}
         </p>
       </TooltipContent>
     </Tooltip>

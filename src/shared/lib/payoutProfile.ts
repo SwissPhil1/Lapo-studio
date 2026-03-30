@@ -1,4 +1,5 @@
 import { supabase } from "@/shared/lib/supabase";
+import i18n from '@/i18n';
 
 export interface PayoutProfileStatus {
   isComplete: boolean;
@@ -38,11 +39,11 @@ export async function checkPayoutProfileStatus(
  */
 export function formatMissingFields(fields: string[]): string {
   const fieldLabels: Record<string, string> = {
-    email: "Email",
-    iban: "IBAN",
-    bank_name: "Nom de la banque",
-    first_name: "Prénom",
-    last_name: "Nom",
+    email: i18n.t('common:fieldEmail'),
+    iban: i18n.t('common:fieldIban'),
+    bank_name: i18n.t('common:fieldBankName'),
+    first_name: i18n.t('common:fieldFirstName'),
+    last_name: i18n.t('common:fieldLastName'),
   };
 
   return fields

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -23,6 +24,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Loader2, Megaphone, Send, Clock, Users, Mail, MessageSquare, Sparkles } from 'lucide-react';
 import { AICampaignContentDialog } from '@/modules/crm/components/campaigns/AICampaignContentDialog';
+import { getLocale } from '@/shared/lib/format';
 
 interface CreateCampaignDialogProps {
   open: boolean;
@@ -48,6 +50,7 @@ export function CreateCampaignDialog({
   patientCount,
   onSuccess,
 }: CreateCampaignDialogProps) {
+  const { t } = useTranslation(['campaigns', 'common']);
   const [name, setName] = useState('');
   const [channel, setChannel] = useState<'email' | 'sms' | 'whatsapp'>('email');
   const [templateId, setTemplateId] = useState<string>('custom');
@@ -56,6 +59,7 @@ export function CreateCampaignDialog({
   const [sendOption, setSendOption] = useState<'now' | 'later'>('now');
   const [scheduledDate, setScheduledDate] = useState('');
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -165,10 +169,10 @@ export function CreateCampaignDialog({
     },
     onSuccess: () => {
       toast({
-        title: sendOption === 'now' ? 'Campagne envoyée' : 'Campagne programmée',
-        description: sendOption === 'now' 
-          ? `La campagne "${name}" a été envoyée à ${patientCount} patients.`
-          : `La campagne "${name}" sera envoyée le ${new Date(scheduledDate).toLocaleDateString('fr-FR')}.`,
+        title: sendOption === 'now' ? t('campaigns:campaignSent') : t('campaigns:campaignScheduled'),
+        description: sendOption === 'now'
+          ? t('campaigns:campaignSentDescription', { name, count: patientCount })
+          : t('campaigns:campaignScheduledDescription', { name, date: new Date(scheduledDate).toLocaleDateString(getLocale()) }),
       });
       queryClient.invalidateQueries({ queryKey: ['crm-campaigns'] });
       resetForm();
@@ -177,7 +181,7 @@ export function CreateCampaignDialog({
     },
     onError: (error: Error) => {
       toast({
-        title: 'Erreur',
+        title: t('common:error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -192,26 +196,36 @@ export function CreateCampaignDialog({
     setCustomMessage('');
     setSendOption('now');
     setScheduledDate('');
+    setErrors({});
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    const newErrors: Record<string, string> = {};
+
     if (!name.trim()) {
-      toast({ title: 'Erreur', description: 'Veuillez entrer un nom pour la campagne.', variant: 'destructive' });
-      return;
+      newErrors.name = t('campaigns:nameCampaignRequired');
     }
-    
-    if (templateId === 'custom' && (!customSubject.trim() || !customMessage.trim())) {
-      toast({ title: 'Erreur', description: 'Veuillez remplir le sujet et le message.', variant: 'destructive' });
-      return;
+
+    if (templateId === 'custom' && !customSubject.trim()) {
+      newErrors.subject = t('campaigns:subjectMessageRequired');
     }
-    
+
+    if (templateId === 'custom' && !customMessage.trim()) {
+      newErrors.message = t('campaigns:subjectMessageRequired');
+    }
+
     if (sendOption === 'later' && !scheduledDate) {
-      toast({ title: 'Erreur', description: 'Veuillez sélectionner une date d\'envoi.', variant: 'destructive' });
+      newErrors.scheduledDate = t('campaigns:dateRequired');
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
+    setErrors({});
     createCampaignMutation.mutate();
   };
 
@@ -224,29 +238,30 @@ export function CreateCampaignDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Megaphone className="h-5 w-5 text-primary" />
-            Créer une campagne
+            {t('campaigns:createCampaign')}
           </DialogTitle>
           <DialogDescription>
-            Créez une campagne pour {patientCount} patients.
+            {t('campaigns:createCampaignDescription', { count: patientCount })}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 mt-4">
           {/* Campaign Name */}
           <div className="space-y-2">
-            <Label htmlFor="campaign-name">Nom de la campagne</Label>
+            <Label htmlFor="campaign-name">{t('campaigns:campaignName')}</Label>
             <Input
               id="campaign-name"
-              placeholder="ex: Réactivation Botox Janvier"
+              placeholder={t('campaigns:campaignNamePlaceholder')}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.name; return n; }); }}
               autoFocus
             />
+            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
           </div>
 
           {/* Channel Selection */}
           <div className="space-y-2">
-            <Label>Canal</Label>
+            <Label>{t('campaigns:channel')}</Label>
             <div className="grid grid-cols-3 gap-2">
               <Button
                 type="button"
@@ -279,26 +294,26 @@ export function CreateCampaignDialog({
           <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
             <div className="flex items-center gap-2 text-sm">
               <Users className="h-4 w-4 text-primary" />
-              <span className="font-medium">{patientCount} destinataires</span>
+              <span className="font-medium">{t('campaigns:recipientCount', { count: patientCount })}</span>
               {aiQuery && (
                 <span className="text-muted-foreground text-xs ml-auto">
-                  Segment dynamique
+                  {t('campaigns:dynamicSegment')}
                 </span>
               )}
             </div>
           </div>
 
-          {/* Template Selection — email only */}
+          {/* Template Selection -- email only */}
           {channel === 'email' && (
             <>
               <div className="space-y-2">
-                <Label>Modèle d'email</Label>
+                <Label>{t('campaigns:emailTemplate')}</Label>
                 <Select value={templateId} onValueChange={setTemplateId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un modèle" />
+                    <SelectValue placeholder={t('campaigns:selectTemplate')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="custom">Message personnalisé</SelectItem>
+                    <SelectItem value="custom">{t('campaigns:customMessage')}</SelectItem>
                     {templates.map((template) => (
                       <SelectItem key={template.id} value={template.id}>
                         {template.name}
@@ -312,32 +327,34 @@ export function CreateCampaignDialog({
               {templateId === 'custom' ? (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Sujet</Label>
+                    <Label htmlFor="subject">{t('campaigns:subject')}</Label>
                     <Input
                       id="subject"
-                      placeholder="Sujet de l'email"
+                      placeholder={t('campaigns:subjectPlaceholder')}
                       value={customSubject}
-                      onChange={(e) => setCustomSubject(e.target.value)}
+                      onChange={(e) => { setCustomSubject(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.subject; return n; }); }}
                     />
+                    {errors.subject && <p className="text-xs text-destructive mt-1">{errors.subject}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
+                    <Label htmlFor="message">{t('campaigns:message')}</Label>
                     <Textarea
                       id="message"
-                      placeholder="Contenu de l'email..."
+                      placeholder={t('campaigns:messagePlaceholder')}
                       value={customMessage}
-                      onChange={(e) => setCustomMessage(e.target.value)}
+                      onChange={(e) => { setCustomMessage(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.message; return n; }); }}
                       rows={5}
                     />
+                    {errors.message && <p className="text-xs text-destructive mt-1">{errors.message}</p>}
                     <p className="text-xs text-muted-foreground">
-                      Tags disponibles: {'{first_name}'}, {'{last_name}'}, {'{email}'}
+                      {t('campaigns:availableTags')}
                     </p>
                   </div>
                 </>
               ) : selectedTemplate && (
                 <div className="p-3 rounded-lg bg-muted/50 border border-border space-y-2">
                   <div className="text-sm">
-                    <span className="font-medium">Sujet:</span> {selectedTemplate.subject}
+                    <span className="font-medium">{t('campaigns:subject')}:</span> {selectedTemplate.subject}
                   </div>
                   <div className="text-sm text-muted-foreground line-clamp-3">
                     {selectedTemplate.body.replace(/<[^>]*>/g, '').substring(0, 150)}...
@@ -350,10 +367,10 @@ export function CreateCampaignDialog({
           {/* SMS/WhatsApp Message */}
           {channel !== 'email' && (
             <div className="space-y-2">
-              <Label htmlFor="sms-message">Message {channel === 'sms' ? 'SMS' : 'WhatsApp'}</Label>
+              <Label htmlFor="sms-message">{t('campaigns:messageChannel', { channel: channel === 'sms' ? 'SMS' : 'WhatsApp' })}</Label>
               <Textarea
                 id="sms-message"
-                placeholder={channel === 'sms' ? 'Écrivez votre SMS (160 caractères max)...' : 'Écrivez votre message WhatsApp...'}
+                placeholder={channel === 'sms' ? t('campaigns:smsPlaceholder') : t('campaigns:whatsappPlaceholder')}
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
                 rows={3}
@@ -361,7 +378,7 @@ export function CreateCampaignDialog({
               />
               <div className="flex items-center justify-between">
                 <p className="text-xs text-muted-foreground">
-                  Tags: {'{first_name}'}, {'{last_name}'}
+                  {t('campaigns:availableTags')}
                 </p>
                 {channel === 'sms' && (
                   <p className="text-xs text-muted-foreground">{customMessage.length}/160</p>
@@ -378,12 +395,12 @@ export function CreateCampaignDialog({
             className="w-full gap-2"
             onClick={() => setAiDialogOpen(true)}
           >
-            <Sparkles className="h-4 w-4" /> Générer avec l'IA
+            <Sparkles className="h-4 w-4" /> {t('campaigns:generateWithAI')}
           </Button>
 
           {/* Send Options */}
           <div className="space-y-3">
-            <Label>Quand envoyer?</Label>
+            <Label>{t('campaigns:whenToSend')}</Label>
             <RadioGroup
               value={sendOption}
               onValueChange={(v) => setSendOption(v as 'now' | 'later')}
@@ -393,14 +410,14 @@ export function CreateCampaignDialog({
                 <RadioGroupItem value="now" id="now" />
                 <Label htmlFor="now" className="flex items-center gap-2 cursor-pointer flex-1">
                   <Send className="h-4 w-4 text-primary" />
-                  Envoyer maintenant
+                  {t('campaigns:sendNow')}
                 </Label>
               </div>
               <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="later" id="later" />
                 <Label htmlFor="later" className="flex items-center gap-2 cursor-pointer flex-1">
                   <Clock className="h-4 w-4" />
-                  Programmer pour plus tard
+                  {t('campaigns:scheduleLater')}
                 </Label>
               </div>
             </RadioGroup>
@@ -408,14 +425,15 @@ export function CreateCampaignDialog({
 
           {sendOption === 'later' && (
             <div className="space-y-2">
-              <Label htmlFor="schedule-date">Date et heure d'envoi</Label>
+              <Label htmlFor="schedule-date">{t('campaigns:sendDateTime')}</Label>
               <Input
                 id="schedule-date"
                 type="datetime-local"
                 value={scheduledDate}
-                onChange={(e) => setScheduledDate(e.target.value)}
+                onChange={(e) => { setScheduledDate(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.scheduledDate; return n; }); }}
                 min={new Date().toISOString().slice(0, 16)}
               />
+              {errors.scheduledDate && <p className="text-xs text-destructive mt-1">{errors.scheduledDate}</p>}
             </div>
           )}
 
@@ -426,7 +444,7 @@ export function CreateCampaignDialog({
               onClick={() => onOpenChange(false)}
               disabled={createCampaignMutation.isPending}
             >
-              Annuler
+              {t('common:cancel')}
             </Button>
             <Button
               type="submit"
@@ -440,7 +458,7 @@ export function CreateCampaignDialog({
               ) : (
                 <Clock className="h-4 w-4 mr-2" />
               )}
-              {sendOption === 'now' ? 'Envoyer la campagne' : 'Programmer'}
+              {sendOption === 'now' ? t('campaigns:sendCampaign') : t('campaigns:schedule')}
             </Button>
           </div>
         </form>

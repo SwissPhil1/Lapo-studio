@@ -1,5 +1,5 @@
 import { format, parseISO } from 'date-fns';
-import { formatCurrency } from '@/shared/lib/constants';
+import { formatCurrency } from '@/shared/lib/format';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';

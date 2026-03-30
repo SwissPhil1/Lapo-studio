@@ -3,8 +3,10 @@ import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Loader2, Star, ArrowRight } from 'lucide-react';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
+import { useTranslation } from 'react-i18next';
 
 export function FirstTreatmentAnalysis() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['first-treatment-analysis'],
     queryFn: async () => {
@@ -87,7 +89,7 @@ export function FirstTreatmentAnalysis() {
   if (!data || data.popularityData.length === 0) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

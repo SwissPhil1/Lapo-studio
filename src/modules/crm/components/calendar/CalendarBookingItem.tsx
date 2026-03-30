@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getStatusColors, getStatusLabel, BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 import { ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { getLocale } from '@/shared/lib/format';
 import type { CalendarBooking } from '@/shared/hooks/useCalendarBookings';
 
 interface CalendarBookingItemProps {
@@ -11,9 +13,10 @@ interface CalendarBookingItemProps {
 }
 
 export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBookingItemProps) {
+  const { t } = useTranslation(['calendar']);
   const navigate = useNavigate();
   const colors = getStatusColors(booking.status || 'scheduled');
-  const statusLabel = getStatusLabel(booking.status || 'scheduled', 'fr');
+  const statusLabel = getStatusLabel(booking.status || 'scheduled');
   const isRescheduled = booking.status === BOOKING_STATUS.RESCHEDULED;
 
   const handleClick = () => {
@@ -45,14 +48,14 @@ export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBo
               </span>
               {booking.booking_value > 0 && (
                 <span className="text-xs text-muted-foreground">
-                  CHF {booking.booking_value.toLocaleString()}
+                  CHF {booking.booking_value.toLocaleString(getLocale())}
                 </span>
               )}
             </div>
             {isRescheduled && booking.rescheduled_to_booking_id && (
               <p className="text-xs text-warning flex items-center gap-1">
                 <ArrowRight className="h-3 w-3" />
-                RDV reporté
+                {t('calendar:appointmentPostponed')}
               </p>
             )}
           </div>
@@ -88,7 +91,7 @@ export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBo
       {isRescheduled && booking.rescheduled_to_booking_id && (
         <div className="mt-1.5 flex items-center gap-1 text-xs text-warning">
           <ArrowRight className="h-3 w-3" />
-          <span>Voir le nouveau RDV</span>
+          <span>{t('calendar:viewNewAppointment')}</span>
         </div>
       )}
     </button>

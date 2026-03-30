@@ -1,6 +1,8 @@
 import { supabase } from "@/shared/lib/supabase";
 import { format, differenceInDays, addDays } from "date-fns";
-import { fr } from "date-fns/locale";
+import { fr as frLocale } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
+import i18n from '@/i18n';
 
 // Clinic configuration - can be moved to settings table later
 const CLINIC_CONFIG = {
@@ -125,11 +127,12 @@ function getDaysOverdue(lastVisitDate: Date | null, recallDays: number): number 
 }
 
 /**
- * Format date in French
+ * Format date with locale-aware formatting
  */
-function formatDateFr(date: Date | null): string {
+function formatDateLocale(date: Date | null): string {
   if (!date) return '';
-  return format(date, "d MMMM yyyy", { locale: fr });
+  const locale = i18n.language === 'fr' ? frLocale : enUS;
+  return format(date, "d MMMM yyyy", { locale });
 }
 
 /**
@@ -153,11 +156,11 @@ export function resolveMergeTags(
   if (treatment) {
     result = result.replace(/{treatment_name}/g, treatment.treatment_name || '');
     result = result.replace(/{recall_days}/g, treatment.recall_days?.toString() || '');
-    result = result.replace(/{last_visit_date}/g, formatDateFr(treatment.last_visit_date));
+    result = result.replace(/{last_visit_date}/g, formatDateLocale(treatment.last_visit_date));
     result = result.replace(/{days_since_visit}/g, getDaysSinceVisit(treatment.last_visit_date).toString());
     
     const nextDueDate = getNextDueDate(treatment.last_visit_date, treatment.recall_days);
-    result = result.replace(/{next_due_date}/g, formatDateFr(nextDueDate));
+    result = result.replace(/{next_due_date}/g, formatDateLocale(nextDueDate));
     result = result.replace(/{days_overdue}/g, getDaysOverdue(treatment.last_visit_date, treatment.recall_days).toString());
   } else {
     // Clear treatment tags if no treatment info
@@ -202,12 +205,14 @@ export function getRecallTemplateKey(treatmentCategory?: string): string {
 }
 
 /**
- * Get template category labels in French
+ * Get template category labels
  */
-export const TEMPLATE_CATEGORIES: Record<string, string> = {
-  recall: 'Rappels de traitement',
-  reactivation: 'Réactivation',
-  followup: 'Suivi',
-  administrative: 'Administratif',
-  marketing: 'Marketing'
-};
+export function getTemplateCategories(): Record<string, string> {
+  return {
+    recall: i18n.t('common:templateRecall'),
+    reactivation: i18n.t('common:templateReactivation'),
+    followup: i18n.t('common:templateFollowup'),
+    administrative: i18n.t('common:templateAdministrative'),
+    marketing: i18n.t('common:templateMarketing'),
+  };
+}

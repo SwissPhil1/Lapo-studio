@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Loader2, FlaskConical } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   Table,
   TableBody,
@@ -23,6 +24,7 @@ interface VariantRow {
 }
 
 export function ABTestResults({ campaignId }: ABTestResultsProps) {
+  const { t } = useTranslation(['campaigns']);
   const { data, isLoading } = useQuery({
     queryKey: ['ab-test-results', campaignId],
     queryFn: async () => {
@@ -92,7 +94,7 @@ export function ABTestResults({ campaignId }: ABTestResultsProps) {
       <div className="h-[200px] flex items-center justify-center text-muted-foreground">
         <div className="text-center">
           <FlaskConical className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>Aucune variante A/B configur\u00e9e pour cette campagne</p>
+          <p>{t('campaigns:noABVariantsConfigured')}</p>
         </div>
       </div>
     );

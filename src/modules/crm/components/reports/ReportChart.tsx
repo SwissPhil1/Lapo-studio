@@ -1,5 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import type { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
 import { REPORT_SOURCES } from '@/shared/lib/reportSources';
+import { getLocale } from '@/shared/lib/format';
 import {
   BarChart,
   Bar,
@@ -45,8 +47,10 @@ const PIE_COLORS = [
 ];
 
 export function ReportChart({ config, data }: ReportChartProps) {
+  const { t } = useTranslation(['reports']);
+  const locale = getLocale();
   const sourceDef = REPORT_SOURCES[config.source];
-  
+
   const getMetricLabel = (key: string) => {
     return sourceDef.metrics.find(m => m.key === key)?.label || key;
   };
@@ -54,15 +58,15 @@ export function ReportChart({ config, data }: ReportChartProps) {
   const formatValue = (value: number, metricKey: string) => {
     const metric = sourceDef.metrics.find(m => m.key === metricKey);
     if (metric?.key === 'revenue' || metric?.key === 'avg_value') {
-      return `${value.toLocaleString('fr-CH')} CHF`;
+      return `${value.toLocaleString(locale)} CHF`;
     }
-    return value.toLocaleString('fr-CH');
+    return value.toLocaleString(locale);
   };
 
   if (data.length === 0) {
     return (
       <div className="h-[400px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('reports:noDataAvailable')}
       </div>
     );
   }
@@ -74,7 +78,7 @@ export function ReportChart({ config, data }: ReportChartProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Dimension</TableHead>
+              <TableHead>{t('reports:dimension')}</TableHead>
               {config.metrics.map(metric => (
                 <TableHead key={metric} className="text-right">
                   {getMetricLabel(metric)}
@@ -128,10 +132,10 @@ export function ReportChart({ config, data }: ReportChartProps) {
   }
 
   // Bar / Line / Area charts
-  const ChartComponent = config.chartType === 'line' 
-    ? LineChart 
-    : config.chartType === 'area' 
-      ? AreaChart 
+  const ChartComponent = config.chartType === 'line'
+    ? LineChart
+    : config.chartType === 'area'
+      ? AreaChart
       : BarChart;
 
   return (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { Button } from '@/components/ui/button';
@@ -42,6 +43,7 @@ interface SavedSegmentsListProps {
 }
 
 export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSegmentsListProps) {
+  const { t } = useTranslation(['segments', 'common']);
   const [isOpen, setIsOpen] = useState(false);
   const [segmentToDelete, setSegmentToDelete] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -54,7 +56,7 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
         .from('crm_segments')
         .select('*')
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data as Segment[];
     },
@@ -71,10 +73,10 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['crm_segments'] });
       setSegmentToDelete(null);
-      toast({ title: 'Segment supprimé' });
+      toast({ title: t('segments:deleted') });
     },
     onError: (error: Error) => {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: t('common:error'), description: error.message, variant: 'destructive' });
     },
   });
 
@@ -93,7 +95,7 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
         <PopoverTrigger asChild>
           <Button variant="outline" className="gap-2">
             <Target className="h-4 w-4 text-primary" />
-            Segments
+            {t('segments:segments')}
             <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
               {segments.length}
             </Badge>
@@ -101,8 +103,8 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0" align="start">
           <div className="p-3 border-b">
-            <h4 className="font-medium text-sm">Segments sauvegardés</h4>
-            <p className="text-xs text-muted-foreground">Appliquez un segment ou créez une campagne</p>
+            <h4 className="font-medium text-sm">{t('segments:savedSegments')}</h4>
+            <p className="text-xs text-muted-foreground">{t('segments:applyOrCreateCampaign')}</p>
           </div>
           <ScrollArea className="max-h-[300px]">
             <div className="p-2 space-y-1">
@@ -115,7 +117,7 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
                     <h5 className="font-medium text-sm text-foreground truncate flex-1">
                       {segment.name}
                     </h5>
-                    <Badge 
+                    <Badge
                       variant={segment.type === 'dynamic' ? 'default' : 'secondary'}
                       className="text-[10px] h-5 shrink-0"
                     >
@@ -126,7 +128,7 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
                       )}
                     </Badge>
                   </div>
-                  
+
                   {segment.type === 'dynamic' && segment.ai_query && (
                     <p className="text-xs text-muted-foreground line-clamp-1 mb-2 italic">
                       "{segment.ai_query}"
@@ -136,26 +138,26 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
                   <div className="flex gap-1">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button 
-                          variant="secondary" 
-                          size="sm" 
+                        <Button
+                          variant="secondary"
+                          size="sm"
                           className="flex-1 h-7 text-xs"
                           onClick={() => handleApply(segment)}
                         >
                           <Play className="h-3 w-3 mr-1" />
-                          Appliquer
+                          {t('segments:apply')}
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Filtrer la liste par ce segment</p>
+                        <p>{t('segments:filterBySegment')}</p>
                       </TooltipContent>
                     </Tooltip>
-                    
+
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
+                        <Button
+                          variant="outline"
+                          size="sm"
                           className="h-7 text-xs px-2"
                           onClick={() => {
                             onCreateCampaign(segment);
@@ -166,10 +168,10 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Créer une campagne avec ce segment</p>
+                        <p>{t('segments:createCampaignWithSegment')}</p>
                       </TooltipContent>
                     </Tooltip>
-                    
+
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -182,7 +184,7 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Supprimer ce segment</p>
+                        <p>{t('segments:deleteSegment')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -197,13 +199,13 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
       <AlertDialog open={!!segmentToDelete} onOpenChange={() => setSegmentToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer ce segment ?</AlertDialogTitle>
+            <AlertDialogTitle>{t('segments:deleteConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action est irréversible. Le segment sera définitivement supprimé.
+              {t('segments:deleteConfirmDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => segmentToDelete && deleteSegmentMutation.mutate(segmentToDelete)}
@@ -211,7 +213,7 @@ export function SavedSegmentsList({ onApplySegment, onCreateCampaign }: SavedSeg
               {deleteSegmentMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                'Supprimer'
+                t('common:delete')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

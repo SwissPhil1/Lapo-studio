@@ -6,6 +6,7 @@ import {
   ChevronsRight,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -44,6 +45,7 @@ export function DataPagination({
   showRange = true,
   pageSizeOptions = [10, 20, 50, 100],
 }: DataPaginationProps) {
+  const { t } = useTranslation(['common']);
   const {
     page,
     pageSize,
@@ -73,7 +75,7 @@ export function DataPagination({
       {/* Range info */}
       {showRange && (
         <div className="text-sm text-muted-foreground">
-          Affichage de {range.from} à {range.to} sur {totalItems} résultats
+          {t('common:showingRange', { from: range.from, to: range.to, total: totalItems })}
         </div>
       )}
 
@@ -81,7 +83,7 @@ export function DataPagination({
         {/* Page size selector */}
         {showPageSize && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground whitespace-nowrap">Par page:</span>
+            <span className="text-sm text-muted-foreground whitespace-nowrap">{t('common:perPage')}</span>
             <Select
               value={pageSize.toString()}
               onValueChange={(value) => setPageSize(Number(value))}
@@ -111,7 +113,7 @@ export function DataPagination({
                 className="h-8 w-8"
                 onClick={firstPage}
                 disabled={!hasPrevPage}
-                title="Première page"
+                title={t('common:firstPage')}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -125,7 +127,7 @@ export function DataPagination({
                 className="h-8 w-8"
                 onClick={() => setPage(page - 1)}
                 disabled={!hasPrevPage}
-                title="Page précédente"
+                title={t('common:prevPage')}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -195,7 +197,7 @@ export function DataPagination({
                 className="h-8 w-8"
                 onClick={() => setPage(page + 1)}
                 disabled={!hasNextPage}
-                title="Page suivante"
+                title={t('common:nextPage')}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -209,7 +211,7 @@ export function DataPagination({
                 className="h-8 w-8"
                 onClick={lastPage}
                 disabled={!hasNextPage}
-                title="Dernière page"
+                title={t('common:lastPage')}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>

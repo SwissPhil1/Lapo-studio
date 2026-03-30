@@ -347,7 +347,7 @@ export default function Payouts() {
                         {t("currentBatch")} #{currentBatch.batch_number}
                       </h2>
                       <span className="text-sm text-muted-foreground">
-                        {currentBatch.entries_count} {currentBatch.entries_count === 1 ? 'entrée' : 'entrées'}
+                        {currentBatch.entries_count} {currentBatch.entries_count === 1 ? t('common:entry') : t('common:entries')}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 mt-1">

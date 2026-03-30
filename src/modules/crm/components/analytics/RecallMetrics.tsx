@@ -1,13 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Loader2, CheckCircle, Clock, AlertTriangle, Calendar } from 'lucide-react';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
-import { 
-  getOverallRecallStatusWithMappings, 
-  type ServiceMapping, 
+import {
+  getOverallRecallStatusWithMappings,
+  type ServiceMapping,
   type TreatmentProtocol,
-  type BookingWithService 
+  type BookingWithService
 } from '@/shared/lib/recallUtils';
 
 const COLORS = {
@@ -20,10 +21,11 @@ const COLORS = {
 };
 
 export function RecallMetrics() {
+  const { t } = useTranslation(['analytics']);
+
   const { data, isLoading } = useQuery({
     queryKey: ['recall-metrics-enhanced'],
     queryFn: async () => {
-      // Fetch service mappings and treatment protocols
       const [serviceMappingsResult, protocolsResult, patientsResult] = await Promise.all([
         supabase
           .from('service_mappings')
@@ -35,26 +37,24 @@ export function RecallMetrics() {
           .from('patients')
           .select('id'),
       ]);
-      
+
       const serviceMappings: ServiceMapping[] = (serviceMappingsResult.data || []) as ServiceMapping[];
       const treatmentProtocols: TreatmentProtocol[] = (protocolsResult.data || []) as TreatmentProtocol[];
       const patients = patientsResult.data;
-      
+
       if (!patients || patients.length === 0) {
         return { onTrack: 0, dueSoon: 0, overdue: 0, inFollowup: 0, noData: 0, total: 0 };
       }
-      
-      // Get all bookings for patients
+
       const patientIds = patients.map(p => p.id);
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
-      
+
       const { data: bookings } = await supabase
         .from('bookings')
         .select('patient_id, booking_date, status, service')
         .in('patient_id', patientIds);
-      
-      // Group bookings by patient
+
       const bookingsByPatient: Record<string, BookingWithService[]> = {};
       bookings?.forEach(booking => {
         if (!bookingsByPatient[booking.patient_id]) {
@@ -66,37 +66,34 @@ export function RecallMetrics() {
           status: booking.status || undefined,
         });
       });
-      
-      // Categorize patients using the proper recall logic
+
       let onTrack = 0;
       let dueSoon = 0;
       let overdue = 0;
       let inFollowup = 0;
       let noData = 0;
-      
+
       patients.forEach(patient => {
         const patientBookings = bookingsByPatient[patient.id] || [];
-        
-        // Split into past (completed) and upcoming bookings
+
         const pastBookings = patientBookings
           .filter(b => b.status === BOOKING_STATUS.COMPLETED)
           .sort((a, b) => b.booking_date.localeCompare(a.booking_date));
-        
+
         const upcomingBookings = patientBookings
           .filter(b => {
             const bookingDateStr = b.booking_date.split('T')[0].split(' ')[0];
             return bookingDateStr >= todayStr && b.status === BOOKING_STATUS.SCHEDULED;
           })
           .sort((a, b) => a.booking_date.localeCompare(b.booking_date));
-        
-        // Calculate recall status using the proper function
+
         const recallStatus = getOverallRecallStatusWithMappings(
           pastBookings,
           upcomingBookings,
           serviceMappings,
           treatmentProtocols
         );
-        
+
         switch (recallStatus) {
           case 'scheduled':
           case 'on_track':
@@ -115,7 +112,7 @@ export function RecallMetrics() {
             noData++;
         }
       });
-      
+
       return {
         onTrack,
         dueSoon,
@@ -126,7 +123,7 @@ export function RecallMetrics() {
       };
     },
   });
-  
+
   if (isLoading) {
     return (
       <div className="h-[250px] flex items-center justify-center">
@@ -134,26 +131,26 @@ export function RecallMetrics() {
       </div>
     );
   }
-  
+
   if (!data || data.total === 0) {
     return (
       <div className="h-[250px] flex items-center justify-center text-muted-foreground">
         <div className="text-center">
           <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>Aucun patient enregistré</p>
+          <p>{t('analytics:noPatients')}</p>
         </div>
       </div>
     );
   }
-  
+
   const chartData = [
-    { name: 'À jour', value: data.onTrack, color: COLORS.onTrack },
-    { name: 'Bientôt dû', value: data.dueSoon, color: COLORS.dueSoon },
-    { name: 'En retard', value: data.overdue, color: COLORS.overdue },
-    { name: 'En suivi', value: data.inFollowup, color: COLORS.inFollowup },
-    { name: 'Sans données', value: data.noData, color: COLORS.noData },
+    { name: t('analytics:recallOnTrack'), value: data.onTrack, color: COLORS.onTrack },
+    { name: t('analytics:recallDueSoon'), value: data.dueSoon, color: COLORS.dueSoon },
+    { name: t('analytics:recallOverdue'), value: data.overdue, color: COLORS.overdue },
+    { name: t('analytics:recallInFollowup'), value: data.inFollowup, color: COLORS.inFollowup },
+    { name: t('analytics:recallNoData'), value: data.noData, color: COLORS.noData },
   ].filter(item => item.value > 0);
-  
+
   return (
     <div className="flex items-center">
       <div className="w-1/2">
@@ -178,17 +175,17 @@ export function RecallMetrics() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: any) => [value, 'Patients']}
+              formatter={(value: any) => [value, t('analytics:patients')]}
             />
           </PieChart>
         </ResponsiveContainer>
       </div>
-      
+
       <div className="w-1/2 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-success" />
-            <span className="text-sm text-foreground">À jour</span>
+            <span className="text-sm text-foreground">{t('analytics:recallOnTrack')}</span>
           </div>
           <div className="text-right">
             <span className="font-bold text-foreground">{data.onTrack}</span>
@@ -197,11 +194,11 @@ export function RecallMetrics() {
             </span>
           </div>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-warning" />
-            <span className="text-sm text-foreground">Bientôt dû</span>
+            <span className="text-sm text-foreground">{t('analytics:recallDueSoon')}</span>
           </div>
           <div className="text-right">
             <span className="font-bold text-foreground">{data.dueSoon}</span>
@@ -210,11 +207,11 @@ export function RecallMetrics() {
             </span>
           </div>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-destructive" />
-            <span className="text-sm text-foreground">En retard</span>
+            <span className="text-sm text-foreground">{t('analytics:recallOverdue')}</span>
           </div>
           <div className="text-right">
             <span className="font-bold text-foreground">{data.overdue}</span>
@@ -223,12 +220,12 @@ export function RecallMetrics() {
             </span>
           </div>
         </div>
-        
+
         {data.inFollowup > 0 && (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-primary" />
-              <span className="text-sm text-foreground">En suivi</span>
+              <span className="text-sm text-foreground">{t('analytics:recallInFollowup')}</span>
             </div>
             <div className="text-right">
               <span className="font-bold text-foreground">{data.inFollowup}</span>
@@ -238,10 +235,10 @@ export function RecallMetrics() {
             </div>
           </div>
         )}
-        
+
         {data.noData > 0 && (
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-sm">Sans données</span>
+            <span className="text-sm">{t('analytics:recallNoData')}</span>
             <span className="text-sm">{data.noData}</span>
           </div>
         )}

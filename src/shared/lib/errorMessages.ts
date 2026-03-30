@@ -1,9 +1,11 @@
 /**
  * User-Friendly Error Messages
  *
- * Maps technical error codes and messages to user-friendly messages in French.
+ * Maps technical error codes and messages to user-friendly messages via i18n.
  * Used throughout the app to provide better UX for error handling.
  */
+
+import i18n from '@/i18n';
 
 type ErrorCode = string;
 
@@ -13,139 +15,144 @@ interface ErrorMapping {
   action?: string;
 }
 
-// Map of known error codes to user-friendly messages
-const errorMappings: Record<ErrorCode, ErrorMapping> = {
-  // Authentication errors
-  'auth/invalid-email': {
-    title: 'Email invalide',
-    message: 'L\'adresse email fournie n\'est pas valide.',
-    action: 'Vérifiez l\'adresse email et réessayez.',
-  },
-  'auth/user-not-found': {
-    title: 'Utilisateur non trouvé',
-    message: 'Aucun compte n\'existe avec cette adresse email.',
-    action: 'Vérifiez l\'email ou créez un nouveau compte.',
-  },
-  'auth/wrong-password': {
-    title: 'Mot de passe incorrect',
-    message: 'Le mot de passe saisi est incorrect.',
-    action: 'Réessayez ou utilisez "Mot de passe oublié".',
-  },
-  'auth/email-already-in-use': {
-    title: 'Email déjà utilisé',
-    message: 'Un compte existe déjà avec cette adresse email.',
-    action: 'Connectez-vous ou utilisez une autre adresse.',
-  },
-  'auth/weak-password': {
-    title: 'Mot de passe trop faible',
-    message: 'Le mot de passe doit contenir au moins 8 caractères.',
-  },
-  'auth/session-expired': {
-    title: 'Session expirée',
-    message: 'Votre session a expiré pour des raisons de sécurité.',
-    action: 'Veuillez vous reconnecter.',
-  },
+// Map of known error codes to i18n keys
+function getErrorMappings(): Record<ErrorCode, ErrorMapping> {
+  return {
+    // Authentication errors
+    'auth/invalid-email': {
+      title: i18n.t('errors:invalidEmail.title'),
+      message: i18n.t('errors:invalidEmail.message'),
+      action: i18n.t('errors:invalidEmail.action'),
+    },
+    'auth/user-not-found': {
+      title: i18n.t('errors:userNotFound.title'),
+      message: i18n.t('errors:userNotFound.message'),
+      action: i18n.t('errors:userNotFound.action'),
+    },
+    'auth/wrong-password': {
+      title: i18n.t('errors:wrongPassword.title'),
+      message: i18n.t('errors:wrongPassword.message'),
+      action: i18n.t('errors:wrongPassword.action'),
+    },
+    'auth/email-already-in-use': {
+      title: i18n.t('errors:emailInUse.title'),
+      message: i18n.t('errors:emailInUse.message'),
+      action: i18n.t('errors:emailInUse.action'),
+    },
+    'auth/weak-password': {
+      title: i18n.t('errors:weakPassword.title'),
+      message: i18n.t('errors:weakPassword.message'),
+    },
+    'auth/session-expired': {
+      title: i18n.t('errors:sessionExpired.title'),
+      message: i18n.t('errors:sessionExpired.message'),
+      action: i18n.t('errors:sessionExpired.action'),
+    },
 
-  // Database errors
-  '23505': {
-    title: 'Doublon détecté',
-    message: 'Cette entrée existe déjà dans le système.',
-    action: 'Vérifiez les données existantes.',
-  },
-  '23503': {
-    title: 'Référence invalide',
-    message: 'L\'élément référencé n\'existe pas ou a été supprimé.',
-  },
-  '42501': {
-    title: 'Accès refusé',
-    message: 'Vous n\'avez pas les permissions nécessaires.',
-    action: 'Contactez un administrateur si vous pensez que c\'est une erreur.',
-  },
-  'PGRST301': {
-    title: 'Non trouvé',
-    message: 'L\'élément demandé n\'existe pas ou a été supprimé.',
-  },
+    // Database errors
+    '23505': {
+      title: i18n.t('errors:duplicate.title'),
+      message: i18n.t('errors:duplicate.message'),
+      action: i18n.t('errors:duplicate.action'),
+    },
+    '23503': {
+      title: i18n.t('errors:invalidReference.title'),
+      message: i18n.t('errors:invalidReference.message'),
+    },
+    '42501': {
+      title: i18n.t('errors:accessDenied.title'),
+      message: i18n.t('errors:accessDenied.message'),
+      action: i18n.t('errors:accessDenied.action'),
+    },
+    'PGRST301': {
+      title: i18n.t('errors:notFound.title'),
+      message: i18n.t('errors:notFound.message'),
+    },
 
-  // Network errors
-  'network_error': {
-    title: 'Erreur réseau',
-    message: 'Impossible de se connecter au serveur.',
-    action: 'Vérifiez votre connexion internet et réessayez.',
-  },
-  'timeout': {
-    title: 'Délai dépassé',
-    message: 'La requête a pris trop de temps.',
-    action: 'Réessayez dans quelques instants.',
-  },
+    // Network errors
+    'network_error': {
+      title: i18n.t('errors:networkError.title'),
+      message: i18n.t('errors:networkError.message'),
+      action: i18n.t('errors:networkError.action'),
+    },
+    'timeout': {
+      title: i18n.t('errors:timeout.title'),
+      message: i18n.t('errors:timeout.message'),
+      action: i18n.t('errors:timeout.action'),
+    },
 
-  // Rate limiting
-  'rate_limit_exceeded': {
-    title: 'Trop de requêtes',
-    message: 'Vous avez effectué trop de requêtes.',
-    action: 'Attendez quelques secondes avant de réessayer.',
-  },
+    // Rate limiting
+    'rate_limit_exceeded': {
+      title: i18n.t('errors:rateLimited.title'),
+      message: i18n.t('errors:rateLimited.message'),
+      action: i18n.t('errors:rateLimited.action'),
+    },
 
-  // Commission/Conversion errors
-  'CONVERSION_IN_PROGRESS': {
-    title: 'Conversion en cours',
-    message: 'Une autre conversion est déjà en cours pour cet ambassadeur.',
-    action: 'Attendez quelques secondes et réessayez.',
-  },
-  'insufficient_balance': {
-    title: 'Solde insuffisant',
-    message: 'Le solde LAPO Cash est insuffisant pour cette opération.',
-  },
-  'insufficient_commissions': {
-    title: 'Commissions insuffisantes',
-    message: 'Le montant des commissions en attente est insuffisant.',
-  },
-  'auto_payout_enabled': {
-    title: 'Versement automatique activé',
-    message: 'La conversion LAPO Cash n\'est pas disponible avec le versement automatique.',
-    action: 'Désactivez le versement automatique pour convertir en LAPO Cash.',
-  },
+    // Commission/Conversion errors
+    'CONVERSION_IN_PROGRESS': {
+      title: i18n.t('errors:conversionInProgress.title'),
+      message: i18n.t('errors:conversionInProgress.message'),
+      action: i18n.t('errors:conversionInProgress.action'),
+    },
+    'insufficient_balance': {
+      title: i18n.t('errors:insufficientBalance.title'),
+      message: i18n.t('errors:insufficientBalance.message'),
+    },
+    'insufficient_commissions': {
+      title: i18n.t('errors:insufficientCommissions.title'),
+      message: i18n.t('errors:insufficientCommissions.message'),
+    },
+    'auto_payout_enabled': {
+      title: i18n.t('errors:autoPayoutEnabled.title'),
+      message: i18n.t('errors:autoPayoutEnabled.message'),
+      action: i18n.t('errors:autoPayoutEnabled.action'),
+    },
 
-  // Referral errors
-  'referral_not_found': {
-    title: 'Parrainage non trouvé',
-    message: 'Ce parrainage n\'existe pas ou a été supprimé.',
-  },
-  'referrer_not_found': {
-    title: 'Ambassadeur non trouvé',
-    message: 'Cet ambassadeur n\'existe pas dans le système.',
-  },
-  'patient_not_found': {
-    title: 'Patient non trouvé',
-    message: 'Ce patient n\'existe pas dans le système.',
-  },
-  'invalid_referrer_code': {
-    title: 'Code invalide',
-    message: 'Le code ambassadeur n\'est pas valide.',
-  },
+    // Referral errors
+    'referral_not_found': {
+      title: i18n.t('errors:referralNotFound.title'),
+      message: i18n.t('errors:referralNotFound.message'),
+    },
+    'referrer_not_found': {
+      title: i18n.t('errors:referrerNotFound.title'),
+      message: i18n.t('errors:referrerNotFound.message'),
+    },
+    'patient_not_found': {
+      title: i18n.t('errors:patientNotFound.title'),
+      message: i18n.t('errors:patientNotFound.message'),
+    },
+    'invalid_referrer_code': {
+      title: i18n.t('errors:invalidCode.title'),
+      message: i18n.t('errors:invalidCode.message'),
+    },
 
-  // Validation errors
-  'validation_error': {
-    title: 'Données invalides',
-    message: 'Certaines informations sont incorrectes ou manquantes.',
-    action: 'Vérifiez les champs du formulaire.',
-  },
-  'missing_required_fields': {
-    title: 'Champs obligatoires',
-    message: 'Certains champs obligatoires ne sont pas remplis.',
-  },
-};
+    // Validation errors
+    'validation_error': {
+      title: i18n.t('errors:validationError.title'),
+      message: i18n.t('errors:validationError.message'),
+      action: i18n.t('errors:validationError.action'),
+    },
+    'missing_required_fields': {
+      title: i18n.t('errors:missingFields.title'),
+      message: i18n.t('errors:missingFields.message'),
+    },
+  };
+}
 
 // Default error message for unknown errors
-const defaultError: ErrorMapping = {
-  title: 'Une erreur est survenue',
-  message: 'Une erreur inattendue s\'est produite.',
-  action: 'Réessayez ou contactez le support si le problème persiste.',
-};
+function getDefaultError(): ErrorMapping {
+  return {
+    title: i18n.t('errors:defaultTitle'),
+    message: i18n.t('errors:defaultMessage'),
+    action: i18n.t('errors:defaultAction'),
+  };
+}
 
 /**
  * Get user-friendly error message from error code or message
  */
 export function getErrorMessage(error: unknown): ErrorMapping {
+  const defaultError = getDefaultError();
   if (!error) return defaultError;
 
   // Extract error code/message
@@ -164,6 +171,8 @@ export function getErrorMessage(error: unknown): ErrorMapping {
     errorCode = (err.code as string) || (err.error as string) || (err.status as string)?.toString();
     errorMessage = (err.message as string) || (err.error_description as string);
   }
+
+  const errorMappings = getErrorMappings();
 
   // Check for known error codes
   if (errorCode && errorMappings[errorCode]) {

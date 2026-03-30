@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { supabase } from '@/shared/lib/supabase';
 import {
   Dialog,
@@ -38,11 +40,14 @@ export function CampaignDetailDialog({
   onOpenChange,
   campaign,
 }: CampaignDetailDialogProps) {
+  const { t, i18n } = useTranslation(['campaigns']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
+
   const { data: recipients, isLoading } = useQuery({
     queryKey: ['campaign-recipients', campaign?.id],
     queryFn: async () => {
       if (!campaign) return [];
-      
+
       const { data: logs, error } = await supabase
         .from('crm_communication_logs')
         .select(`
@@ -65,7 +70,7 @@ export function CampaignDetailDialog({
       // Fetch patient names
       const patientIds = logs?.map(l => l.patient_id) || [];
       if (patientIds.length === 0) return [];
-      
+
       const { data: patients } = await supabase
         .from('patients')
         .select('id, first_name, last_name, email')
@@ -77,7 +82,7 @@ export function CampaignDetailDialog({
         const patient = patientMap.get(log.patient_id);
         return {
           ...log,
-          patient_name: patient ? `${patient.first_name} ${patient.last_name}` : 'Patient inconnu',
+          patient_name: patient ? `${patient.first_name} ${patient.last_name}` : t('campaigns:unknownPatient'),
           patient_email: patient?.email || '',
         };
       }) as RecipientLog[];
@@ -102,11 +107,11 @@ export function CampaignDetailDialog({
   };
 
   const getStatusLabel = (log: RecipientLog) => {
-    if (log.bounce_reason) return 'Échec';
-    if (log.clicked_at) return 'Cliqué';
-    if (log.opened_at) return 'Ouvert';
-    if (log.delivered_at) return 'Délivré';
-    return 'En attente';
+    if (log.bounce_reason) return t('campaigns:statusFailed');
+    if (log.clicked_at) return t('campaigns:statusClicked');
+    if (log.opened_at) return t('campaigns:statusOpened');
+    if (log.delivered_at) return t('campaigns:statusDelivered');
+    return t('campaigns:statusPending');
   };
 
   const getStatusBadgeVariant = (log: RecipientLog): 'default' | 'secondary' | 'destructive' | 'outline' => {
@@ -143,23 +148,23 @@ export function CampaignDetailDialog({
         <div className="grid grid-cols-5 gap-3 py-4 border-b border-border">
           <div className="text-center">
             <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-            <p className="text-xs text-muted-foreground">Total</p>
+            <p className="text-xs text-muted-foreground">{t('campaigns:total')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-foreground">{stats.delivered}</p>
-            <p className="text-xs text-muted-foreground">Délivrés</p>
+            <p className="text-xs text-muted-foreground">{t('campaigns:delivered')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-primary">{stats.opened}</p>
-            <p className="text-xs text-muted-foreground">Ouverts</p>
+            <p className="text-xs text-muted-foreground">{t('campaigns:opened')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-success">{stats.clicked}</p>
-            <p className="text-xs text-muted-foreground">Clics</p>
+            <p className="text-xs text-muted-foreground">{t('campaigns:clicks')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-destructive">{stats.bounced}</p>
-            <p className="text-xs text-muted-foreground">Échecs</p>
+            <p className="text-xs text-muted-foreground">{t('campaigns:bounced')}</p>
           </div>
         </div>
 
@@ -190,12 +195,12 @@ export function CampaignDetailDialog({
                   <div className="flex items-center gap-3">
                     {recipient.opened_count && recipient.opened_count > 1 && (
                       <span className="text-xs text-muted-foreground">
-                        {recipient.opened_count}x ouvert
+                        {t('campaigns:openedCount', { count: recipient.opened_count })}
                       </span>
                     )}
                     {recipient.clicked_count && recipient.clicked_count > 0 && (
                       <span className="text-xs text-muted-foreground">
-                        {recipient.clicked_count}x cliqué
+                        {t('campaigns:clickedCount', { count: recipient.clicked_count })}
                       </span>
                     )}
                     <Badge variant={getStatusBadgeVariant(recipient)}>
@@ -206,7 +211,7 @@ export function CampaignDetailDialog({
                         {format(
                           new Date(recipient.opened_at || recipient.delivered_at!),
                           'dd/MM HH:mm',
-                          { locale: fr }
+                          { locale: dateLocale }
                         )}
                       </span>
                     )}
@@ -216,7 +221,7 @@ export function CampaignDetailDialog({
             </div>
           ) : (
             <div className="text-center py-12 text-muted-foreground">
-              Aucun destinataire trouvé
+              {t('campaigns:noRecipientsFound')}
             </div>
           )}
         </ScrollArea>

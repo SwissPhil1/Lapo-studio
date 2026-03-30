@@ -1,10 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Loader2, AlertTriangle, Users, TrendingDown, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 interface AtRiskPatient {
   id: string;
@@ -15,12 +17,13 @@ interface AtRiskPatient {
 }
 
 export function ChurnPrediction() {
+  const { t, i18n } = useTranslation(['analytics']);
   const navigate = useNavigate();
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
 
   const { data, isLoading } = useQuery({
     queryKey: ['churn-prediction'],
     queryFn: async () => {
-      // Fetch patients with churn_risk_score
       const { data: patients, error } = await supabase
         .from('patients')
         .select('id, first_name, last_name, churn_risk_score, last_visit_date')
@@ -31,7 +34,6 @@ export function ChurnPrediction() {
 
       const typedPatients = (patients || []) as AtRiskPatient[];
 
-      // Risk distribution
       const high = typedPatients.filter((p) => p.churn_risk_score > 70).length;
       const medium = typedPatients.filter(
         (p) => p.churn_risk_score >= 40 && p.churn_risk_score <= 70
@@ -39,15 +41,13 @@ export function ChurnPrediction() {
       const low = typedPatients.filter((p) => p.churn_risk_score < 40).length;
 
       const distributionData = [
-        { name: '\u00c9lev\u00e9', count: high, color: '#FF6B6B' },
-        { name: 'Moyen', count: medium, color: '#F59E0B' },
-        { name: 'Faible', count: low, color: '#22C55E' },
+        { name: t('analytics:riskHigh'), count: high, color: '#FF6B6B' },
+        { name: t('analytics:riskMedium'), count: medium, color: '#F59E0B' },
+        { name: t('analytics:riskLow'), count: low, color: '#22C55E' },
       ];
 
-      // Top 10 at-risk
       const topAtRisk = typedPatients.slice(0, 10);
 
-      // KPIs
       const totalAtRisk = typedPatients.length;
       const avgRiskScore =
         totalAtRisk > 0
@@ -56,7 +56,6 @@ export function ChurnPrediction() {
             )
           : 0;
 
-      // Patients due for reactivation (high risk, last visit > 90 days ago or null)
       const ninetyDaysAgo = new Date();
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
       const dueForReactivation = typedPatients.filter((p) => {
@@ -87,10 +86,8 @@ export function ChurnPrediction() {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <AlertTriangle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">Aucune donn\u00e9e de pr\u00e9diction de churn</p>
-        <p className="text-sm mt-1">
-          Les scores de risque de churn appara\u00eetront ici lorsqu'ils seront calcul\u00e9s.
-        </p>
+        <p className="font-medium">{t('analytics:noChurnData')}</p>
+        <p className="text-sm mt-1">{t('analytics:noChurnDataDescription')}</p>
       </div>
     );
   }
@@ -108,24 +105,24 @@ export function ChurnPrediction() {
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Users className="h-5 w-5 mx-auto text-destructive mb-2" />
           <p className="text-2xl font-bold">{data.totalAtRisk}</p>
-          <p className="text-sm text-muted-foreground">Total \u00e0 risque</p>
+          <p className="text-sm text-muted-foreground">{t('analytics:totalAtRisk')}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <TrendingDown className="h-5 w-5 mx-auto text-warning mb-2" />
           <p className="text-2xl font-bold">{data.avgRiskScore}</p>
-          <p className="text-sm text-muted-foreground">Score moyen</p>
+          <p className="text-sm text-muted-foreground">{t('analytics:avgScore')}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <RefreshCw className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{data.dueForReactivation}</p>
-          <p className="text-sm text-muted-foreground">\u00c0 r\u00e9activer</p>
+          <p className="text-sm text-muted-foreground">{t('analytics:toReactivate')}</p>
         </div>
       </div>
 
       {/* Risk distribution chart */}
       <div>
         <h4 className="text-sm font-medium text-muted-foreground mb-3">
-          R\u00e9partition du risque de churn
+          {t('analytics:churnRiskDistribution')}
         </h4>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data.distributionData} layout="vertical">
@@ -145,7 +142,7 @@ export function ChurnPrediction() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: any) => [`${value}`, 'Patients']}
+              formatter={(value: any) => [`${value}`, t('analytics:patients')]}
             />
             <Bar dataKey="count" radius={[0, 4, 4, 0]}>
               {data.distributionData.map((entry, index) => (
@@ -159,7 +156,7 @@ export function ChurnPrediction() {
       {/* Top 10 at-risk patients */}
       <div>
         <h4 className="text-sm font-medium text-muted-foreground mb-3">
-          Top 10 patients \u00e0 risque
+          {t('analytics:top10AtRisk')}
         </h4>
         <div className="space-y-2">
           {data.topAtRisk.map((patient) => (
@@ -181,8 +178,8 @@ export function ChurnPrediction() {
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {patient.last_visit_date
-                      ? `Derni\u00e8re visite: ${format(new Date(patient.last_visit_date), 'dd MMM yyyy', { locale: fr })}`
-                      : 'Aucune visite enregistr\u00e9e'}
+                      ? `${t('analytics:lastVisit')}: ${format(new Date(patient.last_visit_date), 'dd MMM yyyy', { locale: dateLocale })}`
+                      : t('analytics:noVisitRecorded')}
                   </p>
                 </div>
               </div>

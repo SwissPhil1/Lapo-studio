@@ -11,7 +11,11 @@ import {
 } from 'recharts';
 import { Loader2, TrendingUp, DollarSign, Clock, Target } from 'lucide-react';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
+import { getLocale } from '@/shared/lib/format';
+import { useTranslation } from 'react-i18next';
 
 interface PipelineSnapshot {
   id: string;
@@ -24,6 +28,7 @@ interface PipelineSnapshot {
 }
 
 export function RevenueForecast() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['revenue-forecast'],
     queryFn: async () => {
@@ -113,7 +118,7 @@ export function RevenueForecast() {
       const trendData = Array.from(dateMap.entries())
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([date, value]) => ({
-          date: format(parseISO(date), 'dd MMM', { locale: fr }),
+          date: format(parseISO(date), 'dd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
           valeur: Math.round(value),
         }));
 
@@ -124,15 +129,15 @@ export function RevenueForecast() {
         ...(trendData.length > 0
           ? [
               {
-                date: format(addDays(today, 30), 'dd MMM', { locale: fr }),
+                date: format(addDays(today, 30), 'dd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
                 valeur: forecast30,
               },
               {
-                date: format(addDays(today, 60), 'dd MMM', { locale: fr }),
+                date: format(addDays(today, 60), 'dd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
                 valeur: forecast60,
               },
               {
-                date: format(addDays(today, 90), 'dd MMM', { locale: fr }),
+                date: format(addDays(today, 90), 'dd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
                 valeur: forecast90,
               },
             ]
@@ -163,14 +168,14 @@ export function RevenueForecast() {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <TrendingUp className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">Aucune donn\u00e9e de pr\u00e9vision</p>
+        <p className="font-medium">{t('analytics:noForecastData')}</p>
         <p className="text-sm mt-1">Les donn\u00e9es du pipeline appara\u00eetront ici.</p>
       </div>
     );
   }
 
   const formatCHF = (value: number) =>
-    new Intl.NumberFormat('fr-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 }).format(value);
+    new Intl.NumberFormat(getLocale(), { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 }).format(value);
 
   return (
     <div className="space-y-6">

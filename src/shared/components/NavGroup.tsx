@@ -6,10 +6,19 @@ interface NavGroupProps {
   label: string
   children: ReactNode
   defaultOpen?: boolean
+  collapsed?: boolean
 }
 
-export function NavGroup({ label, children, defaultOpen = true }: NavGroupProps) {
+export function NavGroup({ label, children, defaultOpen = true, collapsed }: NavGroupProps) {
   const [open, setOpen] = useState(defaultOpen)
+
+  if (collapsed) {
+    return (
+      <div className="mb-1">
+        <div className="mt-0.5 space-y-0.5">{children}</div>
+      </div>
+    )
+  }
 
   return (
     <div className="mb-1">

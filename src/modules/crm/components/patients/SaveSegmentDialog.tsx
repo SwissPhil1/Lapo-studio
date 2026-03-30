@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -32,8 +33,10 @@ export function SaveSegmentDialog({
   patientCount,
   onSuccess,
 }: SaveSegmentDialogProps) {
+  const { t } = useTranslation(['segments', 'common']);
   const [name, setName] = useState('');
   const [type, setType] = useState<'static' | 'dynamic'>(aiQuery ? 'dynamic' : 'static');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   const saveMutation = useMutation({
@@ -59,16 +62,17 @@ export function SaveSegmentDialog({
     },
     onSuccess: () => {
       toast({
-        title: 'Segment sauvegardé',
-        description: `Le segment "${name}" a été créé avec succès.`,
+        title: t('segments:saved'),
+        description: t('segments:savedDescription', { name }),
       });
       setName('');
+      setErrors({});
       onOpenChange(false);
       onSuccess?.();
     },
     onError: (error: Error) => {
       toast({
-        title: 'Erreur',
+        title: t('common:error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -78,13 +82,10 @@ export function SaveSegmentDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      toast({
-        title: 'Erreur',
-        description: 'Veuillez entrer un nom pour le segment.',
-        variant: 'destructive',
-      });
+      setErrors({ name: t('segments:nameRequired') });
       return;
     }
+    setErrors({});
     saveMutation.mutate();
   };
 
@@ -94,28 +95,29 @@ export function SaveSegmentDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bookmark className="h-5 w-5 text-primary" />
-            Sauvegarder le segment
+            {t('segments:saveSegment')}
           </DialogTitle>
           <DialogDescription>
-            Créez un segment réutilisable à partir de votre recherche.
+            {t('segments:saveDescription')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="segment-name">Nom du segment</Label>
+            <Label htmlFor="segment-name">{t('segments:segmentName')}</Label>
             <Input
               id="segment-name"
-              placeholder="ex: Botox > 6 mois"
+              placeholder={t('segments:segmentNamePlaceholder')}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.name; return n; }); }}
               autoFocus
             />
+            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
           </div>
 
           {aiQuery && (
             <div className="space-y-3">
-              <Label>Type de segment</Label>
+              <Label>{t('segments:segmentType')}</Label>
               <RadioGroup
                 value={type}
                 onValueChange={(v) => setType(v as 'static' | 'dynamic')}
@@ -126,10 +128,10 @@ export function SaveSegmentDialog({
                   <div className="flex-1">
                     <Label htmlFor="dynamic" className="flex items-center gap-2 cursor-pointer font-medium">
                       <Sparkles className="h-4 w-4 text-primary" />
-                      Dynamique (recommandé)
+                      {t('segments:dynamic')}
                     </Label>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Se met à jour automatiquement. Les nouveaux patients correspondants seront inclus.
+                      {t('segments:dynamicDescription')}
                     </p>
                     <div className="mt-2 p-2 bg-muted/50 rounded text-xs font-mono text-muted-foreground">
                       "{aiQuery}"
@@ -142,10 +144,10 @@ export function SaveSegmentDialog({
                   <div className="flex-1">
                     <Label htmlFor="static" className="flex items-center gap-2 cursor-pointer font-medium">
                       <Users className="h-4 w-4" />
-                      Statique
+                      {t('segments:static')}
                     </Label>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Liste fixe des {patientCount} patients actuellement sélectionnés.
+                      {t('segments:staticDescription', { count: patientCount })}
                     </p>
                   </div>
                 </div>
@@ -157,8 +159,8 @@ export function SaveSegmentDialog({
             <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-2 text-sm">
                 <Users className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">{patientCount} patients</span>
-                <span className="text-muted-foreground">seront inclus dans ce segment</span>
+                <span className="font-medium">{t('segments:patientCount', { count: patientCount })}</span>
+                <span className="text-muted-foreground">{t('segments:willBeIncluded')}</span>
               </div>
             </div>
           )}
@@ -170,7 +172,7 @@ export function SaveSegmentDialog({
               onClick={() => onOpenChange(false)}
               disabled={saveMutation.isPending}
             >
-              Annuler
+              {t('common:cancel')}
             </Button>
             <Button
               type="submit"
@@ -182,7 +184,7 @@ export function SaveSegmentDialog({
               ) : (
                 <Bookmark className="h-4 w-4 mr-2" />
               )}
-              Sauvegarder
+              {t('common:save')}
             </Button>
           </div>
         </form>

@@ -2,8 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Loader2, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function GeographicDistribution() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['geographic-distribution'],
     queryFn: async () => {
@@ -51,7 +53,7 @@ export function GeographicDistribution() {
     return (
       <div className="h-[280px] flex flex-col items-center justify-center text-muted-foreground">
         <MapPin className="h-8 w-8 mb-2" />
-        <p>Aucune ville renseignée</p>
+        <p>{t('analytics:noCityData')}</p>
         <p className="text-sm">Complétez les profils patients</p>
       </div>
     );

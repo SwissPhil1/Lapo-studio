@@ -12,27 +12,20 @@ interface ActivityLegendProps {
 }
 
 export function ActivityLegend({ compact = true }: ActivityLegendProps) {
-  const { i18n } = useTranslation(["referrers"]);
-  const isEnglish = i18n.language === "en";
+  const { t } = useTranslation(["common"]);
 
   const statuses: ReferrerActivityStatus[] = ["active", "dormant", "cold"];
 
-  const labels = {
-    active: isEnglish ? "Active" : "Actif",
-    dormant: isEnglish ? "Dormant" : "À relancer",
-    cold: isEnglish ? "Inactive" : "Inactif",
+  const labels: Record<string, string> = {
+    active: t("common:activityActive"),
+    dormant: t("common:activityDormant"),
+    cold: t("common:activityCold"),
   };
 
-  const descriptions = {
-    active: isEnglish 
-      ? "Made a referral in the last 60 days" 
-      : "A fait un parrainage dans les 60 derniers jours",
-    dormant: isEnglish 
-      ? "No referral in the last 2-6 months" 
-      : "Aucun parrainage dans les 2-6 derniers mois",
-    cold: isEnglish 
-      ? "No referral in over 6 months" 
-      : "Aucun parrainage depuis plus de 6 mois",
+  const descriptions: Record<string, string> = {
+    active: t("common:activityActiveTooltip"),
+    dormant: t("common:activityDormantTooltip"),
+    cold: t("common:activityColdTooltip"),
   };
 
   if (compact) {
@@ -41,7 +34,7 @@ export function ActivityLegend({ compact = true }: ActivityLegendProps) {
         <TooltipTrigger asChild>
           <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
             <HelpCircle className="h-4 w-4" />
-            <span className="text-xs">{isEnglish ? "Activity legend" : "Légende activité"}</span>
+            <span className="text-xs">{t("common:activityLegend")}</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-xs p-3">

@@ -186,7 +186,7 @@ export default function Referrers() {
       sortable: true,
       cell: (row) => {
         const tooltipText = row.first_purchase_rate && row.repeat_purchase_rate
-          ? `Commission 1er achat : ${row.first_purchase_rate}% • Achats suivants : ${row.repeat_purchase_rate}%`
+          ? t('referrers:commissionTooltip', { first: row.first_purchase_rate, repeat: row.repeat_purchase_rate })
           : row.referrer_type_name || "STANDARD";
         
         const tierStyles = getTierBadgeStyles(row.referrer_type_code, row.referrer_type_name);

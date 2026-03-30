@@ -2,15 +2,18 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/shared/lib/supabase';
 import { Users, AlertTriangle, Link2, Banknote, UserCheck, CalendarClock, Calendar } from 'lucide-react';
-import { formatCurrency } from '@/shared/lib/constants';
+import { formatCurrency } from '@/shared/lib/format';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useReactivationTaskCounts, useReactivationTasks } from '@/shared/hooks/useReactivationTasks';
 import { ReactivationTaskCard } from '@/modules/crm/components/tasks/ReactivationTaskCard';
 import { CreateTaskDialog } from '@/modules/crm/components/tasks/CreateTaskDialog';
 import { ActivityFeedWidget } from '@/modules/crm/components/dashboard/ActivityFeedWidget';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, subMonths, subWeeks } from 'date-fns';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import { cn } from '@/shared/lib/utils';
 interface StatCardProps {
   title: string;
   value: string | number;
@@ -18,33 +21,48 @@ interface StatCardProps {
   subtitle?: string;
   onClick?: () => void;
   variant?: 'default' | 'warning' | 'success' | 'destructive';
+  trend?: number;
+  trendLabel?: string;
+  loading?: boolean;
 }
 
-function StatCard({ title, value, icon, subtitle, onClick, variant = 'default' }: StatCardProps) {
-  const bgClass = variant === 'warning' 
-    ? 'bg-warning/5 border-warning/20' 
-    : variant === 'success' 
-    ? 'bg-success/5 border-success/20' 
+function StatCard({ title, value, icon, subtitle, onClick, variant = 'default', trend, trendLabel, loading = false }: StatCardProps) {
+  const bgClass = variant === 'warning'
+    ? 'bg-warning/5 border-warning/20'
+    : variant === 'success'
+    ? 'bg-success/5 border-success/20'
     : variant === 'destructive'
     ? 'bg-destructive/5 border-destructive/20'
     : '';
-    
+
   return (
-    <div 
+    <div
       className={`card-elevated p-6 animate-slide-up ${bgClass} ${onClick ? 'cursor-pointer hover:bg-muted/50 transition-colors' : ''}`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
-          <p className="text-3xl font-bold text-foreground">{value}</p>
-          {subtitle && (
+          {loading ? (
+            <div className="h-9 w-24 rounded bg-muted animate-pulse mt-1" />
+          ) : (
+            <p className="text-3xl font-bold text-foreground">{value}</p>
+          )}
+          {subtitle && !loading && (
             <p className="text-sm mt-2 text-muted-foreground">{subtitle}</p>
+          )}
+          {subtitle && loading && (
+            <div className="h-4 w-32 rounded bg-muted animate-pulse mt-2" />
+          )}
+          {!loading && trend !== undefined && trend !== 0 && (
+            <p className={cn("text-xs font-medium mt-1", trend > 0 ? "text-success" : "text-destructive")}>
+              {trend > 0 ? '\u2191' : '\u2193'} {Math.abs(trend).toFixed(1)}% {trendLabel}
+            </p>
           )}
         </div>
         <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
-          variant === 'warning' ? 'bg-warning/10' : 
-          variant === 'success' ? 'bg-success/10' : 
+          variant === 'warning' ? 'bg-warning/10' :
+          variant === 'success' ? 'bg-success/10' :
           variant === 'destructive' ? 'bg-destructive/10' :
           'bg-accent'
         }`}>
@@ -58,64 +76,81 @@ function StatCard({ title, value, icon, subtitle, onClick, variant = 'default' }
 export default function Dashboard() {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const { t, i18n } = useTranslation(['crmDashboard', 'common']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   
-  // Monthly revenue
-  const { data: monthlyRevenue = 0 } = useQuery({
-    queryKey: ['monthly-revenue'],
+  // Monthly revenue (current + previous)
+  const { data: revenueData = { current: 0, previous: 0 } } = useQuery({
+    queryKey: ['monthly-revenue-trend'],
     queryFn: async () => {
       const now = new Date();
       const start = startOfMonth(now).toISOString();
       const end = endOfMonth(now).toISOString();
-      
-      const { data } = await supabase
-        .from('bookings')
-        .select('booking_value')
-        .eq('status', BOOKING_STATUS.COMPLETED)
-        .eq('is_test', false)
-        .gte('booking_date', start)
-        .lte('booking_date', end);
-      
-      return data?.reduce((sum, b) => sum + (b.booking_value || 0), 0) || 0;
+      const prevMonth = subMonths(now, 1);
+      const prevStart = startOfMonth(prevMonth).toISOString();
+      const prevEnd = endOfMonth(prevMonth).toISOString();
+
+      const [{ data: currentData }, { data: prevData }] = await Promise.all([
+        supabase.from('bookings').select('booking_value').eq('status', BOOKING_STATUS.COMPLETED).eq('is_test', false).gte('booking_date', start).lte('booking_date', end),
+        supabase.from('bookings').select('booking_value').eq('status', BOOKING_STATUS.COMPLETED).eq('is_test', false).gte('booking_date', prevStart).lte('booking_date', prevEnd),
+      ]);
+
+      return {
+        current: currentData?.reduce((sum, b) => sum + (b.booking_value || 0), 0) || 0,
+        previous: prevData?.reduce((sum, b) => sum + (b.booking_value || 0), 0) || 0,
+      };
     },
   });
+  const monthlyRevenue = revenueData.current;
+  const revenueTrend = revenueData.previous > 0 ? ((revenueData.current - revenueData.previous) / revenueData.previous * 100) : 0;
 
-  // Appointments this week
-  const { data: weeklyAppointments = 0 } = useQuery({
-    queryKey: ['weekly-appointments'],
+  // Appointments this week (current + previous)
+  const { data: appointmentsData = { current: 0, previous: 0 } } = useQuery({
+    queryKey: ['weekly-appointments-trend'],
     queryFn: async () => {
       const now = new Date();
       const start = startOfWeek(now, { weekStartsOn: 1 }).toISOString();
       const end = endOfWeek(now, { weekStartsOn: 1 }).toISOString();
-      
-      const { count } = await supabase
-        .from('bookings')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', BOOKING_STATUS.SCHEDULED)
-        .eq('is_test', false)
-        .gte('booking_date', start)
-        .lte('booking_date', end);
-      
-      return count || 0;
+      const prevWeekDate = subWeeks(now, 1);
+      const prevStart = startOfWeek(prevWeekDate, { weekStartsOn: 1 }).toISOString();
+      const prevEnd = endOfWeek(prevWeekDate, { weekStartsOn: 1 }).toISOString();
+
+      const [{ count: currentCount }, { count: prevCount }] = await Promise.all([
+        supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', BOOKING_STATUS.SCHEDULED).eq('is_test', false).gte('booking_date', start).lte('booking_date', end),
+        supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', BOOKING_STATUS.SCHEDULED).eq('is_test', false).gte('booking_date', prevStart).lte('booking_date', prevEnd),
+      ]);
+
+      return { current: currentCount || 0, previous: prevCount || 0 };
     },
   });
+  const weeklyAppointments = appointmentsData.current;
+  const appointmentsTrend = appointmentsData.previous > 0 ? ((appointmentsData.current - appointmentsData.previous) / appointmentsData.previous * 100) : 0;
 
-  // Active patients (booking in last 12 months)
-  const { data: activePatients = 0 } = useQuery({
-    queryKey: ['active-patients'],
+  // Active patients (current 12 months + previous period offset by 2 months)
+  const { data: activePatientsData = { current: 0, previous: 0 } } = useQuery({
+    queryKey: ['active-patients-trend'],
     queryFn: async () => {
+      const now = new Date();
       const twelveMonthsAgo = new Date();
       twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
-      
-      const { data } = await supabase
-        .from('bookings')
-        .select('patient_id')
-        .eq('is_test', false)
-        .gte('booking_date', twelveMonthsAgo.toISOString());
-      
-      const uniquePatients = new Set(data?.map(b => b.patient_id));
-      return uniquePatients.size;
+
+      const prevEnd = subMonths(now, 2);
+      const prevStart = new Date(prevEnd);
+      prevStart.setFullYear(prevStart.getFullYear() - 1);
+
+      const [{ data: currentData }, { data: prevData }] = await Promise.all([
+        supabase.from('bookings').select('patient_id').eq('is_test', false).gte('booking_date', twelveMonthsAgo.toISOString()),
+        supabase.from('bookings').select('patient_id').eq('is_test', false).gte('booking_date', prevStart.toISOString()).lte('booking_date', prevEnd.toISOString()),
+      ]);
+
+      return {
+        current: new Set(currentData?.map(b => b.patient_id)).size,
+        previous: new Set(prevData?.map(b => b.patient_id)).size,
+      };
     },
   });
+  const activePatients = activePatientsData.current;
+  const activePatientsTrend = activePatientsData.previous > 0 ? ((activePatientsData.current - activePatientsData.previous) / activePatientsData.previous * 100) : 0;
 
   // Retention rate (patients with 2+ bookings / total patients with any booking)
   const { data: retentionRate = 0 } = useQuery({
@@ -239,13 +274,13 @@ export default function Dashboard() {
             </div>
             <div className="flex-1">
               <p className="font-medium text-foreground">
-                {unmappedServicesCount} service{unmappedServicesCount !== 1 ? 's' : ''} non mappé{unmappedServicesCount !== 1 ? 's' : ''}
+                {t('crmDashboard:unmappedServices', { count: unmappedServicesCount })}
               </p>
               <p className="text-sm text-muted-foreground">
-                Associez ces services à un protocole pour activer le suivi de rappel
+                {t('crmDashboard:unmappedServicesDesc')}
               </p>
             </div>
-            <span className="text-sm text-primary font-medium">Configurer →</span>
+            <span className="text-sm text-primary font-medium">{t('crmDashboard:configure')} →</span>
           </div>
         </div>
       )}
@@ -262,16 +297,16 @@ export default function Dashboard() {
             </div>
             <div className="flex-1">
               <p className="font-medium text-foreground">
-                {totalAttentionItems} RDV à traiter
-                {needsAttentionPatients > 0 && ` (${needsAttentionPatients} patient${needsAttentionPatients !== 1 ? 's' : ''})`}
+                {t('crmDashboard:appointmentsToProcess', { count: totalAttentionItems })}
+                {needsAttentionPatients > 0 && ` (${t('crmDashboard:patients', { count: needsAttentionPatients })})`}
               </p>
               <p className="text-sm text-muted-foreground">
-                {needsAttentionCount > 0 && `${needsAttentionCount} RDV non traité${needsAttentionCount !== 1 ? 's' : ''}`}
+                {needsAttentionCount > 0 && t('crmDashboard:unprocessedAppointments', { count: needsAttentionCount })}
                 {needsAttentionCount > 0 && noShowCount > 0 && ' • '}
-                {noShowCount > 0 && `${noShowCount} no-show${noShowCount !== 1 ? 's' : ''}`}
+                {noShowCount > 0 && t('crmDashboard:noShows', { count: noShowCount })}
               </p>
             </div>
-            <span className="text-sm text-primary font-medium">Traiter →</span>
+            <span className="text-sm text-primary font-medium">{t('crmDashboard:process')} →</span>
           </div>
         </div>
       )}
@@ -280,26 +315,32 @@ export default function Dashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Patients actifs"
+          title={t('crmDashboard:activePatients')}
           value={activePatients}
           icon={<Users className="h-6 w-6 text-primary" />}
-          subtitle="12 derniers mois"
+          subtitle={t('crmDashboard:last12Months')}
+          trend={activePatientsTrend}
+          trendLabel={t('crmDashboard:vsLastPeriod')}
         />
         <StatCard
-          title="Revenus du mois"
+          title={t('crmDashboard:monthlyRevenue')}
           value={formatCurrency(monthlyRevenue)}
           icon={<Banknote className="h-6 w-6 text-primary" />}
+          trend={revenueTrend}
+          trendLabel={t('crmDashboard:vsLastPeriod')}
         />
         <StatCard
-          title="RDV cette semaine"
+          title={t('crmDashboard:weeklyAppointments')}
           value={weeklyAppointments}
           icon={<CalendarClock className="h-6 w-6 text-primary" />}
+          trend={appointmentsTrend}
+          trendLabel={t('crmDashboard:vsLastPeriod')}
         />
         <StatCard
-          title="Taux de fidélisation"
+          title={t('crmDashboard:retentionRate')}
           value={`${retentionRate}%`}
           icon={<UserCheck className="h-6 w-6 text-primary" />}
-          subtitle="Patients avec 2+ RDV"
+          subtitle={t('crmDashboard:patientsWithMultipleAppts')}
         />
       </div>
 
@@ -307,28 +348,28 @@ export default function Dashboard() {
       <div className="card-elevated p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
-            Relances à effectuer ({pendingTasks.length})
+            {t('crmDashboard:followUps')} ({pendingTasks.length})
           </h3>
           <div className="flex items-center gap-3">
             <div className="flex gap-2 text-sm">
               {taskCounts.overdue_recall > 0 && (
                 <span className="px-2 py-1 rounded bg-destructive/10 text-destructive">
-                  {taskCounts.overdue_recall} rappel{taskCounts.overdue_recall !== 1 ? 's' : ''}
+                  {t('crmDashboard:recalls', { count: taskCounts.overdue_recall })}
                 </span>
               )}
               {taskCounts.dormant > 0 && (
                 <span className="px-2 py-1 rounded bg-warning/10 text-warning">
-                  {taskCounts.dormant} inactif{taskCounts.dormant !== 1 ? 's' : ''}
+                  {t('crmDashboard:inactive', { count: taskCounts.dormant })}
                 </span>
               )}
               {taskCounts.no_show_followup > 0 && (
                 <span className="px-2 py-1 rounded bg-warning/10 text-warning">
-                  {taskCounts.no_show_followup} no-show{taskCounts.no_show_followup !== 1 ? 's' : ''}
+                  {t('crmDashboard:noShows', { count: taskCounts.no_show_followup })}
                 </span>
               )}
               {taskCounts.manual > 0 && (
                 <span className="px-2 py-1 rounded bg-primary/10 text-primary">
-                  {taskCounts.manual} manuel{taskCounts.manual !== 1 ? 's' : ''}
+                  {t('crmDashboard:manual', { count: taskCounts.manual })}
                 </span>
               )}
             </div>
@@ -345,13 +386,13 @@ export default function Dashboard() {
                 onClick={() => navigate('/crm/patients?filter=overdue')}
                 className="w-full text-center text-sm text-primary hover:underline py-2"
               >
-                Voir les {pendingTasks.length - 5} autres tâches →
+                {t('crmDashboard:viewMore', { count: pendingTasks.length - 5 })} →
               </button>
             )}
           </div>
         ) : (
           <div className="text-center py-6 text-muted-foreground">
-            <p>Aucune relance en attente</p>
+            <p>{t('crmDashboard:noFollowUps')}</p>
           </div>
         )}
       </div>
@@ -360,10 +401,10 @@ export default function Dashboard() {
       <div className="card-elevated p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
-            RDV du jour ({todayAppointments.length})
+            {t('crmDashboard:todayAppointments')} ({todayAppointments.length})
           </h3>
           <span className="text-sm text-muted-foreground">
-            {format(new Date(), 'EEEE d MMMM', { locale: fr })}
+            {format(new Date(), 'EEEE d MMMM', { locale: dateLocale })}
           </span>
         </div>
         
@@ -393,10 +434,10 @@ export default function Dashboard() {
                   apt.status === BOOKING_STATUS.NO_SHOW ? 'bg-destructive/10 text-destructive' :
                   'bg-primary/10 text-primary'
                 }`}>
-                  {apt.status === BOOKING_STATUS.COMPLETED ? 'Payé' :
-                   apt.status === BOOKING_STATUS.NO_SHOW ? 'Absent' :
-                   apt.status === BOOKING_STATUS.CANCELLED ? 'Annulé' :
-                   'Planifié'}
+                  {apt.status === BOOKING_STATUS.COMPLETED ? t('crmDashboard:statusPaid') :
+                   apt.status === BOOKING_STATUS.NO_SHOW ? t('crmDashboard:statusAbsent') :
+                   apt.status === BOOKING_STATUS.CANCELLED ? t('crmDashboard:statusCancelled') :
+                   t('crmDashboard:statusScheduled')}
                 </span>
               </div>
             ))}
@@ -404,7 +445,7 @@ export default function Dashboard() {
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p>Aucun rendez-vous aujourd'hui</p>
+            <p>{t('crmDashboard:noAppointmentsToday')}</p>
           </div>
         )}
       </div>
