@@ -17,7 +17,8 @@ export function Breadcrumb() {
       {segments.map((segment, i) => {
         const path = '/' + segments.slice(0, i + 1).join('/')
         const isLast = i === segments.length - 1
-        const label = t(`nav.${segment}`, { defaultValue: segment.replace(/-/g, ' ') })
+        const camelSegment = segment.replace(/-([a-z])/g, (_, c) => c.toUpperCase())
+        const label = t(`nav.${camelSegment}`, { defaultValue: segment.replace(/-/g, ' ') })
 
         return (
           <span key={path} className="flex items-center gap-1">

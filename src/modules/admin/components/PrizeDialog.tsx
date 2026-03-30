@@ -188,7 +188,7 @@ export function PrizeDialog({ open, onOpenChange, prize, onSave, saving }: Prize
 
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              {t('dialog.createTitle', { context: 'cancel' })}
+              {t('common:cancel')}
             </Button>
             <Button type="submit" disabled={saving || !name.trim() || !cost}>
               {saving ? '...' : isEditing ? t('dialog.save') : t('dialog.create')}
