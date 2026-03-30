@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Users, Clock, Target, AlertTriangle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
@@ -45,29 +46,31 @@ export function PipelineMetrics({
   conversionRate,
   staleLeadsCount,
 }: PipelineMetricsProps) {
+  const { t } = useTranslation(['pipeline']);
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       <MetricCard
         icon={Users}
-        label="Total patients"
+        label={t('pipeline:totalPatients')}
         value={totalPatients}
       />
       <MetricCard
         icon={Clock}
-        label="Temps moyen"
-        value={avgDaysToComplete !== null ? `${avgDaysToComplete}j` : '—'}
-        subtext={avgDaysToComplete !== null ? 'pour compléter' : ''}
+        label={t('pipeline:avgTime')}
+        value={avgDaysToComplete !== null ? `${avgDaysToComplete}${t('pipeline:daysUnit')}` : '—'}
+        subtext={avgDaysToComplete !== null ? t('pipeline:toComplete') : ''}
       />
       <MetricCard
         icon={Target}
-        label="Taux de conversion"
+        label={t('pipeline:conversionRate')}
         value={conversionRate !== null ? `${conversionRate}%` : '—'}
       />
       <MetricCard
         icon={AlertTriangle}
-        label="Leads inactifs"
+        label={t('pipeline:staleLeads')}
         value={staleLeadsCount}
-        subtext="> 7 jours"
+        subtext={t('pipeline:moreThan7Days')}
         variant={staleLeadsCount > 0 ? 'warning' : 'default'}
       />
     </div>

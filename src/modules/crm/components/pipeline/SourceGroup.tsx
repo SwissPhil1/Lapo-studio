@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronRight, Link2, UserCircle } from 'lucide-react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -32,13 +33,13 @@ interface SourceGroupProps {
 
 const sourceConfig = {
   referral: {
-    label: 'Referrals',
+    labelKey: 'pipeline:referrals',
     icon: Link2,
     className: 'text-primary',
     bgClassName: 'bg-primary/10',
   },
   organic: {
-    label: 'Organic',
+    labelKey: 'pipeline:organic',
     icon: UserCircle,
     className: 'text-muted-foreground',
     bgClassName: 'bg-muted',
@@ -46,6 +47,7 @@ const sourceConfig = {
 };
 
 export function SourceGroup({ source, patients, stageId }: SourceGroupProps) {
+  const { t } = useTranslation(['pipeline']);
   const [isExpanded, setIsExpanded] = useState(true);
   const config = sourceConfig[source];
   const Icon = config.icon;
@@ -67,7 +69,7 @@ export function SourceGroup({ source, patients, stageId }: SourceGroupProps) {
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         )}
         <Icon className={cn('h-4 w-4', config.className)} />
-        <span className="text-sm font-medium text-foreground">{config.label}</span>
+        <span className="text-sm font-medium text-foreground">{t(config.labelKey)}</span>
         <span className={cn('ml-auto text-xs px-2 py-0.5 rounded-full', config.bgClassName, config.className)}>
           {patients.length}
         </span>
@@ -91,7 +93,7 @@ export function SourceGroup({ source, patients, stageId }: SourceGroupProps) {
               ))
             ) : (
               <div className="flex items-center justify-center h-12 text-muted-foreground text-xs">
-                Aucun patient
+                {t('pipeline:noPatients')}
               </div>
             )}
           </SortableContext>

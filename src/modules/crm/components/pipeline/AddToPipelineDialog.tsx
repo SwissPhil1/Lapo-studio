@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
 import {
   Dialog,
@@ -34,6 +35,7 @@ interface AddToPipelineDialogProps {
 }
 
 export function AddToPipelineDialog({ stages, existingPatientIds }: AddToPipelineDialogProps) {
+  const { t } = useTranslation(['pipeline']);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
@@ -56,9 +58,9 @@ export function AddToPipelineDialog({ stages, existingPatientIds }: AddToPipelin
       }
 
       const { data, error } = await query.limit(20);
-      
+
       if (error) throw error;
-      
+
       // Filter out patients already in pipeline
       return (data || []).filter(p => !existingPatientIds.includes(p.id));
     },
@@ -94,22 +96,22 @@ export function AddToPipelineDialog({ stages, existingPatientIds }: AddToPipelin
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Ajouter un patient
+          {t('pipeline:addPatient')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Ajouter un patient au pipeline</DialogTitle>
+          <DialogTitle>{t('pipeline:addPatientTitle')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {/* Patient Search */}
           <div className="space-y-2">
-            <Label>Rechercher un patient</Label>
+            <Label>{t('pipeline:searchPatient')}</Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Nom, prénom ou email..."
+                placeholder={t('pipeline:searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -125,7 +127,7 @@ export function AddToPipelineDialog({ stages, existingPatientIds }: AddToPipelin
               </div>
             ) : patients.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">
-                Aucun patient disponible
+                {t('pipeline:noPatientAvailable')}
               </p>
             ) : (
               patients.map((patient) => (
@@ -147,16 +149,16 @@ export function AddToPipelineDialog({ stages, existingPatientIds }: AddToPipelin
 
           {selectedPatient && (
             <p className="text-sm text-primary">
-              Sélectionné: {selectedPatient.first_name} {selectedPatient.last_name}
+              {t('pipeline:selected', { name: `${selectedPatient.first_name} ${selectedPatient.last_name}` })}
             </p>
           )}
 
           {/* Stage Selection */}
           <div className="space-y-2">
-            <Label>Étape du pipeline</Label>
+            <Label>{t('pipeline:pipelineStage')}</Label>
             <Select value={selectedStageId} onValueChange={setSelectedStageId}>
               <SelectTrigger>
-                <SelectValue placeholder="Choisir une étape" />
+                <SelectValue placeholder={t('pipeline:chooseStage')} />
               </SelectTrigger>
               <SelectContent>
                 {stages.map((stage) => (
@@ -170,24 +172,24 @@ export function AddToPipelineDialog({ stages, existingPatientIds }: AddToPipelin
 
           {/* Priority */}
           <div className="space-y-2">
-            <Label>Priorité</Label>
+            <Label>{t('pipeline:priority')}</Label>
             <Select value={priority} onValueChange={setPriority}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="high">Haute</SelectItem>
-                <SelectItem value="medium">Moyenne</SelectItem>
-                <SelectItem value="low">Basse</SelectItem>
+                <SelectItem value="high">{t('pipeline:priorityHigh')}</SelectItem>
+                <SelectItem value="medium">{t('pipeline:priorityMedium')}</SelectItem>
+                <SelectItem value="low">{t('pipeline:priorityLow')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label>Notes (optionnel)</Label>
+            <Label>{t('pipeline:notesOptional')}</Label>
             <Textarea
-              placeholder="Ajouter des notes..."
+              placeholder={t('pipeline:addNotesPlaceholder')}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
@@ -197,14 +199,14 @@ export function AddToPipelineDialog({ stages, existingPatientIds }: AddToPipelin
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Annuler
+            {t('pipeline:cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={!selectedPatientId || !selectedStageId || addPatient.isPending}
           >
             {addPatient.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Ajouter
+            {t('pipeline:add')}
           </Button>
         </div>
       </DialogContent>

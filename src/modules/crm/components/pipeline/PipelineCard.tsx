@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { GripVertical, Calendar, Zap } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
@@ -25,24 +26,24 @@ interface PipelineCardProps {
   hasActiveWorkflow?: boolean;
 }
 
-// Helper to handle both numeric and string priority values
-function getPriorityInfo(priority: string | number | null): { label: string; className: string } | null {
+function getPriorityInfo(priority: string | number | null, t: (key: string) => string): { label: string; className: string } | null {
   if (priority === 'high' || priority === 3) {
-    return { label: 'Haute', className: 'bg-destructive/20 text-destructive' };
+    return { label: t('pipeline:priorityHigh'), className: 'bg-destructive/20 text-destructive' };
   }
   if (priority === 'medium' || priority === 2) {
-    return { label: 'Moyenne', className: 'bg-warning/20 text-warning-foreground' };
+    return { label: t('pipeline:priorityMedium'), className: 'bg-warning/20 text-warning-foreground' };
   }
   if (priority === 'low' || priority === 1) {
-    return { label: 'Basse', className: 'bg-muted text-muted-foreground' };
+    return { label: t('pipeline:priorityLow'), className: 'bg-muted text-muted-foreground' };
   }
   return null;
 }
 
 export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
   function PipelineCard({ patient, hasActiveWorkflow = false }, _ref) {
+    const { t } = useTranslation(['pipeline']);
     const navigate = useNavigate();
-    
+
     const {
       attributes,
       listeners,
@@ -67,7 +68,7 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
       }
     };
 
-    const priorityInfo = getPriorityInfo(patient.priority);
+    const priorityInfo = getPriorityInfo(patient.priority, t);
 
     return (
       <div
@@ -86,7 +87,7 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
           >
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </button>
-          
+
           <div className="flex-1 min-w-0" onClick={handleClick}>
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
@@ -100,7 +101,7 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
                   {patient.patients?.first_name} {patient.patients?.last_name}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {patient.patients?.email || 'Pas d\'email'}
+                  {patient.patients?.email || t('pipeline:noEmail')}
                 </p>
               </div>
             </div>
@@ -109,7 +110,7 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
               {hasActiveWorkflow && (
                 <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">
                   <Zap className="h-3 w-3" />
-                  En séquence
+                  {t('pipeline:inSequence')}
                 </span>
               )}
               {priorityInfo && (
@@ -128,11 +129,11 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
             <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
               <Calendar className="h-3 w-3" />
               <span>
-                {daysInStage === 0 
-                  ? "Aujourd'hui" 
-                  : daysInStage === 1 
-                    ? 'Hier' 
-                    : `Il y a ${daysInStage} jours`}
+                {daysInStage === 0
+                  ? t('pipeline:today')
+                  : daysInStage === 1
+                    ? t('pipeline:yesterday')
+                    : t('pipeline:daysAgo', { count: daysInStage })}
               </span>
             </div>
           </div>

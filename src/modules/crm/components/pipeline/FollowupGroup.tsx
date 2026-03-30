@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronRight, Zap, Phone } from 'lucide-react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -33,13 +34,13 @@ interface FollowupGroupProps {
 
 const followupConfig = {
   in_sequence: {
-    label: 'Rappel en cours',
+    labelKey: 'pipeline:inSequenceLabel',
     icon: Zap,
     className: 'text-primary',
     bgClassName: 'bg-primary/15',
   },
   needs_contact: {
-    label: 'À contacter',
+    labelKey: 'pipeline:needsContact',
     icon: Phone,
     className: 'text-warning',
     bgClassName: 'bg-warning/15',
@@ -47,6 +48,7 @@ const followupConfig = {
 };
 
 export function FollowupGroup({ followupType, patients, stageId, activeEnrollmentIds = [] }: FollowupGroupProps) {
+  const { t } = useTranslation(['pipeline']);
   const [isExpanded, setIsExpanded] = useState(true);
   const config = followupConfig[followupType];
   const Icon = config.icon;
@@ -68,7 +70,7 @@ export function FollowupGroup({ followupType, patients, stageId, activeEnrollmen
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         )}
         <Icon className={cn('h-4 w-4', config.className)} />
-        <span className="text-sm font-medium text-foreground">{config.label}</span>
+        <span className="text-sm font-medium text-foreground">{t(config.labelKey)}</span>
         <span className={cn('ml-auto text-xs px-2 py-0.5 rounded-full', config.bgClassName, config.className)}>
           {patients.length}
         </span>
@@ -88,15 +90,15 @@ export function FollowupGroup({ followupType, patients, stageId, activeEnrollmen
           >
             {patients.length > 0 ? (
               patients.map((pp) => (
-                <PipelineCard 
-                  key={pp.id} 
-                  patient={pp} 
+                <PipelineCard
+                  key={pp.id}
+                  patient={pp}
                   hasActiveWorkflow={pp.patient_id ? activeEnrollmentIds.includes(pp.patient_id) : false}
                 />
               ))
             ) : (
               <div className="flex items-center justify-center h-12 text-muted-foreground text-xs">
-                Aucun patient
+                {t('pipeline:noPatients')}
               </div>
             )}
           </SortableContext>
