@@ -31,6 +31,7 @@ import {
   X,
   Zap,
   ClipboardList,
+  Activity,
 } from 'lucide-react'
 
 export function StudioLayout() {
@@ -180,6 +181,13 @@ export function StudioLayout() {
                 to="/crm/communications"
                 icon={<MessageSquare className="h-4 w-4" />}
                 label={t('nav.communications')}
+                collapsed={isCollapsed}
+                onClick={isMobile ? closeMobile : undefined}
+              />
+              <NavItem
+                to="/crm/statistics"
+                icon={<Activity className="h-4 w-4" />}
+                label={t('nav.statistics', { defaultValue: 'Statistics' })}
                 collapsed={isCollapsed}
                 onClick={isMobile ? closeMobile : undefined}
               />

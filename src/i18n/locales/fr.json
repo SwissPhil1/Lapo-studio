@@ -22,7 +22,8 @@
     "profile": "Profil",
     "signOut": "Se déconnecter",
     "search": "Rechercher...",
-    "auditTrail": "Journal d'audit"
+    "auditTrail": "Journal d'audit",
+    "statistics": "Statistiques"
   },
   "commandPalette": {
     "placeholder": "Tapez une commande ou recherchez...",
@@ -924,7 +925,37 @@
       "colDate": "Date",
       "colRiskScore": "Score de risque",
       "colLastVisit": "Dernière visite"
-    }
+    },
+    "statisticsTitle": "Statistiques",
+    "statisticsSubtitle": "Vue d'ensemble des performances de votre cabinet",
+    "totalRevenue": "Chiffre d'affaires",
+    "appointments": "Rendez-vous",
+    "newPatientsLabel": "Nouveaux patients",
+    "avgBookingValue": "Valeur moyenne",
+    "revenueByDay": "Revenus par jour de la semaine",
+    "revenueByDayDesc": "Distribution des revenus des RDV complétés",
+    "appointmentOutcomes": "Résultats des rendez-vous",
+    "performanceMetrics": "Métriques de performance",
+    "completionRateLabel": "Taux de complétion",
+    "noShowRateLabel": "Taux de no-show",
+    "retentionRateLabel": "Rétention patients",
+    "revenuePerAppointment": "Revenu / Rendez-vous",
+    "communicationStats": "Performance des communications",
+    "communicationStatsDesc": "Métriques d'engagement email",
+    "emailsSent": "Emails envoyés",
+    "pipelineOverview": "Pipeline",
+    "totalInPipeline": "patients au total",
+    "topServicesLabel": "Services principaux",
+    "topServicesDesc": "Par rendez-vous complétés",
+    "revenueByService": "Revenus par service",
+    "taskSummary": "Tâches",
+    "pendingTasks": "En attente",
+    "overdueTasks": "En retard",
+    "taskCompletionRate": "Taux de complétion",
+    "campaignsOverview": "Campagnes",
+    "activeCampaigns": "Actives",
+    "completedCampaigns": "Terminées",
+    "manageCampaigns": "Gérer les campagnes"
   },
   "campaigns": {
     "title": "Campagnes",

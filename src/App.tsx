@@ -35,6 +35,7 @@ const CommunicationsPage = lazy(() => import('@/modules/crm/pages/Communications
 const AnalyticsPage = lazy(() => import('@/modules/crm/pages/AnalyticsPage'))
 const CampaignsPage = lazy(() => import('@/modules/crm/pages/CampaignsPage'))
 const WorkflowsPage = lazy(() => import('@/modules/crm/pages/WorkflowsPage'))
+const StatisticsPage = lazy(() => import('@/modules/crm/pages/StatisticsPage'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -262,6 +263,15 @@ export default function App() {
                   element={
                     <ProtectedRoute requireCRM>
                       <WorkflowsPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="crm/statistics"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <StatisticsPage />
                     </ProtectedRoute>
                   }
                 />
