@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
 
 interface PatientRiskBadgeProps {
@@ -5,23 +6,25 @@ interface PatientRiskBadgeProps {
 }
 
 export function PatientRiskBadge({ score }: PatientRiskBadgeProps) {
+  const { t } = useTranslation(['patients']);
+
   if (score === null) return null;
 
   const getRiskInfo = (value: number) => {
     if (value > 70) {
       return {
-        label: 'Risque: \u00c9lev\u00e9',
+        label: t('patients:riskHigh'),
         className: 'bg-destructive/15 text-destructive',
       };
     }
     if (value >= 40) {
       return {
-        label: 'Risque: Moyen',
+        label: t('patients:riskMedium'),
         className: 'bg-warning/15 text-warning',
       };
     }
     return {
-      label: 'Risque: Faible',
+      label: t('patients:riskLow'),
       className: 'bg-success/15 text-success',
     };
   };

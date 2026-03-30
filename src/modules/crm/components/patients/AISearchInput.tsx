@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -23,23 +24,24 @@ interface AISearchInputProps {
   resultCount: number | null;
 }
 
-const EXAMPLE_QUERIES = [
-  "Patients ayant eu du Botox il y a plus de 6 mois sans nouveau RDV",
-  "Patients de Paris ayant dépensé plus de 1000 euros",
-  "Patients avec historique de no-show",
-  "Patients inactifs depuis 3 mois",
-  "Nouveaux patients du dernier mois",
-  "Patients ayant eu du filler cette année",
-];
-
-export function AISearchInput({ 
-  onSearch, 
-  onClear, 
-  isSearching, 
-  explanation, 
-  resultCount 
+export function AISearchInput({
+  onSearch,
+  onClear,
+  isSearching,
+  explanation,
+  resultCount
 }: AISearchInputProps) {
+  const { t } = useTranslation(['patients']);
   const [query, setQuery] = useState('');
+
+  const EXAMPLE_QUERIES = [
+    t('patients:aiExample1'),
+    t('patients:aiExample2'),
+    t('patients:aiExample3'),
+    t('patients:aiExample4'),
+    t('patients:aiExample5'),
+    t('patients:aiExample6'),
+  ];
 
   const handleSearch = async () => {
     if (query.trim()) {
@@ -67,25 +69,24 @@ export function AISearchInput({
     <div className="space-y-3 p-4 bg-accent/30 rounded-lg border border-accent">
       <div className="flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-primary" />
-        <span className="text-sm font-medium text-foreground">Recherche intelligente</span>
+        <span className="text-sm font-medium text-foreground">{t('patients:aiSmartSearch')}</span>
         <Tooltip>
           <TooltipTrigger asChild>
             <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
           </TooltipTrigger>
           <TooltipContent className="max-w-xs">
             <p className="text-sm">
-              Décrivez en langage naturel les patients que vous recherchez. 
-              L'IA analysera votre demande et trouvera les patients correspondants.
+              {t('patients:aiSearchTooltip')}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Vos données patients restent privées - seule la structure de la requête est analysée.
+              {t('patients:aiSearchPrivacy')}
             </p>
           </TooltipContent>
         </Tooltip>
       </div>
 
       <Textarea
-        placeholder="Ex: Patients ayant eu du Botox il y a plus de 6 mois sans nouveau rendez-vous..."
+        placeholder={t('patients:aiSearchPlaceholder')}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -94,8 +95,8 @@ export function AISearchInput({
       />
 
       <div className="flex flex-wrap gap-2 items-center">
-        <Button 
-          onClick={handleSearch} 
+        <Button
+          onClick={handleSearch}
           disabled={!query.trim() || isSearching}
           variant="gradient"
           size="sm"
@@ -103,12 +104,12 @@ export function AISearchInput({
           {isSearching ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Recherche...
+              {t('patients:aiSearching')}
             </>
           ) : (
             <>
               <Sparkles className="h-4 w-4 mr-2" />
-              Rechercher avec l'IA
+              {t('patients:aiSearchButton')}
             </>
           )}
         </Button>
@@ -117,13 +118,13 @@ export function AISearchInput({
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
               <Lightbulb className="h-4 w-4 mr-2" />
-              Exemples
+              {t('patients:aiExamples')}
               <ChevronDown className="h-3 w-3 ml-1" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-[320px]">
             {EXAMPLE_QUERIES.map((example, index) => (
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 key={index}
                 onClick={() => handleExampleClick(example)}
                 className="cursor-pointer text-sm"
@@ -135,14 +136,14 @@ export function AISearchInput({
         </DropdownMenu>
 
         {(explanation || resultCount !== null) && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleClear}
             className="text-muted-foreground"
           >
             <X className="h-4 w-4 mr-1" />
-            Effacer
+            {t('patients:aiClear')}
           </Button>
         )}
       </div>
@@ -151,7 +152,7 @@ export function AISearchInput({
         <Alert className="bg-background border-primary/20">
           <Sparkles className="h-4 w-4 text-primary" />
           <AlertDescription className="text-sm">
-            <span className="font-medium">{resultCount} patient{resultCount !== 1 ? 's' : ''} trouvé{resultCount !== 1 ? 's' : ''}</span>
+            <span className="font-medium">{t('patients:aiResultCount', { count: resultCount ?? 0 })}</span>
             <span className="text-muted-foreground"> — {explanation}</span>
           </AlertDescription>
         </Alert>

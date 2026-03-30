@@ -1,10 +1,11 @@
 import { useState, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { addDays } from 'date-fns';
-import { 
-  Clock, 
-  Phone, 
-  Mail, 
-  CheckCircle, 
+import {
+  Clock,
+  Phone,
+  Mail,
+  CheckCircle,
   User,
   AlertTriangle,
   Moon,
@@ -42,44 +43,9 @@ interface ReactivationTaskCardProps {
   task: ReactivationTask;
 }
 
-const TASK_TYPE_LABELS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  overdue_recall: { 
-    label: 'Rappel en retard', 
-    icon: <Clock className="h-4 w-4" />,
-    color: 'text-destructive bg-destructive/10'
-  },
-  dormant: { 
-    label: 'Patient inactif', 
-    icon: <Moon className="h-4 w-4" />,
-    color: 'text-warning bg-warning/10'
-  },
-  no_show_followup: { 
-    label: 'Suivi no-show', 
-    icon: <AlertTriangle className="h-4 w-4" />,
-    color: 'text-warning bg-warning/10'
-  },
-  manual: { 
-    label: 'Suivi manuel', 
-    icon: <User className="h-4 w-4" />,
-    color: 'text-primary bg-primary/10'
-  },
-  cancelled_followup: { 
-    label: 'Suivi annulation', 
-    icon: <XCircle className="h-4 w-4" />,
-    color: 'text-muted-foreground bg-muted'
-  },
-};
-
-const OUTCOME_LABELS: Record<TaskOutcome, string> = {
-  appointment_booked: 'RDV pris',
-  patient_declined: 'Patient a refusé',
-  no_response: 'Pas de réponse',
-  wrong_contact: 'Mauvais contact',
-  other: 'Autre',
-};
-
 export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskCardProps>(
   function ReactivationTaskCard({ task }, ref) {
+  const { t } = useTranslation(['tasks', 'common']);
   const navigate = useNavigate();
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
   const [showAttemptDialog, setShowAttemptDialog] = useState(false);
@@ -92,6 +58,42 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
   const completeTask = useCompleteTask();
   const snoozeTask = useSnoozeTask();
   const logAttempt = useLogAttempt();
+
+  const TASK_TYPE_LABELS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
+    overdue_recall: {
+      label: t('tasks:overdueRecall'),
+      icon: <Clock className="h-4 w-4" />,
+      color: 'text-destructive bg-destructive/10'
+    },
+    dormant: {
+      label: t('tasks:dormantPatient'),
+      icon: <Moon className="h-4 w-4" />,
+      color: 'text-warning bg-warning/10'
+    },
+    no_show_followup: {
+      label: t('tasks:noShowFollowup'),
+      icon: <AlertTriangle className="h-4 w-4" />,
+      color: 'text-warning bg-warning/10'
+    },
+    manual: {
+      label: t('tasks:manualFollowup'),
+      icon: <User className="h-4 w-4" />,
+      color: 'text-primary bg-primary/10'
+    },
+    cancelled_followup: {
+      label: t('tasks:cancelledFollowup'),
+      icon: <XCircle className="h-4 w-4" />,
+      color: 'text-muted-foreground bg-muted'
+    },
+  };
+
+  const OUTCOME_LABELS: Record<TaskOutcome, string> = {
+    appointment_booked: t('tasks:outcomeBooked'),
+    patient_declined: t('tasks:outcomeDeclined'),
+    no_response: t('tasks:outcomeNoResponse'),
+    wrong_contact: t('tasks:outcomeWrongContact'),
+    other: t('tasks:outcomeOther'),
+  };
 
   const taskType = TASK_TYPE_LABELS[task.task_type] || TASK_TYPE_LABELS.overdue_recall;
   const patient = task.patients;
@@ -111,7 +113,7 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
       taskId: task.id,
       notes: notes || undefined,
     });
-    
+
     // If snooze checkbox is checked, also snooze the task
     if (shouldSnooze) {
       const snoozedUntil = addDays(new Date(), parseInt(snoozeDays)).toISOString().split('T')[0];
@@ -121,7 +123,7 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
         notes: notes || undefined,
       });
     }
-    
+
     setShowAttemptDialog(false);
     setNotes('');
     setShouldSnooze(false);
@@ -137,30 +139,29 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
             {taskType.icon}
           </div>
 
-          {/* Patient Info - No click behavior */}
+          {/* Patient Info */}
           <div className="flex-1 min-w-0">
             <p className="font-medium text-foreground truncate">
-              {patient ? `${patient.first_name} ${patient.last_name}` : 'Patient inconnu'}
+              {patient ? `${patient.first_name} ${patient.last_name}` : t('tasks:unknownPatient')}
             </p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
               <span className={`px-1.5 py-0.5 rounded text-xs ${taskType.color}`}>
                 {taskType.label}
               </span>
               {task.attempt_count > 0 && (
-                <span className="text-xs">• {task.attempt_count} tentative{task.attempt_count > 1 ? 's' : ''}</span>
+                <span className="text-xs">• {t('tasks:attemptCount', { count: task.attempt_count })}</span>
               )}
               {task.assigned_to_profile && (
                 <span className="text-xs">
-                  • Assigné: {task.assigned_to_profile.first_name || ''} {task.assigned_to_profile.last_name || ''}
+                  • {t('tasks:assigned')}: {task.assigned_to_profile.first_name || ''} {task.assigned_to_profile.last_name || ''}
                 </span>
               )}
             </div>
           </div>
         </div>
 
-        {/* Action Buttons - Visible and clearly labeled */}
+        {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Primary action: Complete */}
           <Button
             variant="default"
             size="sm"
@@ -168,23 +169,20 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
             onClick={() => setShowCompleteDialog(true)}
           >
             <CheckCircle className="h-4 w-4 mr-1.5" />
-            Terminé
+            {t('tasks:completed')}
           </Button>
 
-          {/* Log attempt */}
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowAttemptDialog(true)}
           >
             <Phone className="h-4 w-4 mr-1.5" />
-            Tentative
+            {t('tasks:attempt')}
           </Button>
 
-          {/* Separator for secondary actions */}
           <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
 
-          {/* Email button - opens SendMessageDialog via Resend */}
           {patient?.email && (
             <Button
               variant="ghost"
@@ -197,7 +195,6 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
             </Button>
           )}
 
-          {/* View patient profile - explicit action */}
           <Button
             variant="ghost"
             size="sm"
@@ -205,7 +202,7 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
             className="ml-auto"
           >
             <User className="h-4 w-4 mr-1.5" />
-            Profil
+            {t('tasks:profile')}
           </Button>
         </div>
       </div>
@@ -214,14 +211,14 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
       <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Terminer la tâche</DialogTitle>
+            <DialogTitle>{t('tasks:completeTask')}</DialogTitle>
             <DialogDescription>
-              Indiquez le résultat de cette relance pour {patient?.first_name} {patient?.last_name}
+              {t('tasks:completeTaskDescription', { name: patient ? `${patient.first_name} ${patient.last_name}` : '' })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Résultat</Label>
+              <Label>{t('tasks:outcome')}</Label>
               <Select value={outcome} onValueChange={(v) => setOutcome(v as TaskOutcome)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -236,20 +233,20 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Notes (optionnel)</Label>
-              <Textarea 
+              <Label>{t('tasks:notesOptional')}</Label>
+              <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Ajouter des notes..."
+                placeholder={t('tasks:addNotes')}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCompleteDialog(false)}>
-              Annuler
+              {t('common:cancel')}
             </Button>
             <Button onClick={handleComplete} disabled={completeTask.isPending}>
-              {completeTask.isPending ? 'En cours...' : 'Terminer'}
+              {completeTask.isPending ? t('tasks:processing') : t('tasks:complete')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -265,21 +262,21 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Enregistrer une tentative</DialogTitle>
+            <DialogTitle>{t('tasks:logAttempt')}</DialogTitle>
             <DialogDescription>
-              Notez les détails de votre tentative de contact
+              {t('tasks:logAttemptDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Notes</Label>
-              <Textarea 
+              <Label>{t('tasks:notes')}</Label>
+              <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Ex: Appelé, pas de réponse, message vocal laissé..."
+                placeholder={t('tasks:attemptPlaceholder')}
               />
             </div>
-            
+
             {/* Optional snooze checkbox */}
             <div className="flex items-center space-x-2">
               <input
@@ -290,24 +287,24 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
                 className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
               />
               <Label htmlFor="shouldSnooze" className="text-sm font-normal cursor-pointer">
-                Programmer un rappel
+                {t('tasks:scheduleReminder')}
               </Label>
             </div>
-            
+
             {/* Conditional snooze duration */}
             {shouldSnooze && (
               <div className="space-y-2 pl-6">
-                <Label>Rappeler dans</Label>
+                <Label>{t('tasks:remindIn')}</Label>
                 <Select value={snoozeDays} onValueChange={setSnoozeDays}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">1 jour</SelectItem>
-                    <SelectItem value="3">3 jours</SelectItem>
-                    <SelectItem value="7">1 semaine</SelectItem>
-                    <SelectItem value="14">2 semaines</SelectItem>
-                    <SelectItem value="30">1 mois</SelectItem>
+                    <SelectItem value="1">{t('tasks:1day')}</SelectItem>
+                    <SelectItem value="3">{t('tasks:3days')}</SelectItem>
+                    <SelectItem value="7">{t('tasks:1week')}</SelectItem>
+                    <SelectItem value="14">{t('tasks:2weeks')}</SelectItem>
+                    <SelectItem value="30">{t('tasks:1month')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -315,10 +312,10 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAttemptDialog(false)}>
-              Annuler
+              {t('common:cancel')}
             </Button>
             <Button onClick={handleLogAttempt} disabled={logAttempt.isPending || snoozeTask.isPending}>
-              {(logAttempt.isPending || snoozeTask.isPending) ? 'En cours...' : 'Enregistrer'}
+              {(logAttempt.isPending || snoozeTask.isPending) ? t('tasks:processing') : t('tasks:save')}
             </Button>
           </DialogFooter>
         </DialogContent>

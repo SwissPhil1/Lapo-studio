@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { subDays, subMonths } from 'date-fns';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Loader2 } from 'lucide-react';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
+import { getLocale } from '@/shared/lib/format';
 
 interface TreatmentBreakdownProps {
   dateRange: string;
@@ -22,7 +24,7 @@ const COLORS = [
 
 function getDateRange(range: string): Date {
   const end = new Date();
-  
+
   switch (range) {
     case '7d':
       return subDays(end, 7);
@@ -40,8 +42,10 @@ function getDateRange(range: string): Date {
 }
 
 export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
+  const { t } = useTranslation(['analytics']);
   const start = getDateRange(dateRange);
-  
+  const locale = getLocale();
+
   const { data: chartData, isLoading } = useQuery({
     queryKey: ['treatment-breakdown', dateRange],
     queryFn: async () => {
@@ -50,20 +54,18 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
         .select('service, booking_value')
         .eq('status', BOOKING_STATUS.COMPLETED)
         .gte('booking_date', start.toISOString());
-      
-      // Group by service
+
       const serviceData: Record<string, { count: number; revenue: number }> = {};
-      
+
       bookings?.forEach(booking => {
-        const service = booking.service || 'Autre';
+        const service = booking.service || t('analytics:other');
         if (!serviceData[service]) {
           serviceData[service] = { count: 0, revenue: 0 };
         }
         serviceData[service].count += 1;
         serviceData[service].revenue += booking.booking_value || 0;
       });
-      
-      // Convert to array and sort by revenue
+
       const result = Object.entries(serviceData)
         .map(([name, data]) => ({
           name,
@@ -71,12 +73,12 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
           revenue: data.revenue,
         }))
         .sort((a, b) => b.revenue - a.revenue)
-        .slice(0, 8); // Top 8 services
-      
+        .slice(0, 8);
+
       return result;
     },
   });
-  
+
   if (isLoading) {
     return (
       <div className="h-[300px] flex items-center justify-center">
@@ -84,17 +86,17 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
       </div>
     );
   }
-  
+
   if (!chartData || chartData.length === 0) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }
-  
+
   const totalRevenue = chartData.reduce((sum, item) => sum + item.revenue, 0);
-  
+
   return (
     <div className="h-[300px] flex">
       <div className="w-1/2">
@@ -119,7 +121,7 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: any) => [`${value.toLocaleString()}€`, 'Revenus']}
+              formatter={(value: any) => [value.toLocaleString(locale) + '\u20AC', t('analytics:revenue')]}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -128,8 +130,8 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
         {chartData.slice(0, 5).map((item, index) => (
           <div key={item.name} className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
+              <div
+                className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: COLORS[index % COLORS.length] }}
               />
               <span className="text-foreground truncate max-w-[120px]" title={item.name}>
@@ -137,7 +139,7 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
               </span>
             </div>
             <div className="text-right">
-              <span className="font-medium text-foreground">{item.revenue.toLocaleString()}€</span>
+              <span className="font-medium text-foreground">{item.revenue.toLocaleString(locale)}\u20AC</span>
               <span className="text-muted-foreground ml-1">
                 ({((item.revenue / totalRevenue) * 100).toFixed(0)}%)
               </span>
@@ -146,7 +148,7 @@ export function TreatmentBreakdown({ dateRange }: TreatmentBreakdownProps) {
         ))}
         {chartData.length > 5 && (
           <p className="text-xs text-muted-foreground">
-            +{chartData.length - 5} autres traitements
+            {t('analytics:moreServices', { count: chartData.length - 5 })}
           </p>
         )}
       </div>

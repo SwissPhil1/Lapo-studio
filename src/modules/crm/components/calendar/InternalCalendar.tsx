@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
-import { 
-  format, 
-  addMonths, 
-  subMonths, 
-  addWeeks, 
+import {
+  format,
+  addMonths,
+  subMonths,
+  addWeeks,
   subWeeks,
   startOfWeek,
   endOfWeek,
@@ -12,7 +13,8 @@ import {
   endOfMonth,
   eachDayOfInterval
 } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Loader2, AlertCircle, RefreshCw, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -25,32 +27,34 @@ interface InternalCalendarProps {
   className?: string;
 }
 
-const WEEKDAY_HEADERS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-
-// Status filter configuration
-const STATUS_FILTERS = [
-  { key: 'scheduled', label: 'Planifié', colorClass: 'bg-primary' },
-  { key: 'completed', label: 'Complété', colorClass: 'bg-green-500' },
-  { key: 'no_show', label: 'Absent', colorClass: 'bg-destructive' },
-  { key: 'rescheduled', label: 'Reporté', colorClass: 'bg-amber-500' },
-  { key: 'cancelled', label: 'Annulé', colorClass: 'bg-muted-foreground' },
-] as const;
-
-// Default: only show scheduled and completed
-const DEFAULT_VISIBLE_STATUSES = new Set(['scheduled', 'completed']);
-
 export function InternalCalendar({ defaultView = 'month', className }: InternalCalendarProps) {
+  const { t, i18n } = useTranslation(['calendar', 'common']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
+
   const [view, setView] = useState<'month' | 'week'>(defaultView);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [visibleStatuses, setVisibleStatuses] = useState<Set<string>>(DEFAULT_VISIBLE_STATUSES);
-  
+  const [visibleStatuses, setVisibleStatuses] = useState<Set<string>>(new Set(['scheduled', 'completed']));
+
+  const WEEKDAY_HEADERS = [
+    t('calendar:mon'), t('calendar:tue'), t('calendar:wed'),
+    t('calendar:thu'), t('calendar:fri'), t('calendar:sat'), t('calendar:sun')
+  ];
+
+  const STATUS_FILTERS = [
+    { key: 'scheduled', label: t('calendar:statusScheduled'), colorClass: 'bg-primary' },
+    { key: 'completed', label: t('calendar:statusCompleted'), colorClass: 'bg-green-500' },
+    { key: 'no_show', label: t('calendar:statusNoShow'), colorClass: 'bg-destructive' },
+    { key: 'rescheduled', label: t('calendar:statusRescheduled'), colorClass: 'bg-amber-500' },
+    { key: 'cancelled', label: t('calendar:statusCancelled'), colorClass: 'bg-muted-foreground' },
+  ] as const;
+
   const { bookingsByDate, isLoading, error, refetch } = useCalendarBookings(currentDate, view);
 
   // Filter bookings based on selected statuses
   const filteredBookingsByDate = useMemo(() => {
     const filtered: BookingsByDate = {};
     Object.entries(bookingsByDate).forEach(([date, bookings]) => {
-      const filteredBookings = bookings.filter(b => 
+      const filteredBookings = bookings.filter(b =>
         visibleStatuses.has(b.status || 'scheduled')
       );
       if (filteredBookings.length > 0) {
@@ -99,7 +103,7 @@ export function InternalCalendar({ defaultView = 'month', className }: InternalC
       const end = endOfWeek(currentDate, { weekStartsOn: 1 });
       return eachDayOfInterval({ start, end });
     }
-    
+
     // Month view: include days from prev/next month to fill the grid
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
@@ -112,11 +116,11 @@ export function InternalCalendar({ defaultView = 'month', className }: InternalC
 
   const getHeaderText = () => {
     if (view === 'month') {
-      return format(currentDate, 'MMMM yyyy', { locale: fr });
+      return format(currentDate, 'MMMM yyyy', { locale: dateLocale });
     }
     const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
-    return `${format(weekStart, 'd MMM', { locale: fr })} - ${format(weekEnd, 'd MMM yyyy', { locale: fr })}`;
+    return `${format(weekStart, 'd MMM', { locale: dateLocale })} - ${format(weekEnd, 'd MMM yyyy', { locale: dateLocale })}`;
   };
 
   return (
@@ -131,7 +135,7 @@ export function InternalCalendar({ defaultView = 'month', className }: InternalC
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="sm" onClick={handleToday}>
-            Aujourd'hui
+            {t('calendar:today')}
           </Button>
         </div>
 
@@ -143,8 +147,8 @@ export function InternalCalendar({ defaultView = 'month', className }: InternalC
           {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
           <Tabs value={view} onValueChange={(v) => setView(v as 'month' | 'week')}>
             <TabsList>
-              <TabsTrigger value="month">Mois</TabsTrigger>
-              <TabsTrigger value="week">Semaine</TabsTrigger>
+              <TabsTrigger value="month">{t('calendar:month')}</TabsTrigger>
+              <TabsTrigger value="week">{t('calendar:week')}</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -154,10 +158,10 @@ export function InternalCalendar({ defaultView = 'month', className }: InternalC
       {error && (
         <div className="flex items-center gap-3 p-3 mx-4 mt-4 bg-destructive/10 border border-destructive/20 rounded-lg text-sm">
           <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
-          <span className="text-destructive flex-1">Impossible de charger les rendez-vous</span>
+          <span className="text-destructive flex-1">{t('calendar:loadError')}</span>
           <Button variant="outline" size="sm" onClick={() => refetch()} className="shrink-0">
             <RefreshCw className="h-3 w-3 mr-1" />
-            Réessayer
+            {t('calendar:retry')}
           </Button>
         </div>
       )}
@@ -173,7 +177,7 @@ export function InternalCalendar({ defaultView = 'month', className }: InternalC
               </div>
             ))}
           </div>
-          
+
           {/* Days grid */}
           <div className="grid grid-cols-7">
             {days.map((day) => (
@@ -205,7 +209,7 @@ export function InternalCalendar({ defaultView = 'month', className }: InternalC
 
       {/* Interactive Status Filters */}
       <div className="flex items-center justify-center gap-2 p-3 border-t border-border bg-muted/30 text-xs flex-wrap">
-        <span className="text-muted-foreground mr-2">Filtrer :</span>
+        <span className="text-muted-foreground mr-2">{t('calendar:filter')} :</span>
         {STATUS_FILTERS.map(({ key, label, colorClass }) => {
           const isActive = visibleStatuses.has(key);
           return (
@@ -214,8 +218,8 @@ export function InternalCalendar({ defaultView = 'month', className }: InternalC
               onClick={() => toggleStatus(key)}
               className={cn(
                 "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border transition-all",
-                isActive 
-                  ? "border-primary/50 bg-primary/10 text-foreground" 
+                isActive
+                  ? "border-primary/50 bg-primary/10 text-foreground"
                   : "border-border bg-background text-muted-foreground hover:bg-muted"
               )}
             >

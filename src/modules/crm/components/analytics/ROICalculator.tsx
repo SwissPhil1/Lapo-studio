@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -10,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { getLocale } from '@/shared/lib/format';
 
 interface AdSpend {
   id: string;
@@ -28,10 +30,11 @@ interface Lead {
 }
 
 export function ROICalculator() {
+  const { t } = useTranslation(['analytics']);
+
   const { data, isLoading } = useQuery({
     queryKey: ['roi-calculator'],
     queryFn: async () => {
-      // Fetch ad spend data
       const { data: adSpend, error: spendError } = await supabase
         .from('crm_ad_spend')
         .select('id, utm_source, utm_campaign, spend_amount, currency, spend_date');
@@ -39,7 +42,6 @@ export function ROICalculator() {
       if (spendError) throw spendError;
       const typedSpend = (adSpend || []) as AdSpend[];
 
-      // Fetch leads with utm data
       const { data: leads, error: leadsError } = await supabase
         .from('crm_leads')
         .select('id, utm_source, utm_campaign, status');
@@ -47,13 +49,11 @@ export function ROICalculator() {
       if (leadsError) throw leadsError;
       const typedLeads = (leads || []) as Lead[];
 
-      // Group by source/channel
       const channelMap = new Map<
         string,
         { spend: number; leads: number; conversions: number }
       >();
 
-      // Accumulate spend by source
       typedSpend.forEach((s) => {
         const source = s.utm_source || 'direct';
         const existing = channelMap.get(source) || { spend: 0, leads: 0, conversions: 0 };
@@ -61,7 +61,6 @@ export function ROICalculator() {
         channelMap.set(source, existing);
       });
 
-      // Accumulate leads and conversions by source
       typedLeads.forEach((l) => {
         const source = l.utm_source || 'direct';
         const existing = channelMap.get(source) || { spend: 0, leads: 0, conversions: 0 };
@@ -74,9 +73,7 @@ export function ROICalculator() {
         .map(([source, d]) => {
           const costPerLead = d.leads > 0 ? d.spend / d.leads : 0;
           const costPerAcquisition = d.conversions > 0 ? d.spend / d.conversions : 0;
-          // ROAS: assume average revenue per conversion
-          // We estimate based on conversions vs spend
-          const estimatedRevenue = d.conversions * 500; // Fallback avg revenue per conversion
+          const estimatedRevenue = d.conversions * 500;
           const roas = d.spend > 0 ? estimatedRevenue / d.spend : 0;
 
           return {
@@ -92,7 +89,6 @@ export function ROICalculator() {
         .filter((c) => c.spend > 0 || c.leads > 0)
         .sort((a, b) => b.spend - a.spend);
 
-      // KPIs
       const totalSpend = channelData.reduce((sum, c) => sum + c.spend, 0);
       const totalLeads = channelData.reduce((sum, c) => sum + c.leads, 0);
       const totalConversions = channelData.reduce((sum, c) => sum + c.conversions, 0);
@@ -101,11 +97,13 @@ export function ROICalculator() {
       const totalEstRevenue = totalConversions * 500;
       const overallRoas = totalSpend > 0 ? parseFloat((totalEstRevenue / totalSpend).toFixed(2)) : 0;
 
-      // Chart data (top 8 channels)
+      const costPerLeadLabel = t('analytics:costPerLead');
+      const costPerAcqLabel = t('analytics:costPerAcquisition');
+
       const chartData = channelData.slice(0, 8).map((c) => ({
         source: c.source.length > 15 ? c.source.substring(0, 15) + '...' : c.source,
-        'Co\u00fbt/Lead': c.costPerLead,
-        "Co\u00fbt/Acquisition": c.costPerAcquisition,
+        [costPerLeadLabel]: c.costPerLead,
+        [costPerAcqLabel]: c.costPerAcquisition,
       }));
 
       return {
@@ -117,6 +115,8 @@ export function ROICalculator() {
         avgCostPerLead,
         avgCostPerAcquisition,
         overallRoas,
+        costPerLeadLabel,
+        costPerAcqLabel,
       };
     },
   });
@@ -133,16 +133,14 @@ export function ROICalculator() {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <DollarSign className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">Aucune donn\u00e9e de d\u00e9penses publicitaires</p>
-        <p className="text-sm mt-1">
-          Connectez vos comptes publicitaires pour voir le ROI par canal.
-        </p>
+        <p className="font-medium">{t('analytics:noAdSpendData')}</p>
+        <p className="text-sm mt-1">{t('analytics:noAdSpendDescription')}</p>
       </div>
     );
   }
 
   const formatCHF = (value: number) =>
-    new Intl.NumberFormat('fr-CH', {
+    new Intl.NumberFormat(getLocale(), {
       style: 'currency',
       currency: 'CHF',
       maximumFractionDigits: 0,
@@ -155,22 +153,22 @@ export function ROICalculator() {
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <DollarSign className="h-5 w-5 mx-auto text-destructive mb-2" />
           <p className="text-2xl font-bold">{formatCHF(data.avgCostPerLead)}</p>
-          <p className="text-sm text-muted-foreground">Co\u00fbt / Lead</p>
+          <p className="text-sm text-muted-foreground">{t('analytics:costPerLead')}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Target className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{formatCHF(data.avgCostPerAcquisition)}</p>
-          <p className="text-sm text-muted-foreground">Co\u00fbt / Acquisition</p>
+          <p className="text-sm text-muted-foreground">{t('analytics:costPerAcquisition')}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <TrendingUp className="h-5 w-5 mx-auto text-emerald-600 mb-2" />
           <p className="text-2xl font-bold">{data.overallRoas}x</p>
-          <p className="text-sm text-muted-foreground">ROAS global</p>
+          <p className="text-sm text-muted-foreground">{t('analytics:overallRoas')}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Users className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{data.totalConversions}</p>
-          <p className="text-sm text-muted-foreground">Conversions</p>
+          <p className="text-sm text-muted-foreground">{t('analytics:conversions')}</p>
         </div>
       </div>
 
@@ -179,12 +177,12 @@ export function ROICalculator() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Source</TableHead>
-              <TableHead className="text-right">D\u00e9penses</TableHead>
-              <TableHead className="text-right">Leads</TableHead>
-              <TableHead className="text-right">Co\u00fbt/Lead</TableHead>
-              <TableHead className="text-right">Conversions</TableHead>
-              <TableHead className="text-right">Co\u00fbt/Acq.</TableHead>
+              <TableHead>{t('analytics:source')}</TableHead>
+              <TableHead className="text-right">{t('analytics:spend')}</TableHead>
+              <TableHead className="text-right">{t('analytics:leads')}</TableHead>
+              <TableHead className="text-right">{t('analytics:costPerLead')}</TableHead>
+              <TableHead className="text-right">{t('analytics:conversions')}</TableHead>
+              <TableHead className="text-right">{t('analytics:costPerAcqShort')}</TableHead>
               <TableHead className="text-right">ROAS</TableHead>
             </TableRow>
           </TableHeader>
@@ -222,7 +220,7 @@ export function ROICalculator() {
       {data.chartData.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-muted-foreground mb-3">
-            Comparaison des co\u00fbts par canal
+            {t('analytics:costComparisonByChannel')}
           </h4>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={data.chartData}>
@@ -247,8 +245,8 @@ export function ROICalculator() {
                 formatter={(value: any, name: any) => [formatCHF(value), name]}
               />
               <Legend />
-              <Bar dataKey="Co\u00fbt/Lead" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Co\u00fbt/Acquisition" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+              <Bar dataKey={data.costPerLeadLabel} fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              <Bar dataKey={data.costPerAcqLabel} fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

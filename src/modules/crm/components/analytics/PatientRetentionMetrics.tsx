@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -6,6 +7,8 @@ import { differenceInDays, subMonths } from 'date-fns';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 
 export function PatientRetentionMetrics() {
+  const { t } = useTranslation(['analytics']);
+
   const { data, isLoading } = useQuery({
     queryKey: ['patient-retention'],
     queryFn: async () => {
@@ -22,7 +25,6 @@ export function PatientRetentionMetrics() {
       const oneYearAgo = subMonths(today, 12);
       const sixMonthsAgo = subMonths(today, 6);
 
-      // Group bookings by patient
       const patientBookings = new Map<string, Date[]>();
       bookings?.forEach(b => {
         const dates = patientBookings.get(b.patient_id) || [];
@@ -30,58 +32,52 @@ export function PatientRetentionMetrics() {
         patientBookings.set(b.patient_id, dates);
       });
 
-      // Calculate metrics
-      let newPatients = 0; // First booking in last 12 months
-      let returningPatients = 0; // Multiple bookings
-      let churnedPatients = 0; // No booking in last 12 months but had before
-      let activePatients = 0; // At least one booking in last 6 months
+      let newPatients = 0;
+      let returningPatients = 0;
+      let churnedPatients = 0;
+      let activePatients = 0;
 
       const avgIntervals: number[] = [];
 
-      patientBookings.forEach((dates, _patientId) => {
+      patientBookings.forEach((dates) => {
         const sortedDates = dates.sort((a, b) => a.getTime() - b.getTime());
         const firstBooking = sortedDates[0];
         const lastBooking = sortedDates[sortedDates.length - 1];
 
-        // New vs returning
         if (firstBooking >= oneYearAgo) {
           newPatients++;
         }
         if (sortedDates.length > 1) {
           returningPatients++;
-          
-          // Calculate average interval between appointments
           for (let i = 1; i < sortedDates.length; i++) {
             avgIntervals.push(differenceInDays(sortedDates[i], sortedDates[i-1]));
           }
         }
 
-        // Churned
         if (lastBooking < oneYearAgo && firstBooking < oneYearAgo) {
           churnedPatients++;
         }
 
-        // Active
         if (lastBooking >= sixMonthsAgo) {
           activePatients++;
         }
       });
 
       const totalPatients = patientBookings.size;
-      const retentionRate = totalPatients > 0 
-        ? Math.round((returningPatients / totalPatients) * 100) 
+      const retentionRate = totalPatients > 0
+        ? Math.round((returningPatients / totalPatients) * 100)
         : 0;
-      const churnRate = totalPatients > 0 
-        ? Math.round((churnedPatients / totalPatients) * 100) 
+      const churnRate = totalPatients > 0
+        ? Math.round((churnedPatients / totalPatients) * 100)
         : 0;
-      const avgInterval = avgIntervals.length > 0 
-        ? Math.round(avgIntervals.reduce((a, b) => a + b, 0) / avgIntervals.length) 
+      const avgInterval = avgIntervals.length > 0
+        ? Math.round(avgIntervals.reduce((a, b) => a + b, 0) / avgIntervals.length)
         : 0;
 
       const pieData = [
-        { name: 'Fidèles', value: returningPatients, color: '#22C55E' },
-        { name: 'Nouveaux', value: newPatients - (returningPatients > newPatients ? 0 : newPatients), color: '#7C3AED' },
-        { name: 'Inactifs', value: churnedPatients, color: '#FF6B6B' },
+        { name: t('analytics:loyal'), value: returningPatients, color: '#22C55E' },
+        { name: t('analytics:new'), value: newPatients - (returningPatients > newPatients ? 0 : newPatients), color: '#7C3AED' },
+        { name: t('analytics:inactive'), value: churnedPatients, color: '#FF6B6B' },
       ].filter(d => d.value > 0);
 
       return {
@@ -109,7 +105,7 @@ export function PatientRetentionMetrics() {
   if (!data) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }
@@ -121,29 +117,29 @@ export function PatientRetentionMetrics() {
         <div className="bg-success/10 rounded-lg p-3 text-center">
           <UserCheck className="h-4 w-4 mx-auto text-success mb-1" />
           <p className="text-xl font-bold text-foreground">{data.retentionRate}%</p>
-          <p className="text-xs text-muted-foreground">Taux rétention</p>
+          <p className="text-xs text-muted-foreground">{t('analytics:retentionRate')}</p>
         </div>
         <div className="bg-destructive/10 rounded-lg p-3 text-center">
           <UserX className="h-4 w-4 mx-auto text-destructive mb-1" />
           <p className="text-xl font-bold text-foreground">{data.churnRate}%</p>
-          <p className="text-xs text-muted-foreground">Taux churn</p>
+          <p className="text-xs text-muted-foreground">{t('analytics:churnRate')}</p>
         </div>
         <div className="bg-primary/10 rounded-lg p-3 text-center">
           <RefreshCw className="h-4 w-4 mx-auto text-primary mb-1" />
           <p className="text-xl font-bold text-foreground">{data.returningPatients}</p>
-          <p className="text-xs text-muted-foreground">Patients fidèles</p>
+          <p className="text-xs text-muted-foreground">{t('analytics:loyalPatients')}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-3 text-center">
           <Clock className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
-          <p className="text-xl font-bold text-foreground">{data.avgInterval}j</p>
-          <p className="text-xs text-muted-foreground">Intervalle moyen</p>
+          <p className="text-xl font-bold text-foreground">{data.avgInterval}{t('analytics:daysShort')}</p>
+          <p className="text-xs text-muted-foreground">{t('analytics:avgInterval')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         {/* Pie Chart */}
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Répartition patients</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics:patientDistribution')}</h4>
           <ResponsiveContainer width="100%" height={150}>
             <PieChart>
               <Pie
@@ -179,22 +175,22 @@ export function PatientRetentionMetrics() {
 
         {/* Stats */}
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-muted-foreground">Détails</h4>
+          <h4 className="text-sm font-medium text-muted-foreground">{t('analytics:details')}</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Total patients</span>
+              <span className="text-muted-foreground">{t('analytics:totalPatients')}</span>
               <span className="font-medium text-foreground">{data.totalPatients}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Actifs (6 mois)</span>
+              <span className="text-muted-foreground">{t('analytics:active6m')}</span>
               <span className="font-medium text-foreground">{data.activePatients}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Nouveaux (12 mois)</span>
+              <span className="text-muted-foreground">{t('analytics:new12m')}</span>
               <span className="font-medium text-foreground">{data.newPatients}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Inactifs</span>
+              <span className="text-muted-foreground">{t('analytics:inactive')}</span>
               <span className="font-medium text-destructive">{data.churnedPatients}</span>
             </div>
           </div>

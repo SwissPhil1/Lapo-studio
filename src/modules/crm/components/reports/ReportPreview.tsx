@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
 import { REPORT_SOURCES, RELATIVE_PERIODS } from '@/shared/lib/reportSources';
 import { ReportChart } from './ReportChart';
@@ -5,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { format } from 'date-fns';
+import { getLocale } from '@/shared/lib/format';
 
 interface ReportPreviewProps {
   config: ReportConfig;
@@ -13,9 +15,11 @@ interface ReportPreviewProps {
 }
 
 export function ReportPreview({ config, data, isLoading }: ReportPreviewProps) {
+  const { t } = useTranslation(['reports']);
   const sourceDef = REPORT_SOURCES[config.source];
-  const periodLabel = RELATIVE_PERIODS.find(p => p.value === config.dateRange.value)?.label || 'Période personnalisée';
-  
+  const periodLabel = RELATIVE_PERIODS.find(p => p.value === config.dateRange.value)?.label || t('reports:customPeriod');
+  const locale = getLocale();
+
   const getMetricLabel = (key: string) => {
     return sourceDef.metrics.find(m => m.key === key)?.label || key;
   };
@@ -23,7 +27,7 @@ export function ReportPreview({ config, data, isLoading }: ReportPreviewProps) {
   const handleExportCSV = () => {
     if (data.length === 0) return;
 
-    const headers = ['Dimension', ...config.metrics.map(m => getMetricLabel(m))];
+    const headers = [t('reports:dimension'), ...config.metrics.map(m => getMetricLabel(m))];
     const rows = data.map(row => [
       row.label,
       ...config.metrics.map(m => row[m]),
@@ -48,9 +52,9 @@ export function ReportPreview({ config, data, isLoading }: ReportPreviewProps) {
             {sourceDef.label} • {periodLabel}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Groupé par: {sourceDef.dimensions.find(d => d.key === config.dimension)?.label}
+            {t('reports:groupedBy')}: {sourceDef.dimensions.find(d => d.key === config.dimension)?.label}
             {' • '}
-            Métriques: {config.metrics.map(m => getMetricLabel(m)).join(', ')}
+            {t('reports:metrics')}: {config.metrics.map(m => getMetricLabel(m)).join(', ')}
           </p>
         </div>
         <Button
@@ -83,17 +87,17 @@ export function ReportPreview({ config, data, isLoading }: ReportPreviewProps) {
             const total = data.reduce((sum, row) => sum + (row[metricKey] as number), 0);
             const avg = total / data.length;
             const metric = sourceDef.metrics.find(m => m.key === metricKey);
-            
+
             return (
               <div key={metricKey} className="card-elevated p-4">
                 <p className="text-sm text-muted-foreground">{getMetricLabel(metricKey)}</p>
                 <p className="text-xl font-bold">
                   {metric?.key === 'revenue' || metric?.key === 'avg_value'
-                    ? `${Math.round(total).toLocaleString('fr-CH')} CHF`
-                    : Math.round(total).toLocaleString('fr-CH')}
+                    ? `${Math.round(total).toLocaleString(locale)} CHF`
+                    : Math.round(total).toLocaleString(locale)}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Moy: {Math.round(avg).toLocaleString('fr-CH')}
+                  {t('reports:avg')}: {Math.round(avg).toLocaleString(locale)}
                 </p>
               </div>
             );

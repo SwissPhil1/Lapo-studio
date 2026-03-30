@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import {
   Table,
   TableBody,
@@ -65,15 +67,6 @@ interface CampaignTableProps {
   isArchiving?: boolean;
 }
 
-const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
-  draft: { label: 'Brouillon', variant: 'secondary' },
-  scheduled: { label: 'Programmé', variant: 'outline' },
-  sending: { label: 'En cours', variant: 'default' },
-  sent: { label: 'Envoyé', variant: 'default' },
-  completed: { label: 'Terminé', variant: 'secondary' },
-  archived: { label: 'Archivée', variant: 'secondary' },
-};
-
 export function CampaignTable({
   scheduledCampaigns,
   sentCampaigns,
@@ -83,7 +76,18 @@ export function CampaignTable({
   isDuplicating,
   isArchiving,
 }: CampaignTableProps) {
+  const { t, i18n } = useTranslation(['campaigns', 'common']);
   const [archiveTarget, setArchiveTarget] = useState<CampaignWithMetrics | null>(null);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
+
+  const statusConfig: Record<string, { labelKey: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
+    draft: { labelKey: 'campaigns:statusDraft', variant: 'secondary' },
+    scheduled: { labelKey: 'campaigns:statusScheduled', variant: 'outline' },
+    sending: { labelKey: 'campaigns:statusInProgress', variant: 'default' },
+    sent: { labelKey: 'campaigns:statusSent', variant: 'default' },
+    completed: { labelKey: 'campaigns:statusCompleted', variant: 'secondary' },
+    archived: { labelKey: 'campaigns:statusArchived', variant: 'secondary' },
+  };
 
   const renderCampaignRow = (campaign: CampaignWithMetrics, isScheduled: boolean) => {
     const openRate = campaign.recipients > 0 ? Math.round((campaign.opened / campaign.recipients) * 100) : 0;
@@ -111,11 +115,11 @@ export function CampaignTable({
           {campaign.scheduled_at ? (
             <div className="flex items-center gap-1.5 text-sm">
               <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              {format(new Date(campaign.scheduled_at), 'dd MMM HH:mm', { locale: fr })}
+              {format(new Date(campaign.scheduled_at), 'dd MMM HH:mm', { locale: dateLocale })}
             </div>
           ) : campaign.created_at ? (
             <div className="text-sm text-muted-foreground">
-              {format(new Date(campaign.created_at), 'dd MMM yyyy', { locale: fr })}
+              {format(new Date(campaign.created_at), 'dd MMM yyyy', { locale: dateLocale })}
             </div>
           ) : (
             '-'
@@ -126,7 +130,7 @@ export function CampaignTable({
             <TableCell>
               <div className="space-y-1 min-w-[100px]">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Délivrés</span>
+                  <span className="text-muted-foreground">{t('campaigns:delivered')}</span>
                   <span className="font-medium">{deliveryRate}%</span>
                 </div>
                 <Progress value={deliveryRate} className="h-1.5" />
@@ -135,7 +139,7 @@ export function CampaignTable({
             <TableCell>
               <div className="space-y-1 min-w-[100px]">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Ouverts</span>
+                  <span className="text-muted-foreground">{t('campaigns:opened')}</span>
                   <span className="font-medium">{openRate}%</span>
                 </div>
                 <Progress value={openRate} className="h-1.5" />
@@ -144,7 +148,7 @@ export function CampaignTable({
             <TableCell>
               <div className="space-y-1 min-w-[100px]">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Clics</span>
+                  <span className="text-muted-foreground">{t('campaigns:clicks')}</span>
                   <span className="font-medium">{clickRate}%</span>
                 </div>
                 <Progress value={clickRate} className="h-1.5" />
@@ -153,14 +157,14 @@ export function CampaignTable({
           </>
         )}
         <TableCell>
-          <Badge variant={status.variant}>{status.label}</Badge>
+          <Badge variant={status.variant}>{t(status.labelKey)}</Badge>
         </TableCell>
         <TableCell>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="h-8 w-8 p-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
               >
                 <MoreHorizontal className="h-4 w-4" />
@@ -169,7 +173,7 @@ export function CampaignTable({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onViewDetails(campaign)}>
                 <Eye className="h-4 w-4 mr-2" />
-                Voir détails
+                {t('campaigns:viewDetails')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDuplicate(campaign)} disabled={isDuplicating}>
                 {isDuplicating ? (
@@ -177,11 +181,11 @@ export function CampaignTable({
                 ) : (
                   <Copy className="h-4 w-4 mr-2" />
                 )}
-                Dupliquer
+                {t('campaigns:duplicate')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => setArchiveTarget(campaign)} 
+              <DropdownMenuItem
+                onClick={() => setArchiveTarget(campaign)}
                 className="text-destructive"
                 disabled={isArchiving}
               >
@@ -190,7 +194,7 @@ export function CampaignTable({
                 ) : (
                   <Archive className="h-4 w-4 mr-2" />
                 )}
-                Archiver
+                {t('campaigns:archive')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -202,29 +206,29 @@ export function CampaignTable({
   const TableHeaders = ({ isScheduled }: { isScheduled: boolean }) => (
     <TableHeader>
       <TableRow>
-        <TableHead>Campagne</TableHead>
-        <TableHead>Destinataires</TableHead>
-        <TableHead>{isScheduled ? 'Prévu le' : 'Envoyé le'}</TableHead>
+        <TableHead>{t('campaigns:campaign')}</TableHead>
+        <TableHead>{t('campaigns:recipients')}</TableHead>
+        <TableHead>{isScheduled ? t('campaigns:scheduledFor') : t('campaigns:sentOn')}</TableHead>
         {!isScheduled && (
           <>
-            <TableHead>Délivrés</TableHead>
-            <TableHead>Ouverts</TableHead>
-            <TableHead>Clics</TableHead>
+            <TableHead>{t('campaigns:delivered')}</TableHead>
+            <TableHead>{t('campaigns:opened')}</TableHead>
+            <TableHead>{t('campaigns:clicks')}</TableHead>
           </>
         )}
-        <TableHead>Statut</TableHead>
+        <TableHead>{t('campaigns:status')}</TableHead>
         <TableHead className="w-[50px]"></TableHead>
       </TableRow>
     </TableHeader>
   );
 
   const allCampaigns = [...scheduledCampaigns, ...sentCampaigns];
-  
+
   if (allCampaigns.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>Aucune campagne trouvée</p>
+        <p>{t('campaigns:noCampaignsFound')}</p>
       </div>
     );
   }
@@ -236,7 +240,7 @@ export function CampaignTable({
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <Clock className="h-4 w-4" />
-            Programmées ({scheduledCampaigns.length})
+            {t('campaigns:scheduled')} ({scheduledCampaigns.length})
           </div>
           <div className="rounded-lg border border-border overflow-hidden">
             <Table>
@@ -255,7 +259,7 @@ export function CampaignTable({
           {scheduledCampaigns.length > 0 && (
             <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Send className="h-4 w-4" />
-              Envoyées ({sentCampaigns.length})
+              {t('campaigns:sent')} ({sentCampaigns.length})
             </div>
           )}
           <div className="rounded-lg border border-border overflow-hidden">
@@ -273,13 +277,13 @@ export function CampaignTable({
       <AlertDialog open={!!archiveTarget} onOpenChange={(open) => !open && setArchiveTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Archiver cette campagne ?</AlertDialogTitle>
+            <AlertDialogTitle>{t('campaigns:archiveConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              La campagne "{archiveTarget?.name}" sera archivée. Vous pourrez toujours la retrouver en filtrant par statut "Archivée".
+              {t('campaigns:archiveConfirmDescription', { name: archiveTarget?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (archiveTarget) {
@@ -289,7 +293,7 @@ export function CampaignTable({
               }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Archiver
+              {t('campaigns:archive')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

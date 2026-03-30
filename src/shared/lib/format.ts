@@ -1,6 +1,6 @@
 import i18n from '@/i18n';
 
-function getLocale() {
+export function getLocale() {
   return i18n.language === 'fr' ? 'fr-CH' : 'en-US';
 }
 

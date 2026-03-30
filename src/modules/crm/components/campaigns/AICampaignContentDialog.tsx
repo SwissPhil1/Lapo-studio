@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -18,27 +19,28 @@ interface AICampaignContentDialogProps {
 
 type ContentType = 'campaign_email' | 'campaign_sms' | 'reactivation' | 'follow_up' | 'promotion';
 
-const CONTENT_TYPES: { value: ContentType; label: string }[] = [
-  { value: 'campaign_email', label: 'Campagne marketing' },
-  { value: 'campaign_sms', label: 'SMS marketing' },
-  { value: 'reactivation', label: 'Réactivation patient' },
-  { value: 'follow_up', label: 'Suivi post-traitement' },
-  { value: 'promotion', label: 'Promotion' },
-];
-
-const TONES = [
-  { value: 'professional', label: 'Professionnel' },
-  { value: 'friendly', label: 'Amical' },
-  { value: 'urgent', label: 'Urgent' },
-];
-
 export function AICampaignContentDialog({ open, onOpenChange, channel = 'email', onApply }: AICampaignContentDialogProps) {
+  const { t, i18n } = useTranslation(['campaigns', 'common']);
   const [contentType, setContentType] = useState<ContentType>('campaign_email');
   const [treatmentType, setTreatmentType] = useState('');
   const [tone, setTone] = useState('professional');
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<Record<string, string> | null>(null);
+
+  const CONTENT_TYPES: { value: ContentType; label: string }[] = [
+    { value: 'campaign_email', label: t('campaigns:contentTypeMarketing') },
+    { value: 'campaign_sms', label: t('campaigns:contentTypeSms') },
+    { value: 'reactivation', label: t('campaigns:contentTypeReactivation') },
+    { value: 'follow_up', label: t('campaigns:contentTypeFollowUp') },
+    { value: 'promotion', label: t('campaigns:contentTypePromotion') },
+  ];
+
+  const TONES = [
+    { value: 'professional', label: t('campaigns:toneProfessional') },
+    { value: 'friendly', label: t('campaigns:toneFriendly') },
+    { value: 'urgent', label: t('campaigns:toneUrgent') },
+  ];
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -51,7 +53,7 @@ export function AICampaignContentDialog({ open, onOpenChange, channel = 'email',
           context: {
             treatment_type: treatmentType || undefined,
             tone,
-            language: 'fr',
+            language: i18n.language,
             channel,
             additional_info: additionalInfo || undefined,
           },
@@ -63,7 +65,7 @@ export function AICampaignContentDialog({ open, onOpenChange, channel = 'email',
 
       setGeneratedContent(data.content);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erreur lors de la génération');
+      toast.error(err instanceof Error ? err.message : t('campaigns:generateError'));
     } finally {
       setIsGenerating(false);
     }
@@ -79,10 +81,10 @@ export function AICampaignContentDialog({ open, onOpenChange, channel = 'email',
   const handleCopy = () => {
     if (!generatedContent) return;
     const text = generatedContent.subject
-      ? `Sujet: ${generatedContent.subject}\n\n${generatedContent.body}`
+      ? `${t('campaigns:subject')}: ${generatedContent.subject}\n\n${generatedContent.body}`
       : generatedContent.message || generatedContent.body || '';
     navigator.clipboard.writeText(text);
-    toast.success('Copié dans le presse-papiers');
+    toast.success(t('campaigns:copiedToClipboard'));
   };
 
   return (
@@ -91,59 +93,59 @@ export function AICampaignContentDialog({ open, onOpenChange, channel = 'email',
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Générer du contenu avec l'IA
+            {t('campaigns:generateWithAI')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Type de contenu</Label>
+            <Label>{t('campaigns:contentType')}</Label>
             <Select value={contentType} onValueChange={(v) => setContentType(v as ContentType)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {CONTENT_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                {CONTENT_TYPES.map((ct) => (
+                  <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Traitement ciblé (optionnel)</Label>
+            <Label>{t('campaigns:targetTreatment')}</Label>
             <Input
               value={treatmentType}
               onChange={(e) => setTreatmentType(e.target.value)}
-              placeholder="ex: Botox, Peeling, Laser"
+              placeholder={t('campaigns:targetTreatmentPlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Ton</Label>
+            <Label>{t('campaigns:tone')}</Label>
             <Select value={tone} onValueChange={setTone}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {TONES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                {TONES.map((tn) => (
+                  <SelectItem key={tn.value} value={tn.value}>{tn.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Instructions supplémentaires (optionnel)</Label>
+            <Label>{t('campaigns:additionalInstructions')}</Label>
             <Textarea
               value={additionalInfo}
               onChange={(e) => setAdditionalInfo(e.target.value)}
-              placeholder="ex: Mentionner notre promotion -20% en janvier, cibler les patients inactifs depuis 6 mois..."
+              placeholder={t('campaigns:additionalInstructionsPlaceholder')}
               rows={3}
             />
           </div>
 
           <Button onClick={handleGenerate} disabled={isGenerating} className="w-full">
             {isGenerating ? (
-              <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Génération en cours...</>
+              <><Loader2 className="h-4 w-4 animate-spin mr-2" /> {t('campaigns:generating')}</>
             ) : (
-              <><Sparkles className="h-4 w-4 mr-2" /> Générer</>
+              <><Sparkles className="h-4 w-4 mr-2" /> {t('campaigns:generate')}</>
             )}
           </Button>
 
@@ -151,22 +153,22 @@ export function AICampaignContentDialog({ open, onOpenChange, channel = 'email',
           {generatedContent && (
             <div className="mt-4 p-4 rounded-lg bg-secondary/50 border space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-foreground">Contenu généré</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('campaigns:generatedContent')}</h4>
                 <Button variant="ghost" size="sm" onClick={handleCopy}>
-                  <Copy className="h-4 w-4 mr-1" /> Copier
+                  <Copy className="h-4 w-4 mr-1" /> {t('campaigns:copy')}
                 </Button>
               </div>
 
               {generatedContent.subject && (
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1">Sujet :</p>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">{t('campaigns:subject')} :</p>
                   <p className="text-sm bg-background p-2 rounded">{generatedContent.subject}</p>
                 </div>
               )}
 
               {(generatedContent.body || generatedContent.message) && (
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1">Message :</p>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">{t('campaigns:message')} :</p>
                   <p className="text-sm bg-background p-2 rounded whitespace-pre-wrap">
                     {generatedContent.body || generatedContent.message}
                   </p>
@@ -177,10 +179,10 @@ export function AICampaignContentDialog({ open, onOpenChange, channel = 'email',
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Fermer</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{t('campaigns:close')}</Button>
           {generatedContent && onApply && (
             <Button onClick={handleApply}>
-              Appliquer ce contenu
+              {t('campaigns:applyContent')}
             </Button>
           )}
         </DialogFooter>

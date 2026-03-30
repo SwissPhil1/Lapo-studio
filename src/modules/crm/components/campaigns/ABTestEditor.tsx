@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,6 +24,7 @@ interface ABTestEditorProps {
 }
 
 export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, onOpenChange }: ABTestEditorProps) {
+  const { t } = useTranslation(['campaigns', 'common']);
   const [subjectA, setSubjectA] = useState('');
   const [messageA, setMessageA] = useState('');
   const [subjectB, setSubjectB] = useState('');
@@ -65,30 +67,30 @@ export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, o
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FlaskConical className="h-5 w-5 text-primary" />
-            Test A/B
+            {t('campaigns:abTest')}
           </DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="A" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="A">Variante A</TabsTrigger>
-            <TabsTrigger value="B">Variante B</TabsTrigger>
+            <TabsTrigger value="A">{t('campaigns:variantA')}</TabsTrigger>
+            <TabsTrigger value="B">{t('campaigns:variantB')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="A" className="space-y-4 mt-4">
             {showSubject && (
               <div className="space-y-2">
-                <Label>Objet (Variante A)</Label>
+                <Label>{t('campaigns:subjectVariant', { variant: 'A' })}</Label>
                 <Input
                   value={subjectA}
                   onChange={(e) => setSubjectA(e.target.value)}
-                  placeholder="Objet de l'email..."
+                  placeholder={t('campaigns:subjectPlaceholder')}
                 />
               </div>
             )}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Message (Variante A)</Label>
+                <Label>{t('campaigns:messageVariant', { variant: 'A' })}</Label>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -96,18 +98,18 @@ export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, o
                   className="h-7 gap-1 text-xs"
                 >
                   {previewA ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                  {previewA ? 'Modifier' : 'Aper\u00e7u'}
+                  {previewA ? t('campaigns:edit') : t('campaigns:preview')}
                 </Button>
               </div>
               {previewA ? (
                 <div className="rounded-lg border bg-muted/30 p-4 min-h-[150px] text-sm whitespace-pre-wrap">
-                  {messageA || <span className="text-muted-foreground italic">Aucun contenu</span>}
+                  {messageA || <span className="text-muted-foreground italic">{t('campaigns:noContent')}</span>}
                 </div>
               ) : (
                 <Textarea
                   value={messageA}
                   onChange={(e) => setMessageA(e.target.value)}
-                  placeholder="Contenu du message..."
+                  placeholder={t('campaigns:messagePlaceholder')}
                   rows={6}
                 />
               )}
@@ -117,17 +119,17 @@ export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, o
           <TabsContent value="B" className="space-y-4 mt-4">
             {showSubject && (
               <div className="space-y-2">
-                <Label>Objet (Variante B)</Label>
+                <Label>{t('campaigns:subjectVariant', { variant: 'B' })}</Label>
                 <Input
                   value={subjectB}
                   onChange={(e) => setSubjectB(e.target.value)}
-                  placeholder="Objet de l'email..."
+                  placeholder={t('campaigns:subjectPlaceholder')}
                 />
               </div>
             )}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Message (Variante B)</Label>
+                <Label>{t('campaigns:messageVariant', { variant: 'B' })}</Label>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -135,18 +137,18 @@ export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, o
                   className="h-7 gap-1 text-xs"
                 >
                   {previewB ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                  {previewB ? 'Modifier' : 'Aper\u00e7u'}
+                  {previewB ? t('campaigns:edit') : t('campaigns:preview')}
                 </Button>
               </div>
               {previewB ? (
                 <div className="rounded-lg border bg-muted/30 p-4 min-h-[150px] text-sm whitespace-pre-wrap">
-                  {messageB || <span className="text-muted-foreground italic">Aucun contenu</span>}
+                  {messageB || <span className="text-muted-foreground italic">{t('campaigns:noContent')}</span>}
                 </div>
               ) : (
                 <Textarea
                   value={messageB}
                   onChange={(e) => setMessageB(e.target.value)}
-                  placeholder="Contenu du message..."
+                  placeholder={t('campaigns:messagePlaceholder')}
                   rows={6}
                 />
               )}
@@ -156,10 +158,10 @@ export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, o
 
         {/* Weight distribution */}
         <div className="space-y-3 pt-2 border-t">
-          <Label>R\u00e9partition du trafic</Label>
+          <Label>{t('campaigns:trafficDistribution')}</Label>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 flex-1">
-              <span className="text-sm font-medium w-24">Variante A</span>
+              <span className="text-sm font-medium w-24">{t('campaigns:variantA')}</span>
               <Input
                 type="number"
                 min={0}
@@ -171,7 +173,7 @@ export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, o
               <span className="text-sm text-muted-foreground">%</span>
             </div>
             <div className="flex items-center gap-2 flex-1">
-              <span className="text-sm font-medium w-24">Variante B</span>
+              <span className="text-sm font-medium w-24">{t('campaigns:variantB')}</span>
               <Input
                 type="number"
                 min={0}
@@ -197,10 +199,10 @@ export function ABTestEditor({ campaignId: _campaignId, channel, onSave, open, o
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Annuler
+            {t('common:cancel')}
           </Button>
           <Button onClick={handleSave} disabled={!canSave}>
-            Enregistrer les variantes
+            {t('campaigns:saveVariants')}
           </Button>
         </DialogFooter>
       </DialogContent>

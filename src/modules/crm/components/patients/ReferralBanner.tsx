@@ -1,5 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import { Gift, AlertTriangle } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
+import { getLocale } from '@/shared/lib/format';
 
 interface ReferralBannerProps {
   referrerCode: string;
@@ -8,16 +10,17 @@ interface ReferralBannerProps {
   expiresAt?: string;
 }
 
-export function ReferralBanner({ 
-  referrerCode, 
-  referrerName, 
-  discountPercent, 
-  expiresAt 
+export function ReferralBanner({
+  referrerCode,
+  referrerName,
+  discountPercent,
+  expiresAt
 }: ReferralBannerProps) {
-  const daysUntilExpiry = expiresAt 
-    ? differenceInDays(parseISO(expiresAt), new Date()) 
+  const { t } = useTranslation(['referrers']);
+  const daysUntilExpiry = expiresAt
+    ? differenceInDays(parseISO(expiresAt), new Date())
     : null;
-  
+
   const isExpiringSoon = daysUntilExpiry !== null && daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   const isExpired = daysUntilExpiry !== null && daysUntilExpiry <= 0;
 
@@ -30,11 +33,11 @@ export function ReferralBanner({
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-foreground">
-              Referred by {referrerName || referrerCode}
+              {t('referrers:referredBy', { name: referrerName || referrerCode })}
             </span>
             {discountPercent && (
               <span className="text-sm text-primary font-medium">
-                • {discountPercent}% discount
+                • {t('referrers:discountPercent', { percent: discountPercent })}
               </span>
             )}
           </div>
@@ -44,15 +47,15 @@ export function ReferralBanner({
                 <AlertTriangle className="h-3 w-3 text-warning" />
               )}
               <span className={`text-sm ${isExpiringSoon ? 'text-warning font-medium' : 'text-muted-foreground'}`}>
-                {isExpiringSoon 
-                  ? `Expires in ${daysUntilExpiry} days` 
-                  : `Expires: ${new Date(expiresAt).toLocaleDateString()}`
+                {isExpiringSoon
+                  ? t('referrers:expiresInDays', { days: daysUntilExpiry })
+                  : t('referrers:expiresOn', { date: new Date(expiresAt).toLocaleDateString(getLocale()) })
                 }
               </span>
             </div>
           )}
           {isExpired && (
-            <span className="text-sm text-destructive">Referral expired</span>
+            <span className="text-sm text-destructive">{t('referrers:referralExpired')}</span>
           )}
         </div>
       </div>

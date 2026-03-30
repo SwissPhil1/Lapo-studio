@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Table,
   TableBody,
@@ -34,13 +35,14 @@ export function DataTable<T>({
   onRowClick,
   rowClassName,
 }: DataTableProps<T>) {
+  const { t } = useTranslation(['common']);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const handleSort = (columnKey: string, sortable?: boolean) => {
     if (!sortable) return;
-    
+
     if (sortColumn === columnKey) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -51,16 +53,16 @@ export function DataTable<T>({
 
   const sortedData = [...data].sort((a, b) => {
     if (!sortColumn) return 0;
-    
+
     const aValue = a[sortColumn as keyof T];
     const bValue = b[sortColumn as keyof T];
-    
+
     if (aValue === null || aValue === undefined) return 1;
     if (bValue === null || bValue === undefined) return -1;
-    
+
     const aStr = String(aValue).toLowerCase();
     const bStr = String(bValue).toLowerCase();
-    
+
     const comparison = aStr.localeCompare(bStr, undefined, { numeric: true });
     return sortDirection === "asc" ? comparison : -comparison;
   });
@@ -116,7 +118,7 @@ export function DataTable<T>({
                   colSpan={columns.length}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  No data available
+                  {t('common:noDataAvailable')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -140,8 +142,7 @@ export function DataTable<T>({
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {startIndex + 1} to {Math.min(endIndex, sortedData.length)} of{" "}
-            {sortedData.length} results
+            {t('common:showingRange', { start: startIndex + 1, end: Math.min(endIndex, sortedData.length), total: sortedData.length })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -153,7 +154,7 @@ export function DataTable<T>({
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-sm text-foreground">
-              Page {currentPage} of {totalPages}
+              {t('common:pageOf', { current: currentPage, total: totalPages })}
             </span>
             <Button
               variant="outline"

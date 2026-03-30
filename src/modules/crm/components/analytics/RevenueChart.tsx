@@ -1,12 +1,13 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { format, subDays, subMonths, eachDayOfInterval, eachMonthOfInterval, parseISO } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
-import i18n from '@/i18n';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader2 } from 'lucide-react';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
+import { getLocale } from '@/shared/lib/format';
 
 interface RevenueChartProps {
   dateRange: string;
@@ -16,7 +17,7 @@ function getDateRange(range: string): { start: Date; end: Date; granularity: 'da
   const end = new Date();
   let start: Date;
   let granularity: 'day' | 'month' = 'day';
-  
+
   switch (range) {
     case '7d':
       start = subDays(end, 7);
@@ -40,13 +41,16 @@ function getDateRange(range: string): { start: Date; end: Date; granularity: 'da
       start = subMonths(end, 12);
       granularity = 'month';
   }
-  
+
   return { start, end, granularity };
 }
 
 export function RevenueChart({ dateRange }: RevenueChartProps) {
+  const { t, i18n } = useTranslation(['analytics']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
+  const locale = getLocale();
   const { start, end, granularity } = getDateRange(dateRange);
-  
+
   const { data: chartData, isLoading } = useQuery({
     queryKey: ['revenue-chart', dateRange],
     queryFn: async () => {
@@ -56,30 +60,28 @@ export function RevenueChart({ dateRange }: RevenueChartProps) {
         .eq('status', BOOKING_STATUS.COMPLETED)
         .gte('booking_date', start.toISOString())
         .lte('booking_date', end.toISOString());
-      
-      // Group by date
+
       const revenueByDate: Record<string, number> = {};
-      
+
       bookings?.forEach(booking => {
-        const date = granularity === 'day' 
+        const date = granularity === 'day'
           ? format(parseISO(booking.booking_date), 'yyyy-MM-dd')
           : format(parseISO(booking.booking_date), 'yyyy-MM');
         revenueByDate[date] = (revenueByDate[date] || 0) + (booking.booking_value || 0);
       });
-      
-      // Generate all dates in range
+
       const intervals = granularity === 'day'
         ? eachDayOfInterval({ start, end })
         : eachMonthOfInterval({ start, end });
-      
+
       return intervals.map(date => {
-        const key = granularity === 'day' 
+        const key = granularity === 'day'
           ? format(date, 'yyyy-MM-dd')
           : format(date, 'yyyy-MM');
         const label = granularity === 'day'
-          ? format(date, 'd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS })
-          : format(date, 'MMM yy', { locale: i18n.language === 'fr' ? frLocale : enUS });
-        
+          ? format(date, 'd MMM', { locale: dateLocale })
+          : format(date, 'MMM yy', { locale: dateLocale });
+
         return {
           date: key,
           label,
@@ -88,7 +90,7 @@ export function RevenueChart({ dateRange }: RevenueChartProps) {
       });
     },
   });
-  
+
   if (isLoading) {
     return (
       <div className="h-[300px] flex items-center justify-center">
@@ -96,15 +98,15 @@ export function RevenueChart({ dateRange }: RevenueChartProps) {
       </div>
     );
   }
-  
+
   if (!chartData || chartData.length === 0) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }
-  
+
   return (
     <div className="h-[300px]">
       <ResponsiveContainer width="100%" height="100%">
@@ -116,19 +118,19 @@ export function RevenueChart({ dateRange }: RevenueChartProps) {
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="label" 
-            stroke="hsl(var(--muted-foreground))" 
+          <XAxis
+            dataKey="label"
+            stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <YAxis 
-            stroke="hsl(var(--muted-foreground))" 
+          <YAxis
+            stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(value) => `${value}€`}
+            tickFormatter={(value) => `${value}\u20AC`}
           />
           <Tooltip
             contentStyle={{
@@ -137,7 +139,7 @@ export function RevenueChart({ dateRange }: RevenueChartProps) {
               borderRadius: '8px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             }}
-            formatter={(value: any) => [`${value.toLocaleString()}€`, 'Revenus']}
+            formatter={(value: any) => [`${value.toLocaleString(locale)}\u20AC`, t('analytics:revenue')]}
             labelFormatter={(label) => label}
           />
           <Area
