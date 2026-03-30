@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { NavGroup } from './NavGroup'
@@ -10,6 +10,7 @@ import { NotificationBell } from './NotificationBell'
 import { CommandPalette } from './CommandPalette'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/shared/lib/utils'
+import { motion, AnimatePresence, PageTransition } from '@/shared/components/motion'
 import {
   LayoutDashboard,
   Users,
@@ -28,6 +29,8 @@ import {
   PanelLeftOpen,
   Menu,
   X,
+  Zap,
+  ClipboardList,
 } from 'lucide-react'
 
 export function StudioLayout() {
@@ -180,6 +183,13 @@ export function StudioLayout() {
                 collapsed={isCollapsed}
                 onClick={isMobile ? closeMobile : undefined}
               />
+              <NavItem
+                to="/crm/workflows"
+                icon={<Zap className="h-4 w-4" />}
+                label={t('nav.workflows')}
+                collapsed={isCollapsed}
+                onClick={isMobile ? closeMobile : undefined}
+              />
             </NavGroup>
           )}
 
@@ -192,6 +202,15 @@ export function StudioLayout() {
               collapsed={isCollapsed}
               onClick={isMobile ? closeMobile : undefined}
             />
+            {isAdmin && (
+              <NavItem
+                to="/admin/audit-trail"
+                icon={<ClipboardList className="h-4 w-4" />}
+                label={t('nav.auditTrail')}
+                collapsed={isCollapsed}
+                onClick={isMobile ? closeMobile : undefined}
+              />
+            )}
           </NavGroup>
         </nav>
 
@@ -225,43 +244,64 @@ export function StudioLayout() {
     )
   }
 
+  const location = useLocation()
+
   return (
     <TooltipProvider>
       <div className="flex h-screen overflow-hidden bg-background">
-        {/* Desktop Sidebar */}
-        <aside
-          className={cn(
-            'hidden lg:flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-all duration-200',
-            collapsed ? 'w-16' : 'w-64'
-          )}
+        {/* Skip to main content link */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          {t('common.accessibility.skipToContent')}
+        </a>
+
+        {/* Desktop Sidebar — animated width on collapse */}
+        <motion.aside
+          animate={{ width: collapsed ? 64 : 256 }}
+          transition={{ type: 'spring', stiffness: 350, damping: 35 }}
+          className="hidden lg:flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar overflow-hidden"
         >
           {renderSidebarContent(false)}
-        </aside>
+        </motion.aside>
 
         {/* Mobile Sidebar Overlay */}
-        {mobileOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/50"
-              onClick={closeMobile}
-            />
-            {/* Sidebar */}
-            <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar shadow-xl">
-              {/* Close button */}
-              <button
+        <AnimatePresence>
+          {mobileOpen && (
+            <div className="fixed inset-0 z-50 lg:hidden">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-black/50"
                 onClick={closeMobile}
-                className="absolute right-2 top-3 rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+              />
+              {/* Sidebar */}
+              <motion.aside
+                initial={{ x: -256 }}
+                animate={{ x: 0 }}
+                exit={{ x: -256 }}
+                transition={{ type: 'spring', stiffness: 350, damping: 35 }}
+                className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar shadow-xl"
               >
-                <X className="h-5 w-5" />
-              </button>
-              {renderSidebarContent(true)}
-            </aside>
-          </div>
-        )}
+                {/* Close button */}
+                <button
+                  onClick={closeMobile}
+                  className="absolute right-2 top-3 rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+                {renderSidebarContent(true)}
+              </motion.aside>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Main content */}
-        <main className="flex flex-1 flex-col overflow-hidden">
+        <main id="main-content" className="flex flex-1 flex-col overflow-hidden">
           {/* Top bar */}
           <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-6">
             <div className="flex items-center gap-3">
@@ -279,9 +319,13 @@ export function StudioLayout() {
             </div>
           </header>
 
-          {/* Page content */}
+          {/* Page content with route transition */}
           <div className="flex-1 overflow-y-auto p-6">
-            <Outlet />
+            <AnimatePresence mode="wait">
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
+            </AnimatePresence>
           </div>
         </main>
 

@@ -74,8 +74,8 @@ export const RecallStatusBadge = React.forwardRef<HTMLSpanElement, RecallStatusB
     const hasEnrichedContext = treatmentType || lastTreatmentDate || recallIntervalDays;
 
     const badgeContent = (
-      <Badge variant="outline" className={`${statusClassName} ${className || ''} whitespace-nowrap`}>
-        <Icon className="h-3 w-3 mr-1 flex-shrink-0" />
+      <Badge variant="outline" className={`${statusClassName} ${className || ''} whitespace-nowrap`} aria-label={label}>
+        <Icon className="h-3 w-3 mr-1 flex-shrink-0" aria-hidden="true" />
         <span className="truncate max-w-[100px]">{label}</span>
       </Badge>
     );

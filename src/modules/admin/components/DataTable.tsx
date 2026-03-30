@@ -35,14 +35,14 @@ export function DataTable<T>({
   onRowClick,
   rowClassName,
 }: DataTableProps<T>) {
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const handleSort = (columnKey: string, sortable?: boolean) => {
     if (!sortable) return;
-
+    
     if (sortColumn === columnKey) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -53,16 +53,16 @@ export function DataTable<T>({
 
   const sortedData = [...data].sort((a, b) => {
     if (!sortColumn) return 0;
-
+    
     const aValue = a[sortColumn as keyof T];
     const bValue = b[sortColumn as keyof T];
-
+    
     if (aValue === null || aValue === undefined) return 1;
     if (bValue === null || bValue === undefined) return -1;
-
+    
     const aStr = String(aValue).toLowerCase();
     const bStr = String(bValue).toLowerCase();
-
+    
     const comparison = aStr.localeCompare(bStr, undefined, { numeric: true });
     return sortDirection === "asc" ? comparison : -comparison;
   });
@@ -71,6 +71,21 @@ export function DataTable<T>({
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const currentData = sortedData.slice(startIndex, endIndex);
+
+  const handleRowKeyDown = (e: React.KeyboardEvent, row: T, index: number) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onRowClick?.(row);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextRow = (e.currentTarget.parentElement as HTMLElement)?.children[Math.min(index + 1, currentData.length - 1)] as HTMLElement;
+      nextRow?.focus();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevRow = (e.currentTarget.parentElement as HTMLElement)?.children[Math.max(index - 1, 0)] as HTMLElement;
+      prevRow?.focus();
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -83,17 +98,19 @@ export function DataTable<T>({
                   {column.sortable ? (
                     <button
                       onClick={() => handleSort(column.key, column.sortable)}
-                      className="flex items-center gap-2 hover:text-foreground transition-colors"
+                      aria-label={t('common.accessibility.sortBy', { column: typeof column.header === 'string' ? column.header : column.key })}
+                      aria-sort={sortColumn === column.key ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                      className="flex items-center gap-2 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-sm"
                     >
                       {column.header}
                       {sortColumn === column.key ? (
                         sortDirection === "asc" ? (
-                          <ArrowUp className="h-4 w-4" />
+                          <ArrowUp className="h-4 w-4" aria-hidden="true" />
                         ) : (
-                          <ArrowDown className="h-4 w-4" />
+                          <ArrowDown className="h-4 w-4" aria-hidden="true" />
                         )
                       ) : (
-                        <ArrowUpDown className="h-4 w-4 opacity-50" />
+                        <ArrowUpDown className="h-4 w-4 opacity-50" aria-hidden="true" />
                       )}
                     </button>
                   ) : (
@@ -103,12 +120,13 @@ export function DataTable<T>({
               ))}
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody aria-busy={loading} aria-live="polite">
             {loading ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center" role="status" aria-label={t('common.accessibility.loadingSpinner')}>
                     <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    <span className="sr-only">{t('common.accessibility.tableLoading')}</span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -118,15 +136,19 @@ export function DataTable<T>({
                   colSpan={columns.length}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  {t('common:noDataAvailable')}
+                  {t('common.noData')}
                 </TableCell>
               </TableRow>
             ) : (
               currentData.map((row, index) => (
                 <TableRow
                   key={index}
-                  className={`${onRowClick ? "cursor-pointer hover:bg-muted/50" : ""} ${rowClassName?.(row) || ""}`}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  role={onRowClick ? "button" : undefined}
+                  aria-label={onRowClick ? t('common.accessibility.tableRowClickable') : undefined}
+                  className={`${onRowClick ? "cursor-pointer hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring" : ""} ${rowClassName?.(row) || ""}`}
                   onClick={() => onRowClick?.(row)}
+                  onKeyDown={onRowClick ? (e) => handleRowKeyDown(e, row, index) : undefined}
                 >
                   {columns.map((column) => (
                     <TableCell key={column.key}>{column.cell(row)}</TableCell>
@@ -140,9 +162,9 @@ export function DataTable<T>({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {t('common:showingRange', { start: startIndex + 1, end: Math.min(endIndex, sortedData.length), total: sortedData.length })}
+        <nav className="flex items-center justify-between" aria-label={t('common.accessibility.pageInfo', { current: currentPage, total: totalPages })}>
+          <p className="text-sm text-muted-foreground" aria-live="polite">
+            {t('common.accessibility.showingResults', { start: startIndex + 1, end: Math.min(endIndex, sortedData.length), total: sortedData.length })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -150,22 +172,24 @@ export function DataTable<T>({
               size="sm"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
+              aria-label={t('common.accessibility.previousPage')}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </Button>
-            <span className="text-sm text-foreground">
-              {t('common:pageOf', { current: currentPage, total: totalPages })}
+            <span className="text-sm text-foreground" aria-current="page">
+              {t('common.accessibility.pageInfo', { current: currentPage, total: totalPages })}
             </span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
+              aria-label={t('common.accessibility.nextPage')}
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
-        </div>
+        </nav>
       )}
     </div>
   );

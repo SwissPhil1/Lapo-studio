@@ -13,6 +13,7 @@ import { CommunicationFilters } from '@/modules/crm/components/communications/Co
 import type { CommunicationLog, ChannelFilter, StatusFilter, DirectionFilter, PeriodFilter } from '@/shared/types/communications';
 import { useDebounce } from '@/shared/hooks/useDebounce';
 import { useTranslation } from 'react-i18next';
+import { MotionList, MotionItem } from '@/shared/components/motion';
 
 const ITEMS_PER_PAGE = 50;
 
@@ -208,15 +209,16 @@ export default function Communications() {
               <h3 className="text-sm font-medium text-muted-foreground sticky top-0 bg-background py-2 z-10">
                 {dateGroup} ({comms.length})
               </h3>
-              <div className="space-y-2">
+              <MotionList className="space-y-2">
                 {comms.map((comm, index) => (
-                  <CommunicationItem 
-                    key={comm.id} 
-                    communication={comm} 
-                    index={index}
-                  />
+                  <MotionItem key={comm.id}>
+                    <CommunicationItem
+                      communication={comm}
+                      index={index}
+                    />
+                  </MotionItem>
                 ))}
-              </div>
+              </MotionList>
             </div>
           ))}
           

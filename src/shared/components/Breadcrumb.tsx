@@ -15,9 +15,9 @@ export function Breadcrumb() {
   const displaySegments = segments.filter(s => !UUID_REGEX.test(s))
 
   return (
-    <nav className="flex items-center gap-1 text-sm text-muted-foreground">
-      <Link to="/" className="hover:text-foreground transition-colors">
-        <Home className="h-4 w-4" />
+    <nav aria-label={t('common.accessibility.breadcrumbNavigation')} className="flex items-center gap-1 text-sm text-muted-foreground">
+      <Link to="/" className="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-sm" aria-label={t('common.accessibility.homePage')}>
+        <Home className="h-4 w-4" aria-hidden="true" />
       </Link>
       {displaySegments.map((segment, i) => {
         // Build the actual path including any UUIDs that follow this segment

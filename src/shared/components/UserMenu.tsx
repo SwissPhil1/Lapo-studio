@@ -5,11 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-interface UserMenuProps {
-  collapsed?: boolean
-}
-
-export function UserMenu({ collapsed }: UserMenuProps) {
+export function UserMenu({ collapsed }: { collapsed?: boolean }) {
   const { user, signOut, role } = useAuth()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -39,9 +35,13 @@ export function UserMenu({ collapsed }: UserMenuProps) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
+        aria-label={t('common.accessibility.userMenu')}
+        aria-expanded={open}
+        aria-haspopup="true"
         className={cn(
           'flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-colors',
-          'hover:bg-accent'
+          'hover:bg-accent',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
         )}
       >
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
@@ -66,33 +66,36 @@ export function UserMenu({ collapsed }: UserMenuProps) {
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-lg border border-border bg-card p-1 shadow-xl">
+        <div role="menu" className="absolute bottom-full left-0 right-0 mb-1 rounded-lg border border-border bg-card p-1 shadow-xl">
           <button
+            role="menuitem"
             onClick={() => {
               navigate('/settings/profile')
               setOpen(false)
             }}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <User className="h-4 w-4" />
+            <User className="h-4 w-4" aria-hidden="true" />
             {t('nav.profile')}
           </button>
           <button
+            role="menuitem"
             onClick={() => {
               navigate('/settings')
               setOpen(false)
             }}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <Settings className="h-4 w-4" />
+            <Settings className="h-4 w-4" aria-hidden="true" />
             {t('nav.settings')}
           </button>
-          <div className="my-1 border-t border-border" />
+          <div className="my-1 border-t border-border" role="separator" />
           <button
+            role="menuitem"
             onClick={() => signOut()}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-4 w-4" aria-hidden="true" />
             {t('nav.signOut')}
           </button>
         </div>

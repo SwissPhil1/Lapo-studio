@@ -34,13 +34,13 @@ interface FollowupGroupProps {
 
 const followupConfig = {
   in_sequence: {
-    labelKey: 'pipeline:inSequenceLabel',
+    label: 'Rappel en cours',
     icon: Zap,
     className: 'text-primary',
     bgClassName: 'bg-primary/15',
   },
   needs_contact: {
-    labelKey: 'pipeline:needsContact',
+    label: 'À contacter',
     icon: Phone,
     className: 'text-warning',
     bgClassName: 'bg-warning/15',
@@ -48,7 +48,7 @@ const followupConfig = {
 };
 
 export function FollowupGroup({ followupType, patients, stageId, activeEnrollmentIds = [] }: FollowupGroupProps) {
-  const { t } = useTranslation(['pipeline']);
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const config = followupConfig[followupType];
   const Icon = config.icon;
@@ -62,16 +62,18 @@ export function FollowupGroup({ followupType, patients, stageId, activeEnrollmen
     <div className="space-y-2">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+        aria-expanded={isExpanded}
+        aria-label={isExpanded ? t('common.accessibility.collapseGroup', { group: config.label }) : t('common.accessibility.expandGroup', { group: config.label })}
+        className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {isExpanded ? (
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
         ) : (
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
         )}
-        <Icon className={cn('h-4 w-4', config.className)} />
-        <span className="text-sm font-medium text-foreground">{t(config.labelKey)}</span>
-        <span className={cn('ml-auto text-xs px-2 py-0.5 rounded-full', config.bgClassName, config.className)}>
+        <Icon className={cn('h-4 w-4', config.className)} aria-hidden="true" />
+        <span className="text-sm font-medium text-foreground">{config.label}</span>
+        <span className={cn('ml-auto text-xs px-2 py-0.5 rounded-full', config.bgClassName, config.className)} aria-hidden="true">
           {patients.length}
         </span>
       </button>
@@ -90,15 +92,15 @@ export function FollowupGroup({ followupType, patients, stageId, activeEnrollmen
           >
             {patients.length > 0 ? (
               patients.map((pp) => (
-                <PipelineCard
-                  key={pp.id}
-                  patient={pp}
+                <PipelineCard 
+                  key={pp.id} 
+                  patient={pp} 
                   hasActiveWorkflow={pp.patient_id ? activeEnrollmentIds.includes(pp.patient_id) : false}
                 />
               ))
             ) : (
               <div className="flex items-center justify-center h-12 text-muted-foreground text-xs">
-                {t('pipeline:noPatients')}
+                Aucun patient
               </div>
             )}
           </SortableContext>

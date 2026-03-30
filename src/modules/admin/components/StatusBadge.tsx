@@ -59,6 +59,8 @@ export function StatusBadge({ status, type = "referral", className }: StatusBadg
 
   const badge = (
     <span
+      role="status"
+      aria-label={t('common.accessibility.statusBadge', { status: displayLabel })}
       className={cn(
         "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
         variantStyle,

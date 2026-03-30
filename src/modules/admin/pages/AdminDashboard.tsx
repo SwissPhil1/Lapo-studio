@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { motion, MotionList, MotionItem, fadeIn } from '@/shared/components/motion';
 
 type TimeRange = 'this_month' | 'last_month' | 'ytd' | 'all';
 
@@ -322,51 +323,68 @@ export default function Dashboard() {
         </div>
 
         {/* KPIs */}
-        <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <MotionList className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           {/* KPI 1: Net Revenue */}
-          <KPICard
-            title={t('dashboard:netRevenue')}
-            value={formatCurrency(netRevenueData?.net_revenue || 0)}
-            subtitle={`${t('dashboard:grossRevenue')} ${formatCurrency(netRevenueData?.gross_revenue || 0)} – ${t('dashboard:commissionsTotal')} ${formatCurrency(netRevenueData?.total_commissions || 0)}`}
-            loading={loadingNetRevenue}
-          />
+          {/* KPI 1: Net Revenue */}
+          <MotionItem>
+            <KPICard
+              title={t('dashboard:netRevenue')}
+              value={formatCurrency(netRevenueData?.net_revenue || 0)}
+              subtitle={`${t('dashboard:grossRevenue')} ${formatCurrency(netRevenueData?.gross_revenue || 0)} – ${t('dashboard:commissionsTotal')} ${formatCurrency(netRevenueData?.total_commissions || 0)}`}
+              loading={loadingNetRevenue}
+            />
+          </MotionItem>
 
           {/* KPI 2: Conversion Rate */}
-          <KPICard
-            title={t('dashboard:conversionRate')}
-            value={`${conversionData?.conversion_rate || 0}%`}
-            subtitle={`${t('dashboard:booked')} ${conversionData?.booked_count || 0} • ${t('dashboard:confirmed')} ${conversionData?.confirmed_count || 0} • ${t('dashboard:total')} ${conversionData?.total_referrals || 0}`}
-            loading={loadingConversion}
-          />
+          <MotionItem>
+            <KPICard
+              title={t('dashboard:conversionRate')}
+              value={`${conversionData?.conversion_rate || 0}%`}
+              subtitle={`${t('dashboard:booked')} ${conversionData?.booked_count || 0} • ${t('dashboard:confirmed')} ${conversionData?.confirmed_count || 0} • ${t('dashboard:total')} ${conversionData?.total_referrals || 0}`}
+              loading={loadingConversion}
+            />
+          </MotionItem>
 
           {/* KPI 3: New Referrals */}
-          <KPICard
-            title={t('dashboard:newReferrals')}
-            value={newReferralsData?.new_referrals || 0}
-            subtitle={t('dashboard:allStatuses')}
-            loading={loadingNewReferrals}
-          />
+          <MotionItem>
+            <KPICard
+              title={t('dashboard:newReferrals')}
+              value={newReferralsData?.new_referrals || 0}
+              subtitle={t('dashboard:allStatuses')}
+              loading={loadingNewReferrals}
+            />
+          </MotionItem>
 
           {/* KPI 4: Pending Commissions */}
-          <KPICard
-            title={t('dashboard:pendingCommissions')}
-            value={formatCurrency(pendingData?.pending_amount || 0)}
-            subtitle={t('dashboard:toPayReferrers')}
-            loading={loadingPending}
-          />
+          <MotionItem>
+            <KPICard
+              title={t('dashboard:pendingCommissions')}
+              value={formatCurrency(pendingData?.pending_amount || 0)}
+              subtitle={t('dashboard:toPayReferrers')}
+              loading={loadingPending}
+            />
+          </MotionItem>
 
           {/* KPI 5: Converted to LAPO Cash */}
-          <KPICard
-            title={t('dashboard:convertedToLapoCash')}
-            value={`${formatCurrency(convertedStats?.totalChf || 0)} → ${formatLapoCash(convertedStats?.totalLc || 0)}`}
-            subtitle={`${convertedStats?.count || 0} ${t('dashboard:conversions')}`}
-            loading={loadingConverted}
-            valueClassName="text-amber-600"
-          />
-        </div>
+          <MotionItem>
+            <KPICard
+              title={t('dashboard:convertedToLapoCash')}
+              value={`${formatCurrency(convertedStats?.totalChf || 0)} → ${formatLapoCash(convertedStats?.totalLc || 0)}`}
+              subtitle={`${convertedStats?.count || 0} ${t('dashboard:conversions')}`}
+              loading={loadingConverted}
+              valueClassName="text-amber-600"
+            />
+          </MotionItem>
+        </MotionList>
 
         {/* Latest Activities */}
-        <div className="mb-8">
+        <motion.div
+          className="mb-8"
+          variants={fadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+        >
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-foreground">
@@ -497,10 +515,15 @@ export default function Dashboard() {
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
 
         {/* Top Referrers */}
-        <div>
+        <motion.div
+          variants={fadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+        >
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-foreground">
@@ -546,7 +569,7 @@ export default function Dashboard() {
               onRowClick={(row) => navigate(`/admin/referrers/${row.referrer_id}`)}
             />
           )}
-        </div>
+        </motion.div>
       </div>
   );
 }

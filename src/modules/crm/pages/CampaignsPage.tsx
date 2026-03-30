@@ -12,6 +12,7 @@ import { CampaignTable, type CampaignWithMetrics } from '@/modules/crm/component
 import { CampaignDetailDialog } from '@/modules/crm/components/campaigns/CampaignDetailDialog';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuditTrail } from '@/shared/hooks/useAuditTrail';
 
 export interface Campaign {
   id: string;
@@ -42,6 +43,7 @@ export default function Campaigns() {
   const [detailOpen, setDetailOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { logAction } = useAuditTrail();
 
   // Fetch campaigns with their segments
   const { data: campaigns, isLoading, refetch, isFetching } = useQuery({
@@ -107,8 +109,9 @@ export default function Campaigns() {
         });
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, campaign) => {
       queryClient.invalidateQueries({ queryKey: ['crm-campaigns'] });
+      logAction('create', 'campaign', campaign.id, { action: 'duplicate', name: campaign.name });
       toast.success(t('campaigns:duplicateSuccess'));
     },
     onError: () => {
@@ -125,8 +128,9 @@ export default function Campaigns() {
         .eq('id', campaignId);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, campaignId) => {
       queryClient.invalidateQueries({ queryKey: ['crm-campaigns'] });
+      logAction('status_change', 'campaign', campaignId, { newStatus: 'archived' });
       toast.success(t('campaigns:archiveSuccess'));
     },
     onError: () => {

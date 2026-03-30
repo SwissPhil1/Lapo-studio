@@ -14,6 +14,8 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, subMonths, su
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import { cn } from '@/shared/lib/utils';
+import { motion, MotionList, MotionItem, fadeIn } from '@/shared/components/motion';
+
 interface StatCardProps {
   title: string;
   value: string | number;
@@ -37,8 +39,12 @@ function StatCard({ title, value, icon, subtitle, onClick, variant = 'default', 
 
   return (
     <div
-      className={`card-elevated p-6 animate-slide-up ${bgClass} ${onClick ? 'cursor-pointer hover:bg-muted/50 transition-colors' : ''}`}
+      className={`card-elevated p-6 ${bgClass} ${onClick ? 'cursor-pointer hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg' : ''}`}
       onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
+      aria-label={`${title}: ${value}${subtitle ? `, ${subtitle}` : ''}`}
     >
       <div className="flex items-start justify-between">
         <div>
@@ -65,7 +71,7 @@ function StatCard({ title, value, icon, subtitle, onClick, variant = 'default', 
           variant === 'success' ? 'bg-success/10' :
           variant === 'destructive' ? 'bg-destructive/10' :
           'bg-accent'
-        }`}>
+        }`} aria-hidden="true">
           {icon}
         </div>
       </div>
@@ -313,39 +319,53 @@ export default function Dashboard() {
 
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title={t('crmDashboard:activePatients')}
-          value={activePatients}
-          icon={<Users className="h-6 w-6 text-primary" />}
-          subtitle={t('crmDashboard:last12Months')}
-          trend={activePatientsTrend}
-          trendLabel={t('crmDashboard:vsLastPeriod')}
-        />
-        <StatCard
-          title={t('crmDashboard:monthlyRevenue')}
-          value={formatCurrency(monthlyRevenue)}
-          icon={<Banknote className="h-6 w-6 text-primary" />}
-          trend={revenueTrend}
-          trendLabel={t('crmDashboard:vsLastPeriod')}
-        />
-        <StatCard
-          title={t('crmDashboard:weeklyAppointments')}
-          value={weeklyAppointments}
-          icon={<CalendarClock className="h-6 w-6 text-primary" />}
-          trend={appointmentsTrend}
-          trendLabel={t('crmDashboard:vsLastPeriod')}
-        />
-        <StatCard
-          title={t('crmDashboard:retentionRate')}
-          value={`${retentionRate}%`}
-          icon={<UserCheck className="h-6 w-6 text-primary" />}
-          subtitle={t('crmDashboard:patientsWithMultipleAppts')}
-        />
-      </div>
+      <MotionList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <StatCard
+            title={t('crmDashboard:activePatients')}
+            value={activePatients}
+            icon={<Users className="h-6 w-6 text-primary" />}
+            subtitle={t('crmDashboard:last12Months')}
+            trend={activePatientsTrend}
+            trendLabel={t('crmDashboard:vsLastPeriod')}
+          />
+        </MotionItem>
+        <MotionItem>
+          <StatCard
+            title={t('crmDashboard:monthlyRevenue')}
+            value={formatCurrency(monthlyRevenue)}
+            icon={<Banknote className="h-6 w-6 text-primary" />}
+            trend={revenueTrend}
+            trendLabel={t('crmDashboard:vsLastPeriod')}
+          />
+        </MotionItem>
+        <MotionItem>
+          <StatCard
+            title={t('crmDashboard:weeklyAppointments')}
+            value={weeklyAppointments}
+            icon={<CalendarClock className="h-6 w-6 text-primary" />}
+            trend={appointmentsTrend}
+            trendLabel={t('crmDashboard:vsLastPeriod')}
+          />
+        </MotionItem>
+        <MotionItem>
+          <StatCard
+            title={t('crmDashboard:retentionRate')}
+            value={`${retentionRate}%`}
+            icon={<UserCheck className="h-6 w-6 text-primary" />}
+            subtitle={t('crmDashboard:patientsWithMultipleAppts')}
+          />
+        </MotionItem>
+      </MotionList>
 
       {/* Reactivation Tasks Section */}
-      <div className="card-elevated p-6">
+      <motion.div
+        className="card-elevated p-6"
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-50px' }}
+      >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
             {t('crmDashboard:followUps')} ({pendingTasks.length})
@@ -395,10 +415,16 @@ export default function Dashboard() {
             <p>{t('crmDashboard:noFollowUps')}</p>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Today's Appointments */}
-      <div className="card-elevated p-6">
+      <motion.div
+        className="card-elevated p-6"
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-50px' }}
+      >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
             {t('crmDashboard:todayAppointments')} ({todayAppointments.length})
@@ -448,7 +474,7 @@ export default function Dashboard() {
             <p>{t('crmDashboard:noAppointmentsToday')}</p>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Activity Feed */}
       <ActivityFeedWidget 

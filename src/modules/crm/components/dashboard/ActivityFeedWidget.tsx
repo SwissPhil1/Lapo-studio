@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
+import { motion, staggerContainer, slideUp } from '@/shared/components/motion';
 
 interface ActivityItem {
   id: string;
@@ -507,8 +508,12 @@ export function ActivityFeedWidget({
       </div>
 
       {/* Activities List */}
-      <div>
-        {displayedActivities.map((activity, index) => {
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
+        {displayedActivities.map((activity) => {
           let config = activityConfig[activity.activity_type] || defaultConfig;
           
           // For communication activities, use channel-specific icon
@@ -552,10 +557,10 @@ export function ActivityFeedWidget({
           };
 
           return (
-            <div
+            <motion.div
               key={activity.id}
-              className="border-b border-border/50 last:border-b-0 animate-fade-in"
-              style={{ animationDelay: `${Math.min(index * 20, 200)}ms` }}
+              className="border-b border-border/50 last:border-b-0"
+              variants={slideUp}
             >
               {/* Main activity row */}
               <div
@@ -709,10 +714,10 @@ export function ActivityFeedWidget({
                   })}
                 </div>
               )}
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* Expand/Collapse Toggle */}
       {filteredActivities.length > collapsedLimit && (
