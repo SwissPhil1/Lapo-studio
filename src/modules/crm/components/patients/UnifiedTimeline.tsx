@@ -61,6 +61,13 @@ const eventColors: Record<string, { bg: string; text: string; border: string }> 
   task: { bg: 'bg-warning/10', text: 'text-warning', border: 'border-warning/30' },
 };
 
+// Safety: coerce any non-string value (e.g. JSON object from Supabase) to string
+function safeString(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  return String(value);
+}
+
 const statusIcons: Record<string, React.ElementType> = {
   completed: CheckCircle,
   cancelled: XCircle,
@@ -413,7 +420,7 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
         timelineEvents.push({
           id: `booking-${booking.id}`,
           type: 'booking',
-          title: booking.service || t('patientDetail:timeline.appointment'),
+          title: safeString(booking.service) || t('patientDetail:timeline.appointment'),
           description: booking.booking_value > 0 ? t('patientDetail:timeline.value', { amount: booking.booking_value }) : undefined,
           date: parseISO(booking.booking_date),
           status: booking.status || 'confirmed',
@@ -439,8 +446,8 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
         timelineEvents.push({
           id: `note-${note.id}`,
           type: 'note',
-          title: note.title,
-          description: note.content,
+          title: safeString(note.title),
+          description: safeString(note.content) || undefined,
           date: parseISO(note.created_at),
           metadata: {
             noteType: note.note_type,
@@ -461,11 +468,12 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
 
       communications?.forEach(comm => {
         const type = comm.channel === 'sms' ? 'sms' : comm.channel === 'call' ? 'call' : 'email';
+        const subject = safeString(comm.subject);
         timelineEvents.push({
           id: `comm-${comm.id}`,
           type,
-          title: comm.subject || (type === 'sms' ? t('patientDetail:timeline.sms') : type === 'call' ? t('patientDetail:timeline.call') : 'Email'),
-          description: comm.message_preview || undefined,
+          title: subject || (type === 'sms' ? t('patientDetail:timeline.sms') : type === 'call' ? t('patientDetail:timeline.call') : 'Email'),
+          description: safeString(comm.message_preview) || undefined,
           date: parseISO(comm.sent_at),
           status: comm.status,
           metadata: {
@@ -476,8 +484,8 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
             opened_at: comm.opened_at,
             clicked_at: comm.clicked_at,
             bounced_at: comm.bounced_at,
-            bounce_reason: comm.bounce_reason,
-            full_message: comm.full_message,
+            bounce_reason: safeString(comm.bounce_reason),
+            full_message: safeString(comm.full_message),
           },
         });
       });
@@ -507,7 +515,7 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
           title: taskLabelKeys[task.task_type]
             ? t(`patientDetail:timeline.${taskLabelKeys[task.task_type]}`)
             : t('patientDetail:timeline.reactivationTask'),
-          description: task.notes || undefined,
+          description: safeString(task.notes) || undefined,
           date: parseISO(task.created_at),
           status: task.status,
         });
