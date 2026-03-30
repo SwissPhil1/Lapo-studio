@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
@@ -51,6 +51,22 @@ export function StudioLayout() {
   }, [])
 
   const closeMobile = useCallback(() => setMobileOpen(false), [])
+
+  // Auto-collapse sidebar after 3 seconds on desktop if expanded
+  const hasAutoCollapsed = useRef(false)
+  useEffect(() => {
+    if (hasAutoCollapsed.current || collapsed) return
+    const isDesktop = window.matchMedia('(min-width: 1024px)').matches
+    if (!isDesktop) return
+
+    const timer = setTimeout(() => {
+      setCollapsed(true)
+      localStorage.setItem('sidebar-collapsed', 'true')
+      hasAutoCollapsed.current = true
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [collapsed])
 
   function renderSidebarContent(isMobile: boolean) {
     const isCollapsed = isMobile ? false : collapsed

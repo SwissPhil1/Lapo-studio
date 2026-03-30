@@ -41,6 +41,56 @@ export function useKeyboardShortcuts() {
       action: () => navigate("/admin/commissions"),
       description: "Go to Commissions",
     },
+    // CRM shortcuts
+    {
+      key: "h",
+      ctrlKey: true,
+      shiftKey: true,
+      action: () => navigate("/crm/dashboard"),
+      description: "Go to CRM Dashboard",
+    },
+    {
+      key: "t",
+      ctrlKey: true,
+      shiftKey: true,
+      action: () => navigate("/crm/patients"),
+      description: "Go to Patients",
+    },
+    {
+      key: "k",
+      ctrlKey: true,
+      shiftKey: true,
+      action: () => navigate("/crm/pipeline"),
+      description: "Go to Pipeline",
+    },
+    {
+      key: "a",
+      ctrlKey: true,
+      shiftKey: true,
+      action: () => navigate("/crm/appointments"),
+      description: "Go to Appointments",
+    },
+    {
+      key: "m",
+      ctrlKey: true,
+      shiftKey: true,
+      action: () => navigate("/crm/communications"),
+      description: "Go to Communications",
+    },
+    {
+      key: "y",
+      ctrlKey: true,
+      shiftKey: true,
+      action: () => navigate("/crm/analytics"),
+      description: "Go to Analytics",
+    },
+    {
+      key: "s",
+      ctrlKey: true,
+      shiftKey: true,
+      action: () => navigate("/crm/statistics"),
+      description: "Go to Statistics",
+    },
   ];
 
   const handleKeyDown = useCallback(

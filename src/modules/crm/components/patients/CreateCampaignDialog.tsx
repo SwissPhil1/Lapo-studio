@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { EmailTemplateBuilder } from '@/modules/crm/components/campaigns/EmailTemplateBuilder';
 import {
   Select,
   SelectContent,
@@ -337,13 +338,10 @@ export function CreateCampaignDialog({
                     {errors.subject && <p className="text-xs text-destructive mt-1">{errors.subject}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="message">{t('campaigns:message')}</Label>
-                    <Textarea
-                      id="message"
-                      placeholder={t('campaigns:messagePlaceholder')}
+                    <Label>{t('campaigns:message')}</Label>
+                    <EmailTemplateBuilder
                       value={customMessage}
-                      onChange={(e) => { setCustomMessage(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.message; return n; }); }}
-                      rows={5}
+                      onChange={(html) => { setCustomMessage(html); setErrors(prev => { const n = { ...prev }; delete n.message; return n; }); }}
                     />
                     {errors.message && <p className="text-xs text-destructive mt-1">{errors.message}</p>}
                     <p className="text-xs text-muted-foreground">

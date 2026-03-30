@@ -21,6 +21,7 @@ import {
   TrendingDown,
   Minus,
   ArrowRight,
+  Link2,
 } from 'lucide-react';
 import {
   BarChart,
@@ -390,6 +391,54 @@ export default function StatisticsPage() {
     },
   });
 
+  // 8. Referrals
+  const { data: referralsData } = useQuery({
+    queryKey: ['stats-referrals', period],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('referrals')
+        .select('id, referral_status, referrer_id, referred_patient_id, booking_id, created_at, is_test')
+        .eq('is_test', false);
+      return data || [];
+    },
+  });
+
+  // 9. Referrer performance view
+  const { data: referrerPerfData } = useQuery({
+    queryKey: ['stats-referrer-perf'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('v_referrer_performance')
+        .select('referrer_id, referrer_code, referrer_email, total_referrals, booked_referrals, confirmed_referrals, total_commissions, last_referral_at');
+      return data || [];
+    },
+  });
+
+  // 10. Commission entries for ROI
+  const { data: commissionsData } = useQuery({
+    queryKey: ['stats-commissions', period],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('commission_entries')
+        .select('id, commission_amount, purchase_amount, status, purchase_type, created_at, is_test, referrer_id')
+        .eq('is_test', false);
+      return data || [];
+    },
+  });
+
+  // 11. Bookings with referrer_code (for referral revenue)
+  const { data: referredBookingsData } = useQuery({
+    queryKey: ['stats-referred-bookings', period],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('bookings')
+        .select('id, booking_date, booking_value, status, referrer_code, patient_id, is_test')
+        .eq('is_test', false)
+        .not('referrer_code', 'is', null);
+      return data || [];
+    },
+  });
+
   // -----------------------------------------------------------------------
   // Computed Metrics
   // -----------------------------------------------------------------------
@@ -564,6 +613,95 @@ export default function StatisticsPage() {
       };
     });
 
+    // ---- Referral Impact Metrics ----
+
+    // Referral revenue (bookings with referrer_code)
+    const allReferredBookings = (referredBookingsData || []);
+    const currentReferredBookings = allReferredBookings.filter(b =>
+      isWithinInterval(parseISO(b.booking_date), { start: range.start, end: range.end })
+    );
+    const prevReferredBookings = allReferredBookings.filter(b =>
+      isWithinInterval(parseISO(b.booking_date), { start: range.prevStart, end: range.prevEnd })
+    );
+    const referralRevenue = currentReferredBookings
+      .filter(b => b.status === BOOKING_STATUS.COMPLETED)
+      .reduce((sum, b) => sum + (b.booking_value || 0), 0);
+    const prevReferralRevenue = prevReferredBookings
+      .filter(b => b.status === BOOKING_STATUS.COMPLETED)
+      .reduce((sum, b) => sum + (b.booking_value || 0), 0);
+    const organicRevenue = currentRevenue - referralRevenue;
+    const referralRevenueShare = currentRevenue > 0 ? (referralRevenue / currentRevenue) * 100 : 0;
+
+    // Referral revenue sparkline
+    const referralRevenueSparkline = intervals.map((date, i) => {
+      const nextDate = intervals[i + 1] || range.end;
+      return currentReferredBookings
+        .filter(b => {
+          const d = parseISO(b.booking_date);
+          return d >= date && d < nextDate && b.status === BOOKING_STATUS.COMPLETED;
+        })
+        .reduce((sum, b) => sum + (b.booking_value || 0), 0);
+    });
+
+    // Referral funnel
+    const allReferrals = referralsData || [];
+    const currentReferrals = allReferrals.filter(r =>
+      r.created_at && isWithinInterval(parseISO(r.created_at), { start: range.start, end: range.end })
+    );
+    const prevReferrals = allReferrals.filter(r =>
+      r.created_at && isWithinInterval(parseISO(r.created_at), { start: range.prevStart, end: range.prevEnd })
+    );
+    const totalReferrals = currentReferrals.length;
+    const bookedReferrals = currentReferrals.filter(r => ['booked', 'confirmed'].includes(r.referral_status)).length;
+    const confirmedReferrals = currentReferrals.filter(r => r.referral_status === 'confirmed').length;
+    const referralConversionRate = totalReferrals > 0 ? (bookedReferrals / totalReferrals) * 100 : 0;
+    const prevTotalReferrals = prevReferrals.length;
+
+    // Commission ROI
+    const allCommissions = commissionsData || [];
+    const currentCommissions = allCommissions.filter(c =>
+      c.created_at && isWithinInterval(parseISO(c.created_at), { start: range.start, end: range.end })
+    );
+    const totalCommissionsPaid = currentCommissions.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
+    const referralROI = totalCommissionsPaid > 0 ? referralRevenue / totalCommissionsPaid : 0;
+
+    // Referrer network health
+    const referrerPerf = referrerPerfData || [];
+    const now = new Date();
+    const activeReferrers = referrerPerf.filter(r => {
+      if (!r.last_referral_at) return false;
+      const daysSince = (now.getTime() - new Date(r.last_referral_at).getTime()) / (1000 * 60 * 60 * 24);
+      return daysSince <= 60;
+    }).length;
+    const dormantReferrers = referrerPerf.filter(r => {
+      if (!r.last_referral_at) return false;
+      const daysSince = (now.getTime() - new Date(r.last_referral_at).getTime()) / (1000 * 60 * 60 * 24);
+      return daysSince > 60 && daysSince <= 180;
+    }).length;
+    const coldReferrers = referrerPerf.length - activeReferrers - dormantReferrers;
+
+    // Top referrers by revenue (from v_referrer_performance)
+    const topReferrers = [...referrerPerf]
+      .sort((a, b) => (b.total_commissions || 0) - (a.total_commissions || 0))
+      .slice(0, 5)
+      .map(r => ({
+        label: r.referrer_code || r.referrer_email || 'Unknown',
+        value: r.confirmed_referrals || 0,
+        revenue: r.total_commissions || 0,
+      }));
+
+    // Referred patient retention (referred patients with 2+ completed bookings)
+    const referredPatientIds = new Set(allReferredBookings.map(b => b.patient_id));
+    const referredWithMultipleBookings = [...referredPatientIds].filter(pid =>
+      allReferredBookings.filter(b => b.patient_id === pid && b.status === BOOKING_STATUS.COMPLETED).length >= 2
+    ).length;
+    const referredRetentionRate = referredPatientIds.size > 0
+      ? (referredWithMultipleBookings / referredPatientIds.size) * 100 : 0;
+
+    // First purchase vs repeat from commissions
+    const firstPurchaseCommissions = currentCommissions.filter(c => c.purchase_type === 'first_purchase').length;
+    const repeatPurchaseCommissions = currentCommissions.filter(c => c.purchase_type === 'repeat_purchase').length;
+
     return {
       revenue: { current: currentRevenue, prev: prevRevenue, sparkline: revenueSparkline, change: pctChange(currentRevenue, prevRevenue) },
       appointments: { current: currentAppts, prev: prevAppts, sparkline: apptSparkline, change: pctChange(currentAppts, prevAppts) },
@@ -584,8 +722,32 @@ export default function StatisticsPage() {
       comms: { totalSent, openRate, bounceRate },
       campaigns: { active: activeCampaigns, completed: completedCampaigns },
       tasks: { pending: pendingTasks, overdue: overdueTasks, completionRate: taskCompletionRate },
+      referral: {
+        revenue: referralRevenue,
+        prevRevenue: prevReferralRevenue,
+        revenueChange: pctChange(referralRevenue, prevReferralRevenue),
+        revenueSparkline: referralRevenueSparkline,
+        organicRevenue,
+        revenueShare: referralRevenueShare,
+        totalReferrals,
+        prevTotalReferrals,
+        referralChange: pctChange(totalReferrals, prevTotalReferrals),
+        bookedReferrals,
+        confirmedReferrals,
+        conversionRate: referralConversionRate,
+        commissionsPaid: totalCommissionsPaid,
+        roi: referralROI,
+        activeReferrers,
+        dormantReferrers,
+        coldReferrers,
+        totalReferrers: referrerPerf.length,
+        topReferrers,
+        referredRetentionRate,
+        firstPurchase: firstPurchaseCommissions,
+        repeatPurchase: repeatPurchaseCommissions,
+      },
     };
-  }, [bookingsData, patientsData, pipelineData, stagesData, commsData, campaignsData, tasksData, range, period]);
+  }, [bookingsData, patientsData, pipelineData, stagesData, commsData, campaignsData, tasksData, referralsData, referrerPerfData, commissionsData, referredBookingsData, range, period]);
 
   const isLoading = bookingsLoading || patientsLoading;
 
@@ -661,6 +823,280 @@ export default function StatisticsPage() {
           </div>
         </MotionItem>
       </MotionList>
+
+      {/* ----------------------------------------------------------------- */}
+      {/* Referral Impact Section                                         */}
+      {/* ----------------------------------------------------------------- */}
+      {metrics && (
+        <motion.div variants={fadeIn} initial="hidden" animate="visible">
+          <div className="mb-4 flex items-center gap-2">
+            <Link2 className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold text-foreground">
+              {t('analytics:referralImpact', { defaultValue: 'Referral Program Impact' })}
+            </h2>
+            <span className="text-xs text-muted-foreground ml-2">
+              {t('analytics:referralImpactDesc', { defaultValue: 'How your referral network drives business growth' })}
+            </span>
+          </div>
+
+          {/* Referral Hero Row — 4 key numbers */}
+          <MotionList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <MotionItem>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <BigNumber
+                  label={t('analytics:referralRevenue', { defaultValue: 'Referral Revenue' })}
+                  value={formatCurrency(metrics.referral.revenue)}
+                  change={metrics.referral.revenueChange}
+                  sparkline={metrics.referral.revenueSparkline}
+                />
+              </div>
+            </MotionItem>
+            <MotionItem>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <BigNumber
+                  label={t('analytics:revenueShare', { defaultValue: 'Share of Revenue' })}
+                  value={`${metrics.referral.revenueShare.toFixed(1)}%`}
+                />
+                <div className="mt-2 h-1.5 bg-accent/30 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(metrics.referral.revenueShare, 100)}%` }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    className="h-full rounded-full bg-primary"
+                  />
+                </div>
+                <div className="flex justify-between mt-1.5 text-[10px] text-muted-foreground">
+                  <span>{t('analytics:referred', { defaultValue: 'Referred' })}</span>
+                  <span>{t('analytics:organic', { defaultValue: 'Organic' })}</span>
+                </div>
+              </div>
+            </MotionItem>
+            <MotionItem>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <BigNumber
+                  label={t('analytics:referralROI', { defaultValue: 'Referral ROI' })}
+                  value={metrics.referral.roi > 0 ? `${metrics.referral.roi.toFixed(1)}x` : '—'}
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {formatCurrency(metrics.referral.revenue)} {t('analytics:revenueVs', { defaultValue: 'revenue vs' })} {formatCurrency(metrics.referral.commissionsPaid)} {t('analytics:commissions', { defaultValue: 'commissions' })}
+                </p>
+              </div>
+            </MotionItem>
+            <MotionItem>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <BigNumber
+                  label={t('analytics:totalReferralsLabel', { defaultValue: 'Referrals' })}
+                  value={String(metrics.referral.totalReferrals)}
+                  change={metrics.referral.referralChange}
+                />
+              </div>
+            </MotionItem>
+          </MotionList>
+
+          {/* Referral Detail Grid — 3 columns */}
+          <MotionList className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Conversion Funnel */}
+            <MotionItem>
+              <Section
+                title={t('analytics:conversionFunnel', { defaultValue: 'Conversion Funnel' })}
+                subtitle={t('analytics:conversionFunnelDesc', { defaultValue: 'Referral journey stages' })}
+              >
+                <div className="space-y-4">
+                  {[
+                    {
+                      label: t('analytics:funnelReferred', { defaultValue: 'Referred' }),
+                      value: metrics.referral.totalReferrals,
+                      pct: 100,
+                      color: 'hsl(var(--primary))',
+                    },
+                    {
+                      label: t('analytics:funnelBooked', { defaultValue: 'Booked' }),
+                      value: metrics.referral.bookedReferrals,
+                      pct: metrics.referral.totalReferrals > 0 ? (metrics.referral.bookedReferrals / metrics.referral.totalReferrals) * 100 : 0,
+                      color: 'hsl(var(--chart-3))',
+                    },
+                    {
+                      label: t('analytics:funnelConfirmed', { defaultValue: 'Confirmed' }),
+                      value: metrics.referral.confirmedReferrals,
+                      pct: metrics.referral.totalReferrals > 0 ? (metrics.referral.confirmedReferrals / metrics.referral.totalReferrals) * 100 : 0,
+                      color: 'hsl(var(--success))',
+                    },
+                  ].map((step) => (
+                    <div key={step.label}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs text-muted-foreground">{step.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-foreground tabular-nums">{step.value}</span>
+                          <span className="text-[10px] text-muted-foreground tabular-nums">{step.pct.toFixed(0)}%</span>
+                        </div>
+                      </div>
+                      <div className="h-2 bg-accent/30 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${step.pct}%` }}
+                          transition={{ duration: 0.6, ease: 'easeOut' }}
+                          className="h-full rounded-full"
+                          style={{ backgroundColor: step.color }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{t('analytics:conversionRateLabel', { defaultValue: 'Conversion Rate' })}</span>
+                  <span className="text-sm font-bold text-foreground tabular-nums">{metrics.referral.conversionRate.toFixed(1)}%</span>
+                </div>
+              </Section>
+            </MotionItem>
+
+            {/* Network Health */}
+            <MotionItem>
+              <Section
+                title={t('analytics:referrerNetwork', { defaultValue: 'Referrer Network' })}
+                subtitle={`${metrics.referral.totalReferrers} ${t('analytics:totalReferrersLabel', { defaultValue: 'total referrers' })}`}
+              >
+                <div className="space-y-4">
+                  {[
+                    { label: t('analytics:activeReferrers', { defaultValue: 'Active' }), value: metrics.referral.activeReferrers, color: 'hsl(var(--success))', desc: t('analytics:activeDesc', { defaultValue: '< 60 days' }) },
+                    { label: t('analytics:dormantReferrers', { defaultValue: 'Dormant' }), value: metrics.referral.dormantReferrers, color: 'hsl(var(--warning))', desc: t('analytics:dormantDesc', { defaultValue: '60–180 days' }) },
+                    { label: t('analytics:coldReferrers', { defaultValue: 'Cold' }), value: metrics.referral.coldReferrers, color: 'hsl(var(--destructive))', desc: t('analytics:coldDesc', { defaultValue: '> 180 days' }) },
+                  ].map((tier) => (
+                    <div key={tier.label} className="flex items-center gap-3">
+                      <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: tier.color }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-foreground font-medium">{tier.label}</span>
+                          <span className="text-sm font-semibold text-foreground tabular-nums">{tier.value}</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground">{tier.desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {/* Network health bar */}
+                  {metrics.referral.totalReferrers > 0 && (
+                    <div className="h-3 bg-accent/30 rounded-full overflow-hidden flex">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(metrics.referral.activeReferrers / metrics.referral.totalReferrers) * 100}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                        className="h-full bg-success"
+                      />
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(metrics.referral.dormantReferrers / metrics.referral.totalReferrers) * 100}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
+                        className="h-full bg-warning"
+                      />
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(metrics.referral.coldReferrers / metrics.referral.totalReferrers) * 100}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+                        className="h-full bg-destructive"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Commission breakdown */}
+                <div className="mt-4 pt-3 border-t border-border space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">{t('analytics:firstPurchases', { defaultValue: 'First purchases' })}</span>
+                    <span className="text-xs font-semibold text-foreground tabular-nums">{metrics.referral.firstPurchase}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">{t('analytics:repeatPurchases', { defaultValue: 'Repeat purchases' })}</span>
+                    <span className="text-xs font-semibold text-foreground tabular-nums">{metrics.referral.repeatPurchase}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">{t('analytics:referredRetention', { defaultValue: 'Referred patient retention' })}</span>
+                    <span className="text-xs font-semibold text-foreground tabular-nums">{metrics.referral.referredRetentionRate.toFixed(1)}%</span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => navigate('/admin/referrers')}
+                >
+                  {t('analytics:viewReferrers', { defaultValue: 'View all referrers' })}
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </Section>
+            </MotionItem>
+
+            {/* Top Referrers */}
+            <MotionItem>
+              <Section
+                title={t('analytics:topReferrers', { defaultValue: 'Top Referrers' })}
+                subtitle={t('analytics:topReferrersDesc', { defaultValue: 'By confirmed referrals' })}
+              >
+                {metrics.referral.topReferrers.length > 0 ? (
+                  <div className="space-y-3">
+                    {metrics.referral.topReferrers.map((ref, idx) => (
+                      <div key={ref.label} className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold text-muted-foreground w-4 shrink-0 tabular-nums">{idx + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs font-medium text-foreground truncate block">{ref.label}</span>
+                          <span className="text-[10px] text-muted-foreground">{ref.value} {t('analytics:confirmed', { defaultValue: 'confirmed' })}</span>
+                        </div>
+                        <span className="text-xs font-semibold text-foreground tabular-nums shrink-0">
+                          {formatCurrency(ref.revenue)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {t('analytics:noReferrersYet', { defaultValue: 'No referrer data yet' })}
+                  </p>
+                )}
+
+                {/* Revenue comparison mini visual */}
+                {metrics.referral.revenue > 0 && (
+                  <div className="mt-4 pt-3 border-t border-border">
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">
+                      {t('analytics:revenueBreakdown', { defaultValue: 'Revenue Breakdown' })}
+                    </div>
+                    <div className="flex gap-2 h-6 rounded-md overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${metrics.referral.revenueShare}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                        className="bg-primary rounded-sm flex items-center justify-center"
+                      >
+                        {metrics.referral.revenueShare > 15 && (
+                          <span className="text-[9px] font-bold text-primary-foreground">{metrics.referral.revenueShare.toFixed(0)}%</span>
+                        )}
+                      </motion.div>
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${100 - metrics.referral.revenueShare}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
+                        className="bg-accent rounded-sm flex items-center justify-center"
+                      >
+                        {metrics.referral.revenueShare < 85 && (
+                          <span className="text-[9px] font-medium text-muted-foreground">{(100 - metrics.referral.revenueShare).toFixed(0)}%</span>
+                        )}
+                      </motion.div>
+                    </div>
+                    <div className="flex justify-between mt-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        <span className="text-[10px] text-muted-foreground">{t('analytics:referralLabel', { defaultValue: 'Referral' })}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+                        <span className="text-[10px] text-muted-foreground">{t('analytics:organicLabel', { defaultValue: 'Organic' })}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Section>
+            </MotionItem>
+          </MotionList>
+        </motion.div>
+      )}
 
       {/* Main Grid — 2 columns on desktop */}
       <MotionList className="grid grid-cols-1 lg:grid-cols-3 gap-6">
