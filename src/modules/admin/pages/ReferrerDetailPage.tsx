@@ -52,6 +52,7 @@ import { getTierBadgeStyles } from "@/shared/lib/referrerTierBadge";
 import { LapoCashReferrerCard } from "@/modules/admin/components/LapoCashReferrerCard";
 import { useLapoCashWallet, useLapoCashTransactions } from "@/shared/hooks/useLapoCashWallet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "react-i18next";
 
 interface ReferrerData {
   id: string;
@@ -125,18 +126,19 @@ function TransactionsTabs({
   referralColumns: Column<ReferralRow>[];
   onReferralClick: (row: ReferralRow) => void;
 }) {
+  const { t } = useTranslation(['referrerDetailPage', 'common']);
   const { data: wallet } = useLapoCashWallet(referrerId);
   const { data: lapoCashTransactions, isLoading: lapoCashLoading } = useLapoCashTransactions(wallet?.id);
 
   const lapoCashColumns: Column<LapoCashTx>[] = [
     {
       key: "date",
-      header: "Date",
+      header: t('referrerDetailPage:transactions.date'),
       cell: (row) => <span className="text-sm text-foreground">{formatDate(row.created_at)}</span>,
     },
     {
       key: "type",
-      header: "Type",
+      header: t('referrerDetailPage:transactions.type'),
       cell: (row) => (
         <span className="text-sm font-medium text-amber-700 capitalize">
           {row.type.replace(/_/g, " ")}
@@ -145,12 +147,12 @@ function TransactionsTabs({
     },
     {
       key: "description",
-      header: "Description",
+      header: t('referrerDetailPage:transactions.description'),
       cell: (row) => <span className="text-sm text-muted-foreground">{row.description || "—"}</span>,
     },
     {
       key: "amount",
-      header: "Montant",
+      header: t('referrerDetailPage:transactions.amount'),
       cell: (row) => (
         <span className={`text-sm font-medium ${row.amount >= 0 ? "text-success" : "text-destructive"}`}>
           {row.amount >= 0 ? "+" : ""}{formatLapoCash(row.amount)}
@@ -162,13 +164,13 @@ function TransactionsTabs({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Historique des transactions</CardTitle>
+        <CardTitle>{t('referrerDetailPage:transactions.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="referrals" className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="referrals">Parrainages ({referrals.length})</TabsTrigger>
-            <TabsTrigger value="lapo-cash">LAPO Cash ({lapoCashTransactions?.length || 0})</TabsTrigger>
+            <TabsTrigger value="referrals">{t('referrerDetailPage:transactions.referrals')} ({referrals.length})</TabsTrigger>
+            <TabsTrigger value="lapo-cash">{t('referrerDetailPage:transactions.lapoCash')} ({lapoCashTransactions?.length || 0})</TabsTrigger>
           </TabsList>
           <TabsContent value="referrals">
             <DataTable
@@ -192,6 +194,7 @@ function TransactionsTabs({
 }
 
 export default function ReferrerDetail() {
+  const { t } = useTranslation(['referrerDetailPage', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -223,11 +226,11 @@ export default function ReferrerDetail() {
       const result = await response.json();
       if (!result.success) throw new Error(result.error);
 
-      toast.success(`Référent supprimé (${result.deleted.referrals_deleted} parrainages, ${result.deleted.commissions_deleted} commissions)`);
+      toast.success(t('referrerDetailPage:deleteSuccess', { referrals: result.deleted.referrals_deleted, commissions: result.deleted.commissions_deleted }));
       navigate("/admin/referrers");
     } catch (error) {
       console.error("Error deleting referrer:", error);
-      toast.error("Erreur lors de la suppression");
+      toast.error(t('referrerDetailPage:deleteError'));
     } finally {
       setIsDeleting(false);
       setIsDeleteDialogOpen(false);
@@ -412,13 +415,13 @@ export default function ReferrerDetail() {
     onSuccess: (_, enabled) => {
       queryClient.invalidateQueries({ queryKey: ["referrer-detail", id] });
       queryClient.invalidateQueries({ queryKey: ["referrers-performance"] });
-      toast.success(enabled 
-        ? "Versements automatiques activés" 
-        : "Versements automatiques suspendus"
+      toast.success(enabled
+        ? t('referrerDetailPage:profile.autoPayoutEnabled')
+        : t('referrerDetailPage:profile.autoPayoutDisabled')
       );
     },
     onError: () => {
-      toast.error("Échec de la mise à jour");
+      toast.error(t('referrerDetailPage:profile.updateError'));
     },
   });
 
@@ -436,10 +439,10 @@ export default function ReferrerDetail() {
       queryClient.invalidateQueries({ queryKey: ["referrer-detail", id] });
       queryClient.invalidateQueries({ queryKey: ["referrers-performance"] });
       setTypeDialogOpen(false);
-      toast.success("Referrer type updated successfully");
+      toast.success(t('referrerDetailPage:changeType.success'));
     },
     onError: (error: Error) => {
-      toast.error(`Failed to update referrer type: ${error.message}`);
+      toast.error(`${t('referrerDetailPage:changeType.error')}: ${error.message}`);
     },
   });
 
@@ -481,10 +484,10 @@ export default function ReferrerDetail() {
       queryClient.invalidateQueries({ queryKey: ["referrers-performance"] });
       queryClient.invalidateQueries({ queryKey: ["payout-profile-status", id] });
       setEditDialogOpen(false);
-      toast.success("Profile updated successfully");
+      toast.success(t('referrerDetailPage:editDialog.success'));
     },
     onError: (error: Error) => {
-      toast.error(`Failed to update profile: ${error.message}`);
+      toast.error(`${t('referrerDetailPage:editDialog.error')}: ${error.message}`);
     },
   });
 
@@ -590,14 +593,14 @@ export default function ReferrerDetail() {
   const referralColumns: Column<ReferralRow>[] = [
     {
       key: "date",
-      header: "Date",
+      header: t('referrerDetailPage:transactions.date'),
       cell: (row) => (
         <span className="text-sm text-foreground">{formatDate(row.created_at)}</span>
       ),
     },
     {
       key: "referred",
-      header: "Personne parrainée",
+      header: t('referrerDetailPage:transactions.referredPerson'),
       cell: (row) => (
         <div>
           <div className="text-sm text-foreground">{row.referred_name || "—"}</div>
@@ -607,12 +610,12 @@ export default function ReferrerDetail() {
     },
     {
       key: "status",
-      header: "Statut",
+      header: t('referrerDetailPage:transactions.status'),
       cell: (row) => <StatusBadge status={row.referral_status} type="referral" />,
     },
     {
       key: "amount_spent",
-      header: "Montant dépensé",
+      header: t('referrerDetailPage:transactions.amountSpent'),
       cell: (row) => (
         <span className="text-sm text-foreground">
           {row.booking_value ? formatCurrency(row.booking_value) : "—"}
@@ -621,7 +624,7 @@ export default function ReferrerDetail() {
     },
     {
       key: "commission_earned",
-      header: "Commission gagnée",
+      header: t('referrerDetailPage:transactions.commissionEarned'),
       cell: (row) => (
         <span className="text-sm font-medium text-foreground">
           {row.commission_earned ? formatCurrency(row.commission_earned) : "—"}
@@ -647,13 +650,13 @@ export default function ReferrerDetail() {
     return (
       <div className="p-8">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold text-foreground mb-2">Referrer Not Found</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-2">{t('referrerDetailPage:notFound')}</h2>
           <p className="text-muted-foreground mb-4">
-            The referrer you're looking for doesn't exist.
+            {t('referrerDetailPage:notFoundDesc')}
           </p>
           <Button onClick={() => navigate("/admin/referrers")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Referrers
+            {t('referrerDetailPage:backToReferrers')}
           </Button>
         </div>
       </div>
@@ -671,12 +674,12 @@ export default function ReferrerDetail() {
             className="mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Referrers
+            {t('referrerDetailPage:backToReferrers')}
           </Button>
 
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-semibold text-foreground">Referrer Details</h1>
+              <h1 className="text-3xl font-semibold text-foreground">{t('referrerDetailPage:title')}</h1>
               <div className="mt-2 text-sm text-muted-foreground font-mono">
                 {referrer.referrer_code}
               </div>
@@ -700,7 +703,7 @@ export default function ReferrerDetail() {
                 }}
               >
                 <Edit className="mr-2 h-4 w-4" />
-                Edit Profile
+                {t('referrerDetailPage:editProfile')}
               </Button>
               
               <Button
@@ -709,26 +712,26 @@ export default function ReferrerDetail() {
                 onClick={() => setIsDeleteDialogOpen(true)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Supprimer
+                {t('referrerDetailPage:deleteBtn')}
               </Button>
               
               {/* Delete Confirmation Dialog */}
               <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Supprimer ce référent ?</AlertDialogTitle>
+                    <AlertDialogTitle>{t('referrerDetailPage:deleteConfirmTitle')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Cette action supprimera définitivement ce référent ainsi que tous ses parrainages, réservations et commissions associés. Cette action est irréversible.
+                      {t('referrerDetailPage:deleteConfirmDesc')}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+                    <AlertDialogCancel disabled={isDeleting}>{t('common:cancel')}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDeleteReferrer}
                       disabled={isDeleting}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
-                      {isDeleting ? "Suppression..." : "Supprimer"}
+                      {isDeleting ? t('referrerDetailPage:deleting') : t('referrerDetailPage:deleteBtn')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -758,20 +761,20 @@ export default function ReferrerDetail() {
                 </TooltipProvider>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Change Referrer Type</DialogTitle>
+                    <DialogTitle>{t('referrerDetailPage:changeType.title')}</DialogTitle>
                     <DialogDescription>
-                      Détermine les règles de commission pour ce référent.
+                      {t('referrerDetailPage:changeType.description')}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="type-select">Referrer Type</Label>
+                      <Label htmlFor="type-select">{t('referrerDetailPage:changeType.typeLabel')}</Label>
                       <Select
                         value={referrer.referrer_type_id}
                         onValueChange={(value) => updateTypeMutation.mutate(value)}
                       >
                         <SelectTrigger id="type-select">
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder={t('referrerDetailPage:changeType.selectPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
                           {referrerTypes?.map((type) => (
@@ -785,13 +788,13 @@ export default function ReferrerDetail() {
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setTypeDialogOpen(false)}>
-                      Cancel
+                      {t('common:cancel')}
                     </Button>
-                    <Button 
-                      onClick={() => setTypeDialogOpen(false)} 
+                    <Button
+                      onClick={() => setTypeDialogOpen(false)}
                       disabled={updateTypeMutation.isPending}
                     >
-                      {updateTypeMutation.isPending ? "Saving..." : "Done"}
+                      {updateTypeMutation.isPending ? t('referrerDetailPage:changeType.saving') : t('referrerDetailPage:changeType.done')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -808,21 +811,21 @@ export default function ReferrerDetail() {
         {/* Profil du référent */}
         <Card className="mb-8">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Profil du référent</CardTitle>
+            <CardTitle className="text-lg">{t('referrerDetailPage:profile.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <div>
-                <span className="text-muted-foreground block mb-1">Nom complet</span>
+                <span className="text-muted-foreground block mb-1">{t('referrerDetailPage:profile.fullName')}</span>
                 <p className="font-medium text-foreground">
                   {referrer.patient_name || "—"}
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground block mb-1">Email</span>
+                <span className="text-muted-foreground block mb-1">{t('referrerDetailPage:profile.email')}</span>
                 <p className="font-medium">
-                  <a 
-                    href={`mailto:${referrer.email}`} 
+                  <a
+                    href={`mailto:${referrer.email}`}
                     className="text-primary hover:underline"
                   >
                     {referrer.email}
@@ -830,32 +833,32 @@ export default function ReferrerDetail() {
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground block mb-1">Téléphone</span>
+                <span className="text-muted-foreground block mb-1">{t('referrerDetailPage:profile.phone')}</span>
                 <p className="font-medium text-foreground">
                   {referrer.phone_number || "—"}
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground block mb-1">Entreprise</span>
+                <span className="text-muted-foreground block mb-1">{t('referrerDetailPage:profile.company')}</span>
                 <p className="font-medium text-foreground">
                   {referrer.company_name || "—"}
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground block mb-1">Créé le</span>
+                <span className="text-muted-foreground block mb-1">{t('referrerDetailPage:profile.createdAt')}</span>
                 <p className="font-medium text-foreground">
                   {formatDate(referrer.created_at)}
                 </p>
               </div>
               <div className="col-span-2">
-                <span className="text-muted-foreground block mb-1">Informations bancaires</span>
+                <span className="text-muted-foreground block mb-1">{t('referrerDetailPage:profile.bankInfo')}</span>
                 <div className="flex items-center gap-3">
                   <PayoutProfileIndicator referrerId={referrer.id} size="md" />
                   {payoutStatus && !payoutStatus.isComplete && (
                     <Button
                       variant="outline"
                       size="sm"
-                      title="Le référent doit compléter ses informations bancaires (iban, banque…)"
+                      title={t('referrerDetailPage:profile.paymentReminderTitle')}
                       onClick={async () => {
                         setSendingReminder(true);
                         try {
@@ -865,14 +868,14 @@ export default function ReferrerDetail() {
 
                           if (error) {
                             if (error.message.includes("7 days")) {
-                              toast.error("Un rappel a déjà été envoyé au cours des 7 derniers jours");
+                              toast.error(t('referrerDetailPage:profile.reminderRecentlySent'));
                             } else if (error.message.includes("already complete")) {
-                              toast.info("Informations bancaires déjà complètes");
+                              toast.info(t('referrerDetailPage:profile.reminderAlreadyComplete'));
                             } else {
-                              toast.error("Échec de l'envoi du rappel");
+                              toast.error(t('referrerDetailPage:profile.reminderError'));
                             }
                           } else {
-                            toast.success("Rappel envoyé au référent (app + email)");
+                            toast.success(t('referrerDetailPage:profile.reminderSent'));
                             queryClient.invalidateQueries({ queryKey: ["last-payout-reminder", id] });
                           }
                         } finally {
@@ -881,20 +884,20 @@ export default function ReferrerDetail() {
                       }}
                       disabled={sendingReminder}
                     >
-                      {sendingReminder ? "Envoi..." : "Envoyer un rappel d'informations de paiement"}
+                      {sendingReminder ? t('referrerDetailPage:profile.reminderSending') : t('referrerDetailPage:profile.sendPaymentReminder')}
                     </Button>
                   )}
                 </div>
                 {lastReminder && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    Dernier rappel: {formatDateSimple(new Date(lastReminder.created_at), "dd.MM.yyyy")}
+                    {t('referrerDetailPage:profile.lastReminder')}: {formatDateSimple(new Date(lastReminder.created_at), "dd.MM.yyyy")}
                   </p>
                 )}
               </div>
               
               {/* Auto-payout status */}
               <div className="col-span-2">
-                <span className="text-muted-foreground block mb-1">Versements automatiques</span>
+                <span className="text-muted-foreground block mb-1">{t('referrerDetailPage:profile.autoPayout')}</span>
                 <div className="flex items-center gap-3">
                   <TooltipProvider>
                     <Tooltip>
@@ -907,21 +910,21 @@ export default function ReferrerDetail() {
                           {referrer.auto_payout_enabled ? (
                             <>
                               <Play className="h-3.5 w-3.5" />
-                              Actif
+                              {t('referrerDetailPage:profile.autoPayoutActive')}
                             </>
                           ) : (
                             <>
                               <Pause className="h-3.5 w-3.5" />
-                              Suspendu
+                              {t('referrerDetailPage:profile.autoPayoutPaused')}
                             </>
                           )}
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p className="text-sm">
-                          {referrer.auto_payout_enabled 
-                            ? "Les commissions seront versées automatiquement" 
-                            : "Les commissions sont conservées pour conversion en LAPO Cash"}
+                          {referrer.auto_payout_enabled
+                            ? t('referrerDetailPage:profile.autoPayoutActiveTooltip')
+                            : t('referrerDetailPage:profile.autoPayoutPausedTooltip')}
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -933,15 +936,15 @@ export default function ReferrerDetail() {
                     disabled={toggleAutoPayoutMutation.isPending}
                     className="text-xs"
                   >
-                    {toggleAutoPayoutMutation.isPending 
-                      ? "..." 
-                      : referrer.auto_payout_enabled 
-                        ? "Suspendre" 
-                        : "Activer"}
+                    {toggleAutoPayoutMutation.isPending
+                      ? "..."
+                      : referrer.auto_payout_enabled
+                        ? t('referrerDetailPage:profile.autoPayoutPause')
+                        : t('referrerDetailPage:profile.autoPayoutActivate')}
                   </Button>
                   {!referrer.auto_payout_enabled && referrer.auto_payout_paused_at && (
                     <span className="text-xs text-muted-foreground">
-                      Suspendu depuis {formatDateSimple(new Date(referrer.auto_payout_paused_at), "dd.MM.yyyy")}
+                      {t('referrerDetailPage:profile.autoPayoutPausedSince', { date: formatDateSimple(new Date(referrer.auto_payout_paused_at), "dd.MM.yyyy") })}
                     </span>
                   )}
                 </div>
@@ -961,7 +964,7 @@ export default function ReferrerDetail() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Referrals
+                {t('referrerDetailPage:stats.totalReferrals')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -973,7 +976,7 @@ export default function ReferrerDetail() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Booked</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t('referrerDetailPage:stats.booked')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">
@@ -985,7 +988,7 @@ export default function ReferrerDetail() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Confirmed
+                {t('referrerDetailPage:stats.confirmed')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -998,7 +1001,7 @@ export default function ReferrerDetail() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Commissions
+                {t('referrerDetailPage:stats.totalCommissions')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1006,7 +1009,7 @@ export default function ReferrerDetail() {
                 {formatCurrency(referrer.total_commissions)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Pending: {formatCurrency(referrer.pending_commissions)}
+                {t('referrerDetailPage:stats.pending')}: {formatCurrency(referrer.pending_commissions)}
               </p>
             </CardContent>
           </Card>
@@ -1025,18 +1028,17 @@ export default function ReferrerDetail() {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Referrer Profile</DialogTitle>
+            <DialogTitle>{t('referrerDetailPage:editDialog.title')}</DialogTitle>
             <DialogDescription>
-              Modifier les informations du référent. Les modifications seront synchronisées partout.
+              {t('referrerDetailPage:editDialog.title')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
             {/* Personal Information */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium">Personal Information</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-first-name">Prénom</Label>
+                  <Label htmlFor="edit-first-name">{t('referrerDetailPage:editDialog.firstName')}</Label>
                   <Input
                     id="edit-first-name"
                     value={editForm.first_name}
@@ -1044,7 +1046,7 @@ export default function ReferrerDetail() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-last-name">Nom</Label>
+                  <Label htmlFor="edit-last-name">{t('referrerDetailPage:editDialog.lastName')}</Label>
                   <Input
                     id="edit-last-name"
                     value={editForm.last_name}
@@ -1056,10 +1058,9 @@ export default function ReferrerDetail() {
 
             {/* Contact Information */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium">Contact Information</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-email">Email</Label>
+                  <Label htmlFor="edit-email">{t('referrerDetailPage:editDialog.email')}</Label>
                   <Input
                     id="edit-email"
                     type="email"
@@ -1068,7 +1069,7 @@ export default function ReferrerDetail() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-phone">Téléphone</Label>
+                  <Label htmlFor="edit-phone">{t('referrerDetailPage:editDialog.phone')}</Label>
                   <Input
                     id="edit-phone"
                     value={editForm.phone_number}
@@ -1080,10 +1081,9 @@ export default function ReferrerDetail() {
 
             {/* Bank Information */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium">Bank Information</h3>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-iban">IBAN</Label>
+                  <Label htmlFor="edit-iban">{t('referrerDetailPage:editDialog.iban')}</Label>
                   <Input
                     id="edit-iban"
                     value={editForm.iban}
@@ -1092,7 +1092,7 @@ export default function ReferrerDetail() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-bank-name">Nom de la banque</Label>
+                  <Label htmlFor="edit-bank-name">{t('referrerDetailPage:editDialog.bankName')}</Label>
                   <Input
                     id="edit-bank-name"
                     value={editForm.bank_name}
@@ -1100,7 +1100,7 @@ export default function ReferrerDetail() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-bank-address">Adresse de la banque</Label>
+                  <Label htmlFor="edit-bank-address">{t('referrerDetailPage:editDialog.bankAddress')}</Label>
                   <Input
                     id="edit-bank-address"
                     value={editForm.bank_address}
@@ -1108,7 +1108,7 @@ export default function ReferrerDetail() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-address">Adresse du référent</Label>
+                  <Label htmlFor="edit-address">{t('referrerDetailPage:editDialog.address')}</Label>
                   <Input
                     id="edit-address"
                     value={editForm.address}
@@ -1120,13 +1120,13 @@ export default function ReferrerDetail() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              Cancel
+              {t('common:cancel')}
             </Button>
-            <Button 
-              onClick={() => updateProfileMutation.mutate()} 
+            <Button
+              onClick={() => updateProfileMutation.mutate()}
               disabled={updateProfileMutation.isPending}
             >
-              {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+              {updateProfileMutation.isPending ? t('referrerDetailPage:editDialog.saving') : t('referrerDetailPage:editDialog.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
