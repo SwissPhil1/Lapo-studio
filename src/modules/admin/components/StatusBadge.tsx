@@ -2,7 +2,7 @@ import { cn } from "@/shared/lib/utils";
 import { useTranslation } from "react-i18next";
 import type { StatusEntityType } from "@/shared/lib/constants/statusTypes";
 import { referralStatusVariants, commissionStatusVariants, batchStatusVariants, lapoCashStatusVariants } from "@/shared/lib/constants/statusVariants";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface StatusBadgeProps {
   status: string;
@@ -71,16 +71,14 @@ export function StatusBadge({ status, type = "referral", className }: StatusBadg
 
   if (tooltipText) {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span>{badge}</span>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="text-sm">{tooltipText}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span>{badge}</span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-sm">{tooltipText}</p>
+        </TooltipContent>
+      </Tooltip>
     );
   }
 

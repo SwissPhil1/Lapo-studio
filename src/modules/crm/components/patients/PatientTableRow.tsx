@@ -1,6 +1,8 @@
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '@/shared/lib/constants';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { Gift, Clock, AlertTriangle, Calendar, AlertCircle } from 'lucide-react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -58,69 +60,15 @@ interface PatientTableRowProps {
   showCheckbox?: boolean;
 }
 
-const TASK_TYPE_LABELS: Record<string, string> = {
-  overdue_recall: 'Rappel',
-  dormant: 'Patient inactif',
-  no_show_followup: 'Suivi absence',
-  manual: 'Suivi manuel',
-  cancelled_followup: 'Suivi annulation',
+const TASK_TYPE_KEYS: Record<string, string> = {
+  overdue_recall: 'recall',
+  dormant: 'dormant',
+  no_show_followup: 'noShowFollowup',
+  manual: 'manual',
+  cancelled_followup: 'cancelledFollowup',
 };
 
-function getActionRequiredInfo(
-  activeTask: ActiveTask | null,
-  recallStatus: RecallStatus,
-  recallContext?: RecallContext
-): { 
-  label: string; 
-  sublabel?: string; 
-  variant: 'urgent' | 'warning' | 'info' | 'none';
-  tooltip?: string;
-} {
-  // Priority 1: Active task
-  if (activeTask) {
-    const typeLabel = TASK_TYPE_LABELS[activeTask.task_type] || activeTask.task_type;
-    const dueLabel = activeTask.due_date 
-      ? format(parseISO(activeTask.due_date), 'd MMM', { locale: fr })
-      : null;
-    
-    const isOverdue = activeTask.due_date && parseISO(activeTask.due_date) < new Date();
-    
-    return {
-      label: typeLabel,
-      sublabel: dueLabel ?? undefined,
-      variant: isOverdue ? 'urgent' : 'warning',
-      tooltip: `Tâche ${typeLabel.toLowerCase()} ${isOverdue ? 'en retard' : 'à traiter'}${recallContext?.treatmentType ? ` (${recallContext.treatmentType})` : ''}`
-    };
-  }
-
-  // Priority 2: No task but overdue recall → suggest creating task
-  if (recallStatus === 'overdue') {
-    return {
-      label: 'Rappel à créer',
-      sublabel: recallContext?.treatmentType ?? undefined,
-      variant: 'warning',
-      tooltip: `Patient en retard de rappel${recallContext?.daysOverdue ? ` (+${recallContext.daysOverdue}j)` : ''}. Créez une tâche de suivi.`
-    };
-  }
-
-  // Priority 3: Due soon
-  if (recallStatus === 'due_soon') {
-    return {
-      label: 'Rappel bientôt',
-      sublabel: recallContext?.treatmentType ?? undefined,
-      variant: 'info',
-      tooltip: 'Le rappel de ce patient arrive bientôt. Anticipez le contact.'
-    };
-  }
-
-  // No action required
-  return {
-    label: '-',
-    variant: 'none'
-  };
-}
-
-export function PatientTableRow({ 
+export function PatientTableRow({
   patient,
   recallStatus,
   recallDueDate: _recallDueDate,
@@ -131,11 +79,47 @@ export function PatientTableRow({
   onSelectChange,
   showCheckbox = false,
 }: PatientTableRowProps) {
+  const { t, i18n } = useTranslation(['patients', 'common']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   const nextAppt = patient.upcomingBookings[0]?.booking_date;
-  
+
   const hasAnySignal = patient.hasNoShow || patient.hasUnprocessedBooking || patient.referral;
-  
-  const actionInfo = getActionRequiredInfo(patient.activeTask, recallStatus, recallContext);
+
+  // Compute action required info
+  const actionInfo = (() => {
+    const activeTask = patient.activeTask;
+    if (activeTask) {
+      const typeKey = TASK_TYPE_KEYS[activeTask.task_type] || activeTask.task_type;
+      const typeLabel = TASK_TYPE_KEYS[activeTask.task_type] ? t(`patients:actions.${typeKey}`) : activeTask.task_type;
+      const dueLabel = activeTask.due_date
+        ? format(parseISO(activeTask.due_date), 'd MMM', { locale: dateLocale })
+        : null;
+      const isOverdue = activeTask.due_date && parseISO(activeTask.due_date) < new Date();
+      return {
+        label: typeLabel,
+        sublabel: dueLabel ?? undefined,
+        variant: (isOverdue ? 'urgent' : 'warning') as 'urgent' | 'warning' | 'info' | 'none',
+        tooltip: t('patients:actions.taskTooltip', { type: typeLabel.toLowerCase(), status: isOverdue ? t('patients:actions.taskOverdue') : t('patients:actions.taskToDo') }) + (recallContext?.treatmentType ? ` (${recallContext.treatmentType})` : ''),
+      };
+    }
+    if (recallStatus === 'overdue') {
+      return {
+        label: t('patients:actions.createRecall'),
+        sublabel: recallContext?.treatmentType ?? undefined,
+        variant: 'warning' as const,
+        tooltip: t('patients:actions.overdueRecallTip', { days: recallContext?.daysOverdue ?? '?' }),
+      };
+    }
+    if (recallStatus === 'due_soon') {
+      return {
+        label: t('patients:actions.recallSoon'),
+        sublabel: recallContext?.treatmentType ?? undefined,
+        variant: 'info' as const,
+        tooltip: t('patients:actions.recallSoonTip'),
+      };
+    }
+    return { label: '-', variant: 'none' as const };
+  })();
 
   const handleCheckboxClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -200,9 +184,9 @@ export function PatientTableRow({
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <div className="space-y-1">
-                  <p className="font-semibold">Historique no-show</p>
+                  <p className="font-semibold">{t('patients:signals.noShowHistory')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Ce patient a manqué un rendez-vous par le passé. Pensez à confirmer ses prochains RDV.
+                    {t('patients:signals.noShowDesc')}
                   </p>
                 </div>
               </TooltipContent>
@@ -215,9 +199,9 @@ export function PatientTableRow({
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <div className="space-y-1">
-                  <p className="font-semibold">RDV non traité</p>
+                  <p className="font-semibold">{t('patients:signals.unprocessedBooking')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Ce patient a un rendez-vous passé encore marqué comme 'confirmé'. Marquez-le comme terminé ou non présenté.
+                    {t('patients:signals.unprocessedBookingDesc')}
                   </p>
                 </div>
               </TooltipContent>
@@ -230,9 +214,9 @@ export function PatientTableRow({
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <div className="space-y-1">
-                  <p className="font-semibold">Parrainé par {patient.referral.referrer_name || patient.referral.referrer_code}</p>
+                  <p className="font-semibold">{t('patients:signals.referredBy', { name: patient.referral.referrer_name || patient.referral.referrer_code })}</p>
                   <p className="text-xs text-muted-foreground">
-                    Ce patient a été référé. N'oubliez pas de remercier le parrain après le premier RDV.
+                    {t('patients:signals.referredByDesc')}
                   </p>
                 </div>
               </TooltipContent>
@@ -286,7 +270,7 @@ export function PatientTableRow({
 
       {/* Next appointment */}
       <TableCell className="text-muted-foreground">
-        {nextAppt ? format(parseISO(nextAppt), 'd MMM yyyy', { locale: fr }) : '-'}
+        {nextAppt ? format(parseISO(nextAppt), 'd MMM yyyy', { locale: dateLocale }) : '-'}
       </TableCell>
 
       {/* Recall status (enriched badge) */}

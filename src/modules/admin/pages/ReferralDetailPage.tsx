@@ -2,9 +2,22 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '@/shared/lib/supabase'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, User, Building2, Trash2, Pencil } from 'lucide-react'
+import {
+  ArrowLeft,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  ExternalLink,
+  Mail,
+  Phone,
+  Building2,
+  Calendar,
+  CreditCard,
+  TrendingUp,
+  ArrowRight,
+} from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -14,6 +27,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { formatCurrency, formatDate, formatDateTime } from '@/shared/lib/format'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/modules/admin/components/StatusBadge'
@@ -396,22 +416,30 @@ export default function ReferralDetailPage() {
     }
   }
 
+  // Compute KPIs
+  const totalSpent = referral?.transactions.reduce((sum, tx) => sum + tx.purchase_amount, 0) ?? 0
+  const totalCommission = referral?.transactions.reduce((sum, tx) => sum + tx.commission_amount, 0) ?? 0
+  const bookingCount = referral?.transactions.length ?? 0
+
   if (isLoading) {
     return (
-      <div className="p-8">
-        <Skeleton className="h-8 w-64 mb-8" />
-        <div className="grid gap-4 md:grid-cols-2">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-48" />
+      <div className="p-4 md:p-8 space-y-6">
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-8 w-80" />
+        <div className="grid grid-cols-3 gap-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-20 rounded-xl" />
           ))}
         </div>
+        <Skeleton className="h-64 rounded-xl" />
+        <Skeleton className="h-48 rounded-xl" />
       </div>
     )
   }
 
   if (!referral) {
     return (
-      <div className="p-8">
+      <div className="flex min-h-[60vh] items-center justify-center p-4 md:p-8">
         <div className="text-center">
           <h2 className="text-2xl font-semibold text-foreground mb-2">
             {t('referralDetail:notFound')}
@@ -429,51 +457,331 @@ export default function ReferralDetailPage() {
   }
 
   return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="mb-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/admin/referrals')}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          {t('referralDetail:backToReferrals')}
-        </Button>
+    <div className="p-4 md:p-8 space-y-6 max-w-5xl">
 
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold text-foreground mb-2">
-              {t('referralDetail:title')}
+      {/* ── Header: Relationship title ── */}
+      <div>
+        <button
+          onClick={() => navigate('/admin/referrals')}
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+        >
+          <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
+          {t('referralDetail:backToReferrals')}
+        </button>
+
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-semibold text-foreground truncate">
+              {referral.referred_name || '—'}
+              <span className="text-muted-foreground font-normal text-lg md:text-xl ml-2">
+                {t('referralDetail:referredBy')} {referral.referrer_name || referral.referrer_email}
+              </span>
             </h1>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 mt-2">
               <StatusBadge status={referral.referral_status} type="referral" />
+              <span className="text-sm text-muted-foreground capitalize">{referral.origin_type}</span>
+              <span className="text-sm text-muted-foreground">·</span>
+              <span className="text-sm text-muted-foreground">{formatDate(referral.created_at)}</span>
               {referral.is_test && (
-                <Badge variant="outline" className="bg-muted">
+                <Badge variant="outline" className="bg-muted text-xs">
                   {t('referralDetail:testData')}
                 </Badge>
               )}
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <div className="text-sm text-muted-foreground">
-              <div>{t('referralDetail:created')}: {formatDateTime(referral.created_at)}</div>
-              <div>{t('referralDetail:updated')}: {formatDateTime(referral.updated_at)}</div>
-            </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t('common:delete')}
-            </Button>
-          </div>
+
+          {/* Actions dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="shrink-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              {referral.referred_patient_id && (
+                <DropdownMenuItem onClick={openEditDialog}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t('referralDetail:editReferredPerson')}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => navigate(`/admin/referrers/${referral.referrer_id}`)}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                {t('referralDetail:viewReferrerDetails')}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                {t('referralDetail:deleteReferral')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* Delete Referral Confirmation Dialog */}
+      {/* ── KPI Pills ── */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card className="border-0 bg-card/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
+              <CreditCard className="h-3.5 w-3.5" />
+              {t('referralDetail:kpi.totalSpent')}
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-foreground">
+              {totalSpent > 0 ? formatCurrency(totalSpent) : '—'}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-0 bg-card/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
+              <TrendingUp className="h-3.5 w-3.5" />
+              {t('referralDetail:kpi.commissionEarned')}
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-foreground">
+              {totalCommission > 0 ? formatCurrency(totalCommission) : '—'}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-0 bg-card/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
+              <Calendar className="h-3.5 w-3.5" />
+              {t('referralDetail:kpi.bookings')}
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-foreground">
+              {bookingCount}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ── Activity Timeline ── */}
+      <Card>
+        <CardContent className="p-4 md:p-6">
+          <h2 className="text-base font-semibold text-foreground mb-4">
+            {t('referralDetail:timeline.title')}
+          </h2>
+
+          {referral.transactions.length > 0 ? (
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-[7px] top-3 bottom-3 w-px bg-border" />
+
+              <div className="space-y-0">
+                {referral.transactions.map((tx) => {
+                  const hasCommission = tx.commission_rate !== null && tx.commission_status !== 'no_commission'
+                  const serviceName = tx.service && tx.service !== 'Zapier Webhook Booking' ? tx.service : null
+
+
+                  return (
+                    <div key={tx.booking_id} className="relative pl-7 pb-5 group">
+                      {/* Timeline dot */}
+                      <div className={`absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-2 ${
+                        hasCommission
+                          ? 'border-primary bg-primary/20'
+                          : 'border-muted-foreground/30 bg-background'
+                      }`} />
+
+                      {/* Booking row */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium text-foreground">
+                              {serviceName || t('referralDetail:timeline.booking')}
+                            </span>
+                            <StatusBadge status={tx.commission_status} type="commission" />
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            {formatDate(tx.booking_date)}
+                          </div>
+
+                          {/* Commission detail nested under booking */}
+                          {hasCommission && (
+                            <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-md px-2.5 py-1.5 w-fit">
+                              <span>
+                                {tx.commission_rate}% ·{' '}
+                                {tx.purchase_type === 'first_purchase' || tx.purchase_type?.toLowerCase() === 'first'
+                                  ? t('referralDetail:timeline.firstPurchase')
+                                  : t('referralDetail:timeline.repeatPurchase')}
+                              </span>
+                              <ArrowRight className="h-3 w-3" />
+                              <span className="font-semibold text-foreground">
+                                {formatCurrency(tx.commission_amount)}
+                              </span>
+                              {tx.batch_number && (
+                                <button
+                                  onClick={() => navigate(`/admin/payouts/${tx.batch_id}`)}
+                                  className="text-primary hover:underline font-mono ml-1"
+                                >
+                                  #{tx.batch_number}
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Amount + delete */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-sm font-semibold text-foreground tabular-nums">
+                            {tx.commission_status === 'no_commission' ? '—' : formatCurrency(tx.purchase_amount)}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                            onClick={() => setBookingToDelete(tx.booking_id)}
+                            aria-label={t('referralDetail:timeline.deleteBooking')}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {/* Referral creation event */}
+                <div className="relative pl-7">
+                  <div className="absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-2 border-muted-foreground/30 bg-background" />
+                  <div className="text-sm text-muted-foreground">
+                    {t('referralDetail:timeline.referralCreated')}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {formatDateTime(referral.created_at)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Total summary */}
+              {referral.transactions.length > 1 && (
+                <div className="mt-5 pt-4 border-t flex items-center justify-between">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {t('referralDetail:timeline.totalThisReferral')}
+                  </span>
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-bold text-foreground tabular-nums">
+                      {formatCurrency(totalSpent)}
+                    </span>
+                    <span className="text-sm font-bold text-foreground tabular-nums">
+                      → {formatCurrency(totalCommission)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              <Calendar className="h-8 w-8 mx-auto mb-2 opacity-40" />
+              {t('referralDetail:noTransactions')}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ── People & Contact Info ── */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Referrer */}
+        <Card className="border-0 bg-card/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('referralDetail:referrer')}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => navigate(`/admin/referrers/${referral.referrer_id}`)}
+              >
+                {t('referralDetail:viewProfile')}
+                <ExternalLink className="ml-1 h-3 w-3" />
+              </Button>
+            </div>
+            <div className="text-base font-medium text-foreground mb-1">
+              {referral.referrer_name || referral.referrer_email}
+            </div>
+            <div className="space-y-1.5 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs bg-muted/50 px-1.5 py-0.5 rounded">
+                  {referral.referrer_code}
+                </span>
+              </div>
+              {referral.referrer_email !== '—' && (
+                <div className="flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 shrink-0" />
+                  <a href={`mailto:${referral.referrer_email}`} className="hover:text-foreground truncate">
+                    {referral.referrer_email}
+                  </a>
+                </div>
+              )}
+              {referral.referrer_company && (
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-3.5 w-3.5 shrink-0" />
+                  {referral.referrer_company}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Referred Person */}
+        <Card className="border-0 bg-card/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('referralDetail:referredPerson')}
+              </h3>
+              {referral.referred_patient_id && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={openEditDialog}
+                >
+                  <Pencil className="mr-1 h-3 w-3" />
+                  {t('common:edit')}
+                </Button>
+              )}
+            </div>
+            <div className="text-base font-medium text-foreground mb-1">
+              {referral.referred_name || '—'}
+            </div>
+            <div className="space-y-1.5 text-sm text-muted-foreground">
+              {referral.referred_email && (
+                <div className="flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{referral.referred_email}</span>
+                </div>
+              )}
+              {referral.referred_phone && (
+                <div className="flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 shrink-0" />
+                  {referral.referred_phone}
+                </div>
+              )}
+              {referral.referred_last_appointment && (
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-3.5 w-3.5 shrink-0" />
+                  {t('referralDetail:lastSeen')} {formatDate(referral.referred_last_appointment)}
+                </div>
+              )}
+              {referral.referred_total_spent != null && referral.referred_total_spent > 0 && (
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-3.5 w-3.5 shrink-0" />
+                  {t('referralDetail:lifetimeSpending')}: {formatCurrency(referral.referred_total_spent)}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ── Dialogs ── */}
+
+      {/* Delete Referral */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -495,241 +803,7 @@ export default function ReferralDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* People Cards */}
-      <div className="grid gap-4 md:grid-cols-2 mb-4">
-        {/* Referrer Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              {t('referralDetail:referrer')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('common:name')}</div>
-              <div className="text-base text-foreground">
-                {referral.referrer_name || referral.referrer_email}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('referralDetail:code')}</div>
-              <div className="font-mono text-base text-foreground">
-                {referral.referrer_code}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('common:email')}</div>
-              <a
-                href={`mailto:${referral.referrer_email}`}
-                className="text-base text-foreground hover:underline"
-              >
-                {referral.referrer_email}
-              </a>
-            </div>
-            {referral.referrer_company && (
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">{t('referralDetail:company')}</div>
-                <div className="flex items-center gap-1 text-base text-foreground">
-                  <Building2 className="h-4 w-4" />
-                  {referral.referrer_company}
-                </div>
-              </div>
-            )}
-            <div className="pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/admin/referrers/${referral.referrer_id}`)}
-              >
-                {t('referralDetail:viewReferrerDetails')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Referred Person Card */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                {t('referralDetail:referredPerson')}
-              </CardTitle>
-              {referral.referred_patient_id && (
-                <Button variant="outline" size="sm" onClick={openEditDialog}>
-                  <Pencil className="h-4 w-4 mr-1" />
-                  {t('common:edit')}
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('common:name')}</div>
-              <div className="text-base text-foreground">
-                {referral.referred_name || '—'}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('common:email')}</div>
-              <div className="text-base text-foreground">
-                {referral.referred_email || '—'}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('referralDetail:phone')}</div>
-              <div className="text-base text-foreground">
-                {referral.referred_phone || '—'}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('referralDetail:originType')}</div>
-              <div className="text-base text-foreground capitalize">
-                {referral.origin_type || '—'}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('referralDetail:lastAppointment')}</div>
-              <div className="text-base text-foreground">
-                {referral.referred_last_appointment
-                  ? formatDate(referral.referred_last_appointment)
-                  : '—'}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('referralDetail:lifetimeSpending')}</div>
-              <div className="text-base font-semibold text-foreground">
-                {referral.referred_total_spent
-                  ? formatCurrency(referral.referred_total_spent)
-                  : '—'}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                {t('referralDetail:totalAcrossBookings')}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Transaction Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('referralDetail:transactionTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {referral.transactions.length > 0 ? (
-            <div className="space-y-4">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">{t('referralDetail:table.date')}</th>
-                      <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">{t('referralDetail:table.service')}</th>
-                      <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">{t('referralDetail:table.amountSpent')}</th>
-                      <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">{t('referralDetail:table.rateApplied')}</th>
-                      <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">{t('referralDetail:table.commission')}</th>
-                      <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">{t('common:status')}</th>
-                      <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">{t('referralDetail:table.payoutBatch')}</th>
-                      <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">{t('common:actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {referral.transactions.map((tx) => (
-                      <tr key={tx.booking_id} className="border-b">
-                        <td className="py-3 px-2 text-sm text-foreground">
-                          {formatDate(tx.booking_date)}
-                        </td>
-                        <td className="py-3 px-2 text-sm text-foreground">
-                          {tx.service && tx.service !== 'Zapier Webhook Booking' ? tx.service : '—'}
-                        </td>
-                        <td className="py-3 px-2 text-sm text-foreground text-right font-medium">
-                          {tx.commission_status === 'no_commission' ? '—' : formatCurrency(tx.purchase_amount)}
-                        </td>
-                        <td className="py-3 px-2 text-sm text-foreground">
-                          {tx.commission_rate !== null ? (
-                            <>
-                              {tx.commission_rate}%
-                              {tx.purchase_type && (
-                                <span className="text-muted-foreground text-xs ml-1">
-                                  – {tx.purchase_type === 'first_purchase' || tx.purchase_type.toLowerCase() === 'first'
-                                    ? t('referralDetail:table.first')
-                                    : t('referralDetail:table.repeat')}
-                                </span>
-                              )}
-                            </>
-                          ) : (
-                            '—'
-                          )}
-                        </td>
-                        <td className="py-3 px-2 text-sm text-foreground text-right font-semibold">
-                          {tx.commission_status === 'no_commission' ? '—' : formatCurrency(tx.commission_amount)}
-                        </td>
-                        <td className="py-3 px-2">
-                          <StatusBadge
-                            status={tx.commission_status}
-                            type="commission"
-                          />
-                        </td>
-                        <td className="py-3 px-2 text-sm text-muted-foreground">
-                          {tx.batch_id ? (
-                            <button
-                              onClick={() => navigate(`/admin/payouts/${tx.batch_id}`)}
-                              className="font-mono text-sm text-primary hover:underline"
-                            >
-                              {tx.batch_number ? `${t('referralDetail:table.batch')} #${tx.batch_number}` : tx.batch_id.slice(0, 8)}
-                            </button>
-                          ) : (
-                            '—'
-                          )}
-                        </td>
-                        <td className="py-3 px-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setBookingToDelete(tx.booking_id)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="border-t-2 font-semibold">
-                      <td colSpan={2} className="py-3 px-2 text-sm text-foreground">
-                        {t('referralDetail:table.total')}
-                      </td>
-                      <td className="py-3 px-2 text-sm text-foreground text-right font-bold">
-                        {formatCurrency(
-                          referral.transactions.reduce((sum, tx) => sum + tx.purchase_amount, 0)
-                        )}
-                      </td>
-                      <td></td>
-                      <td className="py-3 px-2 text-sm text-foreground text-right font-bold">
-                        {formatCurrency(
-                          referral.transactions.reduce((sum, tx) => sum + tx.commission_amount, 0)
-                        )}
-                      </td>
-                      <td colSpan={3}></td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-              <div className="text-xs text-muted-foreground pt-2">
-                {t('referralDetail:table.footnote')}
-              </div>
-            </div>
-          ) : (
-            <div className="text-muted-foreground py-4">
-              {t('referralDetail:noTransactions')}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Delete Booking Confirmation */}
+      {/* Delete Booking */}
       <AlertDialog open={!!bookingToDelete} onOpenChange={() => setBookingToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -750,14 +824,14 @@ export default function ReferralDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Edit Referred Person Dialog */}
+      {/* Edit Referred Person */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('referralDetail:editDialog.title')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="first_name">{t('referralDetail:editDialog.firstName')}</Label>
                 <Input

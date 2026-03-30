@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { StudioLayout } from '@/shared/components/StudioLayout'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 // Lazy-loaded pages
 const LoginPage = lazy(() => import('@/pages/LoginPage'))
@@ -78,6 +79,7 @@ function RoleBasedRedirect() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
       <BrowserRouter>
         <AuthProvider>
           <ErrorBoundary>
@@ -257,6 +259,7 @@ export default function App() {
           </ErrorBoundary>
         </AuthProvider>
       </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   )
 }

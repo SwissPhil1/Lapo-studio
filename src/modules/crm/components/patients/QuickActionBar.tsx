@@ -1,6 +1,7 @@
 import { Mail, MessageSquare, StickyNote, ListTodo, CalendarPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { CreateTaskDialog } from '@/modules/crm/components/tasks/CreateTaskDialog';
@@ -16,19 +17,19 @@ interface QuickActionBarProps {
   showCreateTask?: boolean;
 }
 
-export function QuickActionBar({ 
+export function QuickActionBar({
   patientId,
   patientName,
-  email, 
-  phone, 
+  email,
+  phone,
   onAddNote,
   showCreateTask = false,
 }: QuickActionBarProps) {
+  const { t } = useTranslation(['patientDetail']);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [sendMessageOpen, setSendMessageOpen] = useState(false);
   const [bookingLinkOpen, setBookingLinkOpen] = useState(false);
-  
-  // Fetch active task for this patient to link email sends
+
   const { data: activeTask } = useQuery({
     queryKey: ['patient-active-task', patientId],
     queryFn: async () => {
@@ -40,7 +41,7 @@ export function QuickActionBar({
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
-      
+
       if (error) throw error;
       return data;
     },
@@ -52,7 +53,6 @@ export function QuickActionBar({
     }
   };
 
-  // Split patient name for SendMessageDialog
   const nameParts = patientName.split(' ');
   const firstName = nameParts[0] || '';
   const lastName = nameParts.slice(1).join(' ') || '';
@@ -67,14 +67,14 @@ export function QuickActionBar({
         className="gap-2"
       >
         <Mail className="h-4 w-4" />
-        Email
+        {t('patientDetail:quickActions.email')}
         {activeTask && (
           <span className="ml-1 px-1.5 py-0.5 text-[10px] rounded bg-primary/10 text-primary">
-            +tâche
+            {t('patientDetail:quickActions.linkedTask')}
           </span>
         )}
       </Button>
-      
+
       <Button
         variant="outline"
         size="sm"
@@ -83,9 +83,9 @@ export function QuickActionBar({
         className="gap-2"
       >
         <MessageSquare className="h-4 w-4" />
-        SMS
+        {t('patientDetail:quickActions.sms')}
       </Button>
-      
+
       <Button
         variant="outline"
         size="sm"
@@ -93,7 +93,7 @@ export function QuickActionBar({
         className="gap-2"
       >
         <StickyNote className="h-4 w-4" />
-        Note
+        {t('patientDetail:quickActions.note')}
       </Button>
 
       <Button
@@ -103,7 +103,7 @@ export function QuickActionBar({
         className="gap-2"
       >
         <CalendarPlus className="h-4 w-4" />
-        Lien RDV
+        {t('patientDetail:quickActions.bookingLink')}
       </Button>
 
       {showCreateTask && (
@@ -115,10 +115,10 @@ export function QuickActionBar({
             className="gap-2"
           >
             <ListTodo className="h-4 w-4" />
-            Créer tâche
+            {t('patientDetail:quickActions.createTask')}
           </Button>
-          
-          <CreateTaskDialog 
+
+          <CreateTaskDialog
             open={createTaskOpen}
             onOpenChange={setCreateTaskOpen}
             defaultPatientId={patientId}
@@ -127,7 +127,6 @@ export function QuickActionBar({
         </>
       )}
 
-      {/* Send Message Dialog with task linking */}
       <SendMessageDialog
         open={sendMessageOpen}
         onOpenChange={setSendMessageOpen}
@@ -141,7 +140,6 @@ export function QuickActionBar({
         taskId={activeTask?.id}
       />
 
-      {/* Booking Link Dialog */}
       <BookingLinkDialog
         open={bookingLinkOpen}
         onOpenChange={setBookingLinkOpen}
