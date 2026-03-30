@@ -30,16 +30,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const fetchUserProfile = useCallback(async (userId: string, email: string) => {
-    // Try fetching by auth user id first
+    // Primary lookup: match auth user ID to profiles.auth_user_id
+    // NOTE: profiles.id is the profile's own PK, NOT the auth user id
     let { data: profile, error } = await supabase
       .from('profiles')
       .select('first_name, last_name, role, email')
-      .eq('id', userId)
+      .eq('auth_user_id', userId)
       .single()
 
-    // If no match by id, try by email
+    // Fallback: try by email if auth_user_id lookup fails
     if (!profile || error) {
-      console.warn('[Auth] Profile not found by id, trying email lookup:', error?.message)
+      console.warn('[Auth] Profile not found by auth_user_id, trying email:', error?.message)
       const { data: emailProfile, error: emailError } = await supabase
         .from('profiles')
         .select('first_name, last_name, role, email')
@@ -51,6 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       profile = emailProfile
     }
+
+    console.log('[Auth] Profile loaded:', profile?.first_name, profile?.last_name, 'role:', profile?.role)
 
     const firstName = profile?.first_name ?? ''
     const lastName = profile?.last_name ?? ''
