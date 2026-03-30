@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ArrowLeft, Mail, Phone, Calendar, Loader2, MapPin, Check, X, UserX, Pencil, Trash2, MoreHorizontal, Gift, MessageSquare, Activity } from 'lucide-react';
 import { UnifiedTimeline } from '@/modules/crm/components/patients/UnifiedTimeline';
-import { formatCurrency } from '@/shared/lib/constants';
+import { formatCurrency } from '@/shared/lib/format';
 import { format, parseISO, differenceInDays, formatDistanceToNow } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';

@@ -908,7 +908,12 @@
     "nameCampaignRequired": "Please enter a campaign name.",
     "subjectMessageRequired": "Please fill in the subject and message.",
     "dateRequired": "Please select a send date.",
-    "noABVariantsConfigured": "No A/B variants configured for this campaign"
+    "noABVariantsConfigured": "No A/B variants configured for this campaign",
+    "campaignsThisMonth": "Campaigns this month",
+    "emailsSent": "Emails sent",
+    "openRate": "Open rate",
+    "bestCampaign": "Best campaign",
+    "openRateShort": "open rate"
   },
   "referralDetail": {
     "title": "Referral Details",

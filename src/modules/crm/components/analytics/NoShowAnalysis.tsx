@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Loader2, AlertTriangle, XCircle, TrendingDown } from 'lucide-react';
-import { formatCurrency } from '@/shared/lib/constants';
+import { formatCurrency } from '@/shared/lib/format';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';

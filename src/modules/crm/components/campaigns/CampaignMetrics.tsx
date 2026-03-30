@@ -3,6 +3,7 @@ import { supabase } from '@/shared/lib/supabase';
 import { Card, CardContent } from '@/components/ui/card';
 import { Megaphone, Mail, MousePointerClick, Trophy } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 interface CampaignMetricsData {
   activeCampaigns: number;
@@ -12,6 +13,7 @@ interface CampaignMetricsData {
 }
 
 export function CampaignMetrics() {
+  const { t } = useTranslation(['campaigns']);
   const { data: metrics, isLoading } = useQuery({
     queryKey: ['campaign-metrics'],
     queryFn: async (): Promise<CampaignMetricsData> => {
@@ -83,27 +85,27 @@ export function CampaignMetrics() {
 
   const stats = [
     {
-      label: 'Campagnes ce mois',
+      label: t('campaigns:campaignsThisMonth'),
       value: metrics?.activeCampaigns || 0,
       icon: Megaphone,
       color: 'text-blue-500'
     },
     {
-      label: 'Emails envoyés',
+      label: t('campaigns:emailsSent'),
       value: metrics?.totalSent || 0,
       icon: Mail,
       color: 'text-green-500'
     },
     {
-      label: 'Taux d\'ouverture',
+      label: t('campaigns:openRate'),
       value: `${metrics?.avgOpenRate || 0}%`,
       icon: MousePointerClick,
       color: 'text-purple-500'
     },
     {
-      label: 'Meilleure campagne',
+      label: t('campaigns:bestCampaign'),
       value: metrics?.bestCampaign?.name || '-',
-      subtitle: metrics?.bestCampaign ? `${metrics.bestCampaign.openRate}% ouverture` : undefined,
+      subtitle: metrics?.bestCampaign ? `${metrics.bestCampaign.openRate}% ${t('campaigns:openRateShort')}` : undefined,
       icon: Trophy,
       color: 'text-amber-500',
       truncate: true

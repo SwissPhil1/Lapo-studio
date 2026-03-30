@@ -908,7 +908,12 @@
     "nameCampaignRequired": "Veuillez entrer un nom pour la campagne.",
     "subjectMessageRequired": "Veuillez remplir le sujet et le message.",
     "dateRequired": "Veuillez sélectionner une date d'envoi.",
-    "noABVariantsConfigured": "Aucune variante A/B configurée pour cette campagne"
+    "noABVariantsConfigured": "Aucune variante A/B configurée pour cette campagne",
+    "campaignsThisMonth": "Campagnes ce mois",
+    "emailsSent": "Emails envoyés",
+    "openRate": "Taux d'ouverture",
+    "bestCampaign": "Meilleure campagne",
+    "openRateShort": "ouverture"
   },
   "referralDetail": {
     "title": "Détails du parrainage",

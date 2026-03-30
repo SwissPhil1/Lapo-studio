@@ -287,7 +287,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
             .single();
 
           const newAttemptCount = (task?.attempt_count || 0) + 1;
-          const timestamp = new Date().toLocaleString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', {
+          const timestamp = new Date().toLocaleString(i18n.language === 'fr' ? 'fr-CH' : 'en-US', {
             day: '2-digit',
             month: 'short',
             hour: '2-digit',

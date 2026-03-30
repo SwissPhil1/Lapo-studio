@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/shared/lib/supabase';
 import { Users, AlertTriangle, Link2, Banknote, UserCheck, CalendarClock, Calendar } from 'lucide-react';
-import { formatCurrency } from '@/shared/lib/constants';
+import { formatCurrency } from '@/shared/lib/format';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';

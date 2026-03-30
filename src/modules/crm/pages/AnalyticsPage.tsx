@@ -8,7 +8,7 @@ import { TrendingUp, TrendingDown, Users, Banknote, Calendar, Target, Download, 
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatCurrency } from '@/shared/lib/constants';
+import { formatCurrency } from '@/shared/lib/format';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 
 // Lazy-load chart components by tab to reduce initial bundle
