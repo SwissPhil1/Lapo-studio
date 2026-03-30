@@ -541,6 +541,8 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
     return events.filter(event => activeFilters.has(event.type));
   }, [events, activeFilters]);
 
+  const groupedEvents = useGroupEventsByDate(filteredEvents, t, dateLocale);
+
   const toggleFilter = (type: string) => {
     setActiveFilters(prev => {
       const next = new Set(prev);
@@ -594,8 +596,6 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
       </div>
     );
   }
-
-  const groupedEvents = useGroupEventsByDate(filteredEvents, t, dateLocale);
 
   const labelKeys: Record<string, string> = {
     booking: 'bookingLabel',
