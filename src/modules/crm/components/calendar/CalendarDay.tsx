@@ -1,6 +1,7 @@
 import { cn } from '@/shared/lib/utils';
 import { format, isToday, isSameMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { CalendarBookingItem } from './CalendarBookingItem';
 import type { CalendarBooking } from '@/shared/hooks/useCalendarBookings';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -16,6 +17,7 @@ interface CalendarDayProps {
 const MAX_VISIBLE_BOOKINGS = 3;
 
 export function CalendarDay({ date, currentMonth, bookings, variant }: CalendarDayProps) {
+  const { t } = useTranslation(['calendar']);
   const isCurrentMonth = isSameMonth(date, currentMonth);
   const isCurrentDay = isToday(date);
   const hasMoreBookings = bookings.length > MAX_VISIBLE_BOOKINGS;
@@ -45,7 +47,7 @@ export function CalendarDay({ date, currentMonth, bookings, variant }: CalendarD
             ))}
             {bookings.length === 0 && (
               <p className="text-xs text-muted-foreground text-center py-4">
-                Aucun RDV
+                {t('calendar:noAppointments')}
               </p>
             )}
           </div>

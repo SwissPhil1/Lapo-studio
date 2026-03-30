@@ -15,6 +15,7 @@ import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import i18n from '@/i18n';
 import { getLocale } from '@/shared/lib/format';
+import { useTranslation } from 'react-i18next';
 
 interface PipelineSnapshot {
   id: string;
@@ -27,6 +28,7 @@ interface PipelineSnapshot {
 }
 
 export function RevenueForecast() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['revenue-forecast'],
     queryFn: async () => {
@@ -166,7 +168,7 @@ export function RevenueForecast() {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <TrendingUp className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">Aucune donn\u00e9e de pr\u00e9vision</p>
+        <p className="font-medium">{t('analytics:noForecastData')}</p>
         <p className="text-sm mt-1">Les donn\u00e9es du pipeline appara\u00eetront ici.</p>
       </div>
     );

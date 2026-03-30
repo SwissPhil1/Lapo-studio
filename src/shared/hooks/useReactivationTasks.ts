@@ -251,7 +251,7 @@ export function useUpdateReactivationTask() {
       toast.success(i18n.t('common:taskUpdated'));
     },
     onError: (error: Error) => {
-      toast.error(`Erreur: ${error.message}`);
+      toast.error(i18n.t('common:errorWithMessage', { message: error.message }));
     },
   });
 }
@@ -330,7 +330,7 @@ export function useLogAttempt() {
       toast.success(message);
     },
     onError: (error: Error) => {
-      toast.error(`Erreur: ${error.message}`);
+      toast.error(i18n.t('common:errorWithMessage', { message: error.message }));
     },
   });
 }

@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { getStatusColors, getStatusLabel, BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { getLocale } from '@/shared/lib/format';
 import type { CalendarBooking } from '@/shared/hooks/useCalendarBookings';
 
 interface CalendarBookingItemProps {
@@ -47,7 +48,7 @@ export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBo
               </span>
               {booking.booking_value > 0 && (
                 <span className="text-xs text-muted-foreground">
-                  CHF {booking.booking_value.toLocaleString()}
+                  CHF {booking.booking_value.toLocaleString(getLocale())}
                 </span>
               )}
             </div>

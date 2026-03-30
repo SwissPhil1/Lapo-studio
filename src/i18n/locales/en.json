@@ -133,7 +133,8 @@
     "pageOf": "Page {{current}} of {{total}}",
     "activityLegend": "Activity legend",
     "somethingWentWrong": "Something went wrong",
-    "reloadPage": "Reload page"
+    "reloadPage": "Reload page",
+    "errorWithMessage": "Error: {{message}}"
   },
   "dashboard": {
     "title": "Admin Dashboard",
@@ -781,7 +782,15 @@
     "costComparisonByChannel": "Cost comparison by channel",
     "other": "Other",
     "revenue": "Revenue",
-    "moreServices": "+{{count}} more services"
+    "moreServices": "+{{count}} more services",
+    "noEmailsSent": "No emails sent",
+    "noActiveWorkflows": "No active workflows",
+    "noWorkflows": "No workflows",
+    "noPipelineStages": "No pipeline stages configured",
+    "configurePipelineInSettings": "Configure your pipeline in settings",
+    "noForecastData": "No forecast data",
+    "noSatisfactionData": "No satisfaction responses",
+    "noCityData": "No city data available"
   },
   "campaigns": {
     "title": "Campaigns",
@@ -898,7 +907,8 @@
     "campaignScheduledDescription": "The campaign \"{{name}}\" will be sent on {{date}}.",
     "nameCampaignRequired": "Please enter a campaign name.",
     "subjectMessageRequired": "Please fill in the subject and message.",
-    "dateRequired": "Please select a send date."
+    "dateRequired": "Please select a send date.",
+    "noABVariantsConfigured": "No A/B variants configured for this campaign"
   },
   "referralDetail": {
     "title": "Referral Details",
@@ -1122,7 +1132,10 @@
     "aiExample3": "Patients with no-show history",
     "aiExample4": "Patients inactive for 3 months",
     "aiExample5": "New patients from last month",
-    "aiExample6": "Patients who had filler this year"
+    "aiExample6": "Patients who had filler this year",
+    "referral": "Referral",
+    "referredBy": "Referred by",
+    "discount": "discount"
   },
   "patientDetail": {
     "backToPatients": "Back to patients",
@@ -1548,7 +1561,16 @@
     "groupedBy": "Grouped by",
     "metrics": "Metrics",
     "avg": "Avg",
-    "noDataAvailable": "No data available"
+    "noDataAvailable": "No data available",
+    "reportDeleted": "Report deleted",
+    "deleteError": "Error deleting report",
+    "noCustomReports": "No custom reports",
+    "createFirstReport": "Create your first report to get started",
+    "deleteReportConfirm": "Delete this report?",
+    "unknownSource": "Unknown source",
+    "modified": "Modified",
+    "dataSource": "Data source",
+    "metricsMax3": "Metrics (max 3)"
   },
   "crmDashboard": {
     "unmappedServices": "{{count}} unmapped service(s)",
@@ -1644,7 +1666,8 @@
     "loadError": "Unable to load appointments",
     "retry": "Retry",
     "appointmentPostponed": "Appointment postponed",
-    "viewNewAppointment": "View new appointment"
+    "viewNewAppointment": "View new appointment",
+    "noAppointments": "No appointments"
   },
   "tasks": {
     "overdueRecall": "Overdue recall",

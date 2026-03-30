@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { BarChart3, LineChart, AreaChart, PieChart, Table } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTranslation } from 'react-i18next';
 
 interface ReportBuilderSidebarProps {
   config: ReportConfig;
@@ -22,6 +23,7 @@ const chartIcons: Record<string, React.ElementType> = {
 };
 
 export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarProps) {
+  const { t } = useTranslation(['reports']);
   const sourceDef = REPORT_SOURCES[config.source];
 
   const handleSourceChange = (source: ReportSource) => {
@@ -50,7 +52,7 @@ export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarP
       <div className="p-4 space-y-6">
         {/* Source */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Source de données</Label>
+          <Label className="text-sm font-medium">{t('reports:dataSource')}</Label>
           <Select value={config.source} onValueChange={(v) => handleSourceChange(v as ReportSource)}>
             <SelectTrigger>
               <SelectValue />
@@ -65,7 +67,7 @@ export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarP
 
         {/* Metrics */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Métriques (max 3)</Label>
+          <Label className="text-sm font-medium">{t('reports:metricsMax3')}</Label>
           <div className="space-y-2">
             {sourceDef.metrics.map((metric) => (
               <div key={metric.key} className="flex items-center space-x-2">

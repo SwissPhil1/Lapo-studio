@@ -2,12 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader2, Mail, MousePointer, AlertTriangle, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface CommunicationEffectivenessProps {
   dateRange: string;
 }
 
 export function CommunicationEffectiveness({ dateRange }: CommunicationEffectivenessProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['communication-effectiveness', dateRange],
     queryFn: async () => {
@@ -84,7 +86,7 @@ export function CommunicationEffectiveness({ dateRange }: CommunicationEffective
   if (!data || data.total === 0) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucun email envoyé
+        {t('analytics:noEmailsSent')}
       </div>
     );
   }

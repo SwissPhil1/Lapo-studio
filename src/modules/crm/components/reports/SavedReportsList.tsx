@@ -8,6 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { REPORT_SOURCES } from '@/shared/lib/reportSources';
 import {
   AlertDialog,
@@ -45,6 +46,7 @@ function parseReportConfig(config: unknown): ReportConfig | null {
 }
 
 export function SavedReportsList() {
+  const { t } = useTranslation(['reports', 'common']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -85,10 +87,10 @@ export function SavedReportsList() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['custom-reports'] });
-      toast.success('Rapport supprimé');
+      toast.success(t('reports:reportDeleted'));
     },
     onError: () => {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('reports:deleteError'));
     },
   });
 
@@ -116,9 +118,9 @@ export function SavedReportsList() {
     return (
       <div className="text-center py-12">
         <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium">Aucun rapport personnalisé</h3>
+        <h3 className="text-lg font-medium">{t('reports:noCustomReports')}</h3>
         <p className="text-muted-foreground mt-1">
-          Créez votre premier rapport pour commencer
+          {t('reports:createFirstReport')}
         </p>
       </div>
     );
@@ -150,11 +152,11 @@ export function SavedReportsList() {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {sourceDef?.label || 'Source inconnue'}
-                    {config && ` • ${config.metrics.length} métrique(s)`}
+                    {sourceDef?.label || t('reports:unknownSource')}
+                    {config && ` • ${config.metrics.length} ${t('reports:metrics')}`}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Modifié {formatDistanceToNow(new Date(report.updated_at), { addSuffix: true, locale: fr })}
+                    {t('reports:modified')} {formatDistanceToNow(new Date(report.updated_at), { addSuffix: true, locale: fr })}
                   </p>
                 </div>
               </div>
@@ -187,18 +189,18 @@ export function SavedReportsList() {
                   </AlertDialogTrigger>
                   <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Supprimer ce rapport ?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('reports:deleteReportConfirm')}</AlertDialogTitle>
                       <AlertDialogDescription>
                         Cette action est irréversible. Le rapport "{report.name}" sera définitivement supprimé.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => deleteReport.mutate(report.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Supprimer
+                        {t('common:delete')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

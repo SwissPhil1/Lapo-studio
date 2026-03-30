@@ -133,7 +133,8 @@
     "pageOf": "Page {{current}} de {{total}}",
     "activityLegend": "Légende activité",
     "somethingWentWrong": "Une erreur est survenue",
-    "reloadPage": "Recharger la page"
+    "reloadPage": "Recharger la page",
+    "errorWithMessage": "Erreur: {{message}}"
   },
   "dashboard": {
     "title": "Tableau de Bord Admin",
@@ -781,7 +782,15 @@
     "costComparisonByChannel": "Comparaison des coûts par canal",
     "other": "Autre",
     "revenue": "Revenus",
-    "moreServices": "+{{count}} autres traitements"
+    "moreServices": "+{{count}} autres traitements",
+    "noEmailsSent": "Aucun email envoyé",
+    "noActiveWorkflows": "Aucun workflow actif",
+    "noWorkflows": "Aucun workflow",
+    "noPipelineStages": "Aucun stage de pipeline configuré",
+    "configurePipelineInSettings": "Configurez votre pipeline dans les paramètres",
+    "noForecastData": "Aucune donnée de prévision",
+    "noSatisfactionData": "Aucune réponse de satisfaction",
+    "noCityData": "Aucune ville renseignée"
   },
   "campaigns": {
     "title": "Campagnes",
@@ -898,7 +907,8 @@
     "campaignScheduledDescription": "La campagne \"{{name}}\" sera envoyée le {{date}}.",
     "nameCampaignRequired": "Veuillez entrer un nom pour la campagne.",
     "subjectMessageRequired": "Veuillez remplir le sujet et le message.",
-    "dateRequired": "Veuillez sélectionner une date d'envoi."
+    "dateRequired": "Veuillez sélectionner une date d'envoi.",
+    "noABVariantsConfigured": "Aucune variante A/B configurée pour cette campagne"
   },
   "referralDetail": {
     "title": "Détails du parrainage",
@@ -1122,7 +1132,10 @@
     "aiExample3": "Patients avec historique de no-show",
     "aiExample4": "Patients inactifs depuis 3 mois",
     "aiExample5": "Nouveaux patients du dernier mois",
-    "aiExample6": "Patients ayant eu du filler cette année"
+    "aiExample6": "Patients ayant eu du filler cette année",
+    "referral": "Parrainage",
+    "referredBy": "Parrainé par",
+    "discount": "de réduction"
   },
   "patientDetail": {
     "backToPatients": "Retour aux patients",
@@ -1548,7 +1561,16 @@
     "groupedBy": "Groupé par",
     "metrics": "Métriques",
     "avg": "Moy",
-    "noDataAvailable": "Aucune donnée disponible"
+    "noDataAvailable": "Aucune donnée disponible",
+    "reportDeleted": "Rapport supprimé",
+    "deleteError": "Erreur lors de la suppression",
+    "noCustomReports": "Aucun rapport personnalisé",
+    "createFirstReport": "Créez votre premier rapport pour commencer",
+    "deleteReportConfirm": "Supprimer ce rapport ?",
+    "unknownSource": "Source inconnue",
+    "modified": "Modifié",
+    "dataSource": "Source de données",
+    "metricsMax3": "Métriques (max 3)"
   },
   "crmDashboard": {
     "unmappedServices": "{{count}} service(s) non mappé(s)",
@@ -1644,7 +1666,8 @@
     "loadError": "Impossible de charger les rendez-vous",
     "retry": "Réessayer",
     "appointmentPostponed": "RDV reporté",
-    "viewNewAppointment": "Voir le nouveau RDV"
+    "viewNewAppointment": "Voir le nouveau RDV",
+    "noAppointments": "Aucun RDV"
   },
   "tasks": {
     "overdueRecall": "Rappel en retard",
