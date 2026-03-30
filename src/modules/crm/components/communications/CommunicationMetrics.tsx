@@ -10,13 +10,9 @@ export function CommunicationMetrics() {
   const { data: metrics, isLoading } = useQuery({
     queryKey: ['communication-metrics'],
     queryFn: async () => {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
       const { data, error } = await supabase
         .from('crm_communication_logs')
         .select('id, status, channel, delivered_at, opened_count, clicked_count, bounced_at')
-        .gte('sent_at', sevenDaysAgo.toISOString())
         .eq('channel', 'email');
 
       if (error) throw error;
