@@ -8,6 +8,7 @@ import {
   DragOverlay,
   type DragStartEvent,
   closestCenter,
+  KeyboardSensor,
   PointerSensor,
   TouchSensor,
   useSensor,
@@ -97,7 +98,8 @@ export default function Pipeline() {
         delay: 200,
         tolerance: 8,
       },
-    })
+    }),
+    useSensor(KeyboardSensor)
   );
 
   const { data: stages = [], isLoading: stagesLoading } = useQuery({

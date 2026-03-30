@@ -295,7 +295,7 @@ export default function Analytics() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-6xl grid-cols-11">
+        <TabsList className="inline-flex w-auto max-w-full overflow-x-auto scrollbar-hide">
           <TabsTrigger value="performance">{t('analytics:tabs.performance')}</TabsTrigger>
           <TabsTrigger value="demographics">{t('analytics:tabs.demographics')}</TabsTrigger>
           <TabsTrigger value="cohort">{t('analytics:tabs.cohort', { defaultValue: 'Cohort' })}</TabsTrigger>

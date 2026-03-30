@@ -1,14 +1,24 @@
 import { type ReactNode } from 'react';
-import { motion, AnimatePresence, type Variants } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion';
 
 // ---------------------------------------------------------------------------
-// Reusable motion variants
+// Reduced-motion–safe variants
+// When the user prefers reduced motion, animations resolve instantly with
+// no transform/scale changes — only a subtle fade remains.
 // ---------------------------------------------------------------------------
+
+const instant = { duration: 0 };
 
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, ease: 'easeOut' } },
   exit: { opacity: 0, transition: { duration: 0.2 } },
+};
+
+export const fadeInReduced: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: instant },
+  exit: { opacity: 0, transition: instant },
 };
 
 export const slideUp: Variants = {
@@ -52,8 +62,16 @@ export const staggerContainer: Variants = {
   },
 };
 
+const staggerContainerReduced: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0, delayChildren: 0 },
+  },
+};
+
 // ---------------------------------------------------------------------------
-// Wrapper components
+// Wrapper components — automatically respect prefers-reduced-motion
 // ---------------------------------------------------------------------------
 
 interface PageTransitionProps {
@@ -66,12 +84,13 @@ interface PageTransitionProps {
  * Place inside <AnimatePresence> (e.g. in StudioLayout) for exit animations.
  */
 export function PageTransition({ children, className }: PageTransitionProps) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       initial="hidden"
       animate="visible"
       exit="exit"
-      variants={slideUp}
+      variants={reduced ? fadeInReduced : slideUp}
       className={className}
     >
       {children}
@@ -88,11 +107,12 @@ interface MotionListProps {
  * Wraps a list of <MotionItem> children with stagger animation.
  */
 export function MotionList({ children, className }: MotionListProps) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       initial="hidden"
       animate="visible"
-      variants={staggerContainer}
+      variants={reduced ? staggerContainerReduced : staggerContainer}
       className={className}
     >
       {children}
@@ -112,12 +132,13 @@ interface MotionItemProps {
  * Should be used as a direct child of <MotionList>.
  */
 export function MotionItem({ children, className, variants: customVariants }: MotionItemProps) {
+  const reduced = useReducedMotion();
   return (
-    <motion.div variants={customVariants || slideUp} className={className}>
+    <motion.div variants={reduced ? fadeInReduced : (customVariants || slideUp)} className={className}>
       {children}
     </motion.div>
   );
 }
 
 // Re-export framer-motion primitives for convenience
-export { motion, AnimatePresence };
+export { motion, AnimatePresence, useReducedMotion };
