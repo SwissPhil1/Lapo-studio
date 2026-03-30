@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/shared/lib/supabase';
@@ -48,13 +49,7 @@ function ChartLoader() {
 
 type DateRange = '7d' | '30d' | '90d' | '12m' | 'ytd';
 
-const dateRangeLabels: Record<DateRange, string> = {
-  '7d': '7 derniers jours',
-  '30d': '30 derniers jours',
-  '90d': '3 derniers mois',
-  '12m': '12 derniers mois',
-  'ytd': 'Année en cours',
-};
+const DATE_RANGE_KEYS: DateRange[] = ['7d', '30d', '90d', '12m', 'ytd'];
 
 function getDateRange(range: DateRange): { start: Date; end: Date } {
   const end = new Date();
@@ -89,9 +84,10 @@ interface MetricCardProps {
   change?: number;
   icon: React.ElementType;
   subtitle?: string;
+  vsPeriodLabel?: string;
 }
 
-function MetricCard({ title, value, change, icon: Icon, subtitle }: MetricCardProps) {
+function MetricCard({ title, value, change, icon: Icon, subtitle, vsPeriodLabel = 'vs previous period' }: MetricCardProps) {
   const isPositive = change !== undefined && change >= 0;
   
   return (
@@ -104,7 +100,7 @@ function MetricCard({ title, value, change, icon: Icon, subtitle }: MetricCardPr
             <div className={`flex items-center gap-1 mt-1 text-sm ${isPositive ? 'text-success' : 'text-destructive'}`}>
               {isPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
               <span>{isPositive ? '+' : ''}{change.toFixed(1)}%</span>
-              <span className="text-muted-foreground">vs période précédente</span>
+              <span className="text-muted-foreground">{vsPeriodLabel}</span>
             </div>
           )}
           {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
@@ -118,6 +114,7 @@ function MetricCard({ title, value, change, icon: Icon, subtitle }: MetricCardPr
 }
 
 export default function Analytics() {
+  const { t } = useTranslation(['analytics', 'common']);
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState<DateRange>('30d');
   const [activeTab, setActiveTab] = useState('performance');
@@ -247,11 +244,11 @@ export default function Analytics() {
   
   const handleExport = () => {
     const data = [
-      ['Métrique', 'Valeur'],
-      ['Revenus', metrics?.revenue || 0],
-      ['Nouveaux patients', metrics?.newPatients || 0],
-      ['Rendez-vous', metrics?.appointments || 0],
-      ['Taux de conversion', `${metrics?.conversionRate?.toFixed(1) || 0}%`],
+      [t('analytics:exportHeaders.metric'), t('analytics:exportHeaders.value')],
+      [t('analytics:metrics.revenue'), metrics?.revenue || 0],
+      [t('analytics:metrics.newPatients'), metrics?.newPatients || 0],
+      [t('analytics:metrics.appointments'), metrics?.appointments || 0],
+      [t('analytics:metrics.conversionRate'), `${metrics?.conversionRate?.toFixed(1) || 0}%`],
     ];
     
     const csv = data.map(row => row.join(',')).join('\n');
@@ -269,8 +266,8 @@ export default function Analytics() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Rapports & Analyses</h1>
-          <p className="text-muted-foreground">Vue d'ensemble de la performance de votre clinique</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('analytics:title')}</h1>
+          <p className="text-muted-foreground">{t('analytics:description')}</p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={dateRange} onValueChange={(v) => setDateRange(v as DateRange)}>
@@ -278,8 +275,8 @@ export default function Analytics() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(dateRangeLabels).map(([value, label]) => (
-                <SelectItem key={value} value={value}>{label}</SelectItem>
+              {DATE_RANGE_KEYS.map((value) => (
+                <SelectItem key={value} value={value}>{t(`analytics:dateRanges.${value}`)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -288,7 +285,7 @@ export default function Analytics() {
           </Button>
           <Button variant="outline" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
-            Exporter
+            {t('analytics:export')}
           </Button>
         </div>
       </div>
@@ -296,76 +293,76 @@ export default function Analytics() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full max-w-4xl grid-cols-8">
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="demographics">Démographie</TabsTrigger>
-          <TabsTrigger value="attribution">Attribution</TabsTrigger>
-          <TabsTrigger value="satisfaction">Satisfaction</TabsTrigger>
-          <TabsTrigger value="revenue">Prévisions</TabsTrigger>
-          <TabsTrigger value="predictions">IA Risques</TabsTrigger>
-          <TabsTrigger value="roi">ROI Pubs</TabsTrigger>
-          <TabsTrigger value="custom">Rapports</TabsTrigger>
+          <TabsTrigger value="performance">{t('analytics:tabs.performance')}</TabsTrigger>
+          <TabsTrigger value="demographics">{t('analytics:tabs.demographics')}</TabsTrigger>
+          <TabsTrigger value="attribution">{t('analytics:tabs.attribution')}</TabsTrigger>
+          <TabsTrigger value="satisfaction">{t('analytics:tabs.satisfaction')}</TabsTrigger>
+          <TabsTrigger value="revenue">{t('analytics:tabs.revenue')}</TabsTrigger>
+          <TabsTrigger value="predictions">{t('analytics:tabs.predictions')}</TabsTrigger>
+          <TabsTrigger value="roi">{t('analytics:tabs.roi')}</TabsTrigger>
+          <TabsTrigger value="custom">{t('analytics:tabs.custom')}</TabsTrigger>
         </TabsList>
 
         {/* Performance Tab */}
         <TabsContent value="performance" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard title="Revenus" value={formatCurrency(metrics?.revenue || 0)} change={metrics?.revenueChange} icon={Banknote} />
-            <MetricCard title="Nouveaux patients" value={metrics?.newPatients || 0} change={metrics?.patientsChange} icon={Users} />
-            <MetricCard title="Rendez-vous" value={metrics?.appointments || 0} change={metrics?.appointmentsChange} icon={Calendar} />
-            <MetricCard title="Taux de conversion" value={`${metrics?.conversionRate?.toFixed(1) || 0}%`} icon={Target} subtitle="RDV terminés / total" />
+            <MetricCard title={t('analytics:metrics.revenue')} value={formatCurrency(metrics?.revenue || 0)} change={metrics?.revenueChange} icon={Banknote} vsPeriodLabel={t('analytics:vsPreviousPeriod')} />
+            <MetricCard title={t('analytics:metrics.newPatients')} value={metrics?.newPatients || 0} change={metrics?.patientsChange} icon={Users} vsPeriodLabel={t('analytics:vsPreviousPeriod')} />
+            <MetricCard title={t('analytics:metrics.appointments')} value={metrics?.appointments || 0} change={metrics?.appointmentsChange} icon={Calendar} vsPeriodLabel={t('analytics:vsPreviousPeriod')} />
+            <MetricCard title={t('analytics:metrics.conversionRate')} value={`${metrics?.conversionRate?.toFixed(1) || 0}%`} icon={Target} subtitle={t('analytics:metrics.completedPerTotal')} />
           </div>
           <Suspense fallback={<ChartLoader />}>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Évolution des revenus</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.revenueEvolution')}</h3>
               <RevenueChart dateRange={dateRange} />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Répartition par traitement</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.treatmentBreakdown')}</h3>
               <TreatmentBreakdown dateRange={dateRange} />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Performance Staff</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.staffPerformance')}</h3>
               <StaffPerformanceChart dateRange={dateRange} />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Efficacité Emails</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.emailEffectiveness')}</h3>
               <CommunicationEffectiveness dateRange={dateRange} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Analyse Parrainages</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.referralAnalysis')}</h3>
               <ReferralAnalytics dateRange={dateRange} />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">No-Shows & Annulations</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.noShowCancellations')}</h3>
               <NoShowAnalysis dateRange={dateRange} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Entonnoir Pipeline</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.pipelineFunnel')}</h3>
               <PipelineFunnel />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Métriques Rappel</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.recallMetrics')}</h3>
               <RecallMetrics />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Workflows</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.workflows')}</h3>
               <WorkflowEffectiveness dateRange={dateRange} />
             </div>
           </div>
-          
+
           <div className="card-elevated p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Performance des campagnes</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.campaignPerformance')}</h3>
             <CampaignPerformance dateRange={dateRange} />
           </div>
           </Suspense>
@@ -374,65 +371,64 @@ export default function Analytics() {
         {/* Demographics Tab */}
         <TabsContent value="demographics" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-            <MetricCard title="Total Patients" value={demoMetrics?.total || 0} icon={Users} />
-            <MetricCard title="% Femmes" value={`${demoMetrics?.femalePercent || 0}%`} icon={UserCheck} />
-            <MetricCard title="Âge moyen" value={`${demoMetrics?.avgAge || 0} ans`} icon={Calendar} />
-            <MetricCard title="Top ville" value={demoMetrics?.topCity || '-'} icon={MapPin} />
+            <MetricCard title={t('analytics:metrics.totalPatients')} value={demoMetrics?.total || 0} icon={Users} />
+            <MetricCard title={t('analytics:metrics.percentFemale')} value={`${demoMetrics?.femalePercent || 0}%`} icon={UserCheck} />
+            <MetricCard title={t('analytics:metrics.avgAge')} value={`${demoMetrics?.avgAge || 0} ${t('analytics:metrics.years')}`} icon={Calendar} />
+            <MetricCard title={t('analytics:metrics.topCity')} value={demoMetrics?.topCity || '-'} icon={MapPin} />
           </div>
 
           <Suspense fallback={<ChartLoader />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Répartition par genre</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.genderDistribution')}</h3>
               <GenderDistribution />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Tranches d'âge</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.ageGroups')}</h3>
               <AgeGroupDistribution />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Traitements par âge</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.treatmentsByAge')}</h3>
               <TreatmentsByAgeGroup />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Traitements par genre</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.treatmentsByGender')}</h3>
               <TreatmentsByGender />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Distribution géographique</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.geographicDistribution')}</h3>
               <GeographicDistribution />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Croissance patients</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.patientGrowth')}</h3>
               <PatientGrowthTrend />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Valeur vie client (LTV)</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.lifetimeValue')}</h3>
               <PatientLifetimeValue />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Rétention & Churn</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.retentionChurn')}</h3>
               <PatientRetentionMetrics />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Analyse premiers traitements</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.firstTreatmentAnalysis')}</h3>
               <FirstTreatmentAnalysis />
             </div>
             <div className="card-elevated p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Qualité des données</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.dataQuality')}</h3>
               <DatabaseHealthMetrics />
             </div>
           </div>
@@ -443,9 +439,9 @@ export default function Analytics() {
         <TabsContent value="attribution" className="space-y-6">
           <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Attribution & Sources</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.attributionSources')}</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              Trackez la provenance de vos leads et mesurez le ROI de vos canaux d'acquisition (Google Ads, Meta, SEO, etc.)
+              {t('analytics:descriptions.attribution')}
             </p>
             <AttributionAnalytics dateRange={dateRange} />
           </div>
@@ -456,9 +452,9 @@ export default function Analytics() {
         <TabsContent value="satisfaction" className="space-y-6">
           <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Satisfaction Patients (NPS & CSAT)</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.satisfactionNps')}</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              Suivez la satisfaction de vos patients et identifiez les axes d'amélioration
+              {t('analytics:descriptions.satisfaction')}
             </p>
             <SatisfactionAnalytics />
           </div>
@@ -469,9 +465,9 @@ export default function Analytics() {
         <TabsContent value="revenue" className="space-y-6">
           <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Prévisions de revenus</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.revenueForecast')}</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              Projections basées sur le pipeline et les tendances historiques
+              {t('analytics:descriptions.forecast')}
             </p>
             <RevenueForecast />
           </div>
@@ -482,9 +478,9 @@ export default function Analytics() {
         <TabsContent value="predictions" className="space-y-6">
           <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Prédictions IA - Risque de perte</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.churnPrediction')}</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              Identifiez les patients à risque de ne pas revenir grâce à l'analyse IA
+              {t('analytics:descriptions.churn')}
             </p>
             <ChurnPrediction />
           </div>
@@ -495,9 +491,9 @@ export default function Analytics() {
         <TabsContent value="roi" className="space-y-6">
           <Suspense fallback={<ChartLoader />}>
           <div className="card-elevated p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">ROI Publicitaire</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.adRoi')}</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              Mesurez le retour sur investissement de vos campagnes publicitaires
+              {t('analytics:descriptions.roi')}
             </p>
             <ROICalculator />
           </div>
@@ -509,12 +505,12 @@ export default function Analytics() {
           <Suspense fallback={<ChartLoader />}>
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Mes rapports personnalisés</h2>
-              <p className="text-sm text-muted-foreground">Créez et gérez vos propres analyses</p>
+              <h2 className="text-lg font-semibold">{t('analytics:customReports.title')}</h2>
+              <p className="text-sm text-muted-foreground">{t('analytics:customReports.description')}</p>
             </div>
             <Button onClick={() => navigate('/crm/reports/new')}>
               <Plus className="h-4 w-4 mr-2" />
-              Nouveau rapport
+              {t('analytics:customReports.newReport')}
             </Button>
           </div>
           <SavedReportsList />

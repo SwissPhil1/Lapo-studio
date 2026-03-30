@@ -73,6 +73,7 @@
     "email": "Email",
     "role": "Role",
     "language": "Language",
+    "switchLanguage": "Switch to French",
     "all": "All",
     "status": "Status",
     "emptyState": {
@@ -235,6 +236,103 @@
     "reminderSuccess": "Reminder sent successfully",
     "reminderError": "Failed to send reminder"
   },
+  "payoutDetail": {
+    "csvHeaders": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "bank": "Bank",
+      "bankAddress": "Bank Address",
+      "iban": "IBAN",
+      "amount": "Amount (CHF)"
+    }
+  },
+  "referrerDetailPage": {
+    "backToReferrers": "Back to Referrers",
+    "title": "Referrer Details",
+    "editProfile": "Edit Profile",
+    "deleteBtn": "Delete",
+    "notFound": "Referrer Not Found",
+    "notFoundDesc": "The referrer you're looking for doesn't exist.",
+    "deleteConfirmTitle": "Delete this referrer?",
+    "deleteConfirmDesc": "This action will permanently delete this referrer along with all their referrals, bookings, and associated commissions. This action is irreversible.",
+    "deleting": "Deleting...",
+    "deleteSuccess": "Referrer deleted ({{referrals}} referrals, {{commissions}} commissions)",
+    "deleteError": "Error deleting referrer",
+    "profile": {
+      "title": "Referrer Profile",
+      "fullName": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company",
+      "createdAt": "Created",
+      "bankInfo": "Bank Information",
+      "sendPaymentReminder": "Send payment info reminder",
+      "paymentReminderTitle": "Referrer must complete bank info (IBAN, bank...)",
+      "reminderSending": "Sending...",
+      "reminderSent": "Reminder sent to referrer (app + email)",
+      "reminderRecentlySent": "A reminder was already sent in the last 7 days",
+      "reminderAlreadyComplete": "Bank info already complete",
+      "reminderError": "Failed to send reminder",
+      "lastReminder": "Last reminder",
+      "autoPayout": "Automatic Payouts",
+      "autoPayoutActive": "Active",
+      "autoPayoutPaused": "Paused",
+      "autoPayoutActiveTooltip": "Commissions will be paid out automatically",
+      "autoPayoutPausedTooltip": "Commissions are held for LAPO Cash conversion",
+      "autoPayoutActivate": "Activate",
+      "autoPayoutPause": "Pause",
+      "autoPayoutPausedSince": "Paused since {{date}}",
+      "autoPayoutEnabled": "Automatic payouts enabled",
+      "autoPayoutDisabled": "Automatic payouts paused",
+      "updateError": "Failed to update"
+    },
+    "stats": {
+      "totalReferrals": "Total Referrals",
+      "booked": "Booked",
+      "confirmed": "Confirmed",
+      "totalCommissions": "Total Commissions",
+      "pending": "Pending"
+    },
+    "transactions": {
+      "title": "Transaction History",
+      "referrals": "Referrals",
+      "lapoCash": "LAPO Cash",
+      "date": "Date",
+      "type": "Type",
+      "description": "Description",
+      "amount": "Amount",
+      "referredPerson": "Referred Person",
+      "status": "Status",
+      "amountSpent": "Amount Spent",
+      "commissionEarned": "Commission Earned"
+    },
+    "changeType": {
+      "title": "Change Referrer Type",
+      "description": "Determines commission rules for this referrer.",
+      "typeLabel": "Referrer Type",
+      "selectPlaceholder": "Select type",
+      "done": "Done",
+      "saving": "Saving...",
+      "success": "Referrer type updated successfully",
+      "error": "Failed to update referrer type"
+    },
+    "editDialog": {
+      "title": "Edit Profile",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "iban": "IBAN",
+      "bankName": "Bank Name",
+      "bankAddress": "Bank Address",
+      "address": "Address",
+      "saving": "Saving...",
+      "save": "Save",
+      "success": "Profile updated successfully",
+      "error": "Failed to update profile"
+    }
+  },
   "lapoCash": {
     "pageTitle": "Gift LAPO Cash",
     "pageDescription": "Manage LAPO Cash wallets, transactions, and conversion rates",
@@ -353,6 +451,186 @@
       "lapoCashSpent": "LAPO Cash Spent"
     }
   },
+  "pipeline": {
+    "description": "Track your patients from first contact to completed treatment.",
+    "noPatients": "No patients",
+    "dragHere": "Drag a patient here",
+    "noEmail": "No email",
+    "addToPipeline": "Add to Pipeline"
+  },
+  "appointments": {
+    "description": "Appointment calendar secured from the database."
+  },
+  "communications": {
+    "sendMessage": "Send a message",
+    "messageCount": "{{count}} message",
+    "messageCount_plural": "{{count}} messages",
+    "displayOf": "{{displayed}} of {{total}} messages",
+    "loadMore": "Load more ({{remaining}} remaining)",
+    "noCommunications": "No communications",
+    "noResultsFilters": "No results for these filters.",
+    "emptyDescription": "Start communicating with your patients by sending your first message.",
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "analytics": {
+    "title": "Reports & Analytics",
+    "description": "Overview of your clinic's performance",
+    "export": "Export",
+    "vsPreviousPeriod": "vs previous period",
+    "dateRanges": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 3 months",
+      "12m": "Last 12 months",
+      "ytd": "Year to date"
+    },
+    "tabs": {
+      "performance": "Performance",
+      "demographics": "Demographics",
+      "attribution": "Attribution",
+      "satisfaction": "Satisfaction",
+      "revenue": "Forecasts",
+      "predictions": "AI Risks",
+      "roi": "Ad ROI",
+      "custom": "Reports"
+    },
+    "metrics": {
+      "revenue": "Revenue",
+      "newPatients": "New Patients",
+      "appointments": "Appointments",
+      "conversionRate": "Conversion Rate",
+      "completedPerTotal": "Completed / total",
+      "totalPatients": "Total Patients",
+      "percentFemale": "% Female",
+      "avgAge": "Average Age",
+      "years": "years",
+      "topCity": "Top City"
+    },
+    "charts": {
+      "revenueEvolution": "Revenue Evolution",
+      "treatmentBreakdown": "Treatment Breakdown",
+      "staffPerformance": "Staff Performance",
+      "emailEffectiveness": "Email Effectiveness",
+      "referralAnalysis": "Referral Analysis",
+      "noShowCancellations": "No-Shows & Cancellations",
+      "pipelineFunnel": "Pipeline Funnel",
+      "recallMetrics": "Recall Metrics",
+      "workflows": "Workflows",
+      "campaignPerformance": "Campaign Performance",
+      "genderDistribution": "Gender Distribution",
+      "ageGroups": "Age Groups",
+      "treatmentsByAge": "Treatments by Age",
+      "treatmentsByGender": "Treatments by Gender",
+      "geographicDistribution": "Geographic Distribution",
+      "patientGrowth": "Patient Growth",
+      "lifetimeValue": "Customer Lifetime Value (LTV)",
+      "retentionChurn": "Retention & Churn",
+      "firstTreatmentAnalysis": "First Treatment Analysis",
+      "dataQuality": "Data Quality",
+      "attributionSources": "Attribution & Sources",
+      "satisfactionNps": "Patient Satisfaction (NPS & CSAT)",
+      "revenueForecast": "Revenue Forecast",
+      "churnPrediction": "AI Predictions - Churn Risk",
+      "adRoi": "Ad ROI"
+    },
+    "descriptions": {
+      "attribution": "Track lead origins and measure ROI across acquisition channels (Google Ads, Meta, SEO, etc.)",
+      "satisfaction": "Monitor patient satisfaction and identify areas for improvement",
+      "forecast": "Projections based on pipeline and historical trends",
+      "churn": "Identify patients at risk of not returning with AI analysis",
+      "roi": "Measure return on investment from your ad campaigns"
+    },
+    "customReports": {
+      "title": "My Custom Reports",
+      "description": "Create and manage your own analyses",
+      "newReport": "New Report"
+    },
+    "exportHeaders": {
+      "metric": "Metric",
+      "value": "Value"
+    }
+  },
+  "campaigns": {
+    "title": "Campaigns",
+    "description": "Manage your marketing campaigns and track their performance",
+    "newCampaign": "New Campaign",
+    "searchPlaceholder": "Search campaigns...",
+    "refresh": "Refresh",
+    "loading": "Loading campaigns...",
+    "noCampaigns": "No campaigns",
+    "emptyDescription": "Create your first campaign from the Patients page by selecting a group of patients or using AI search.",
+    "goToPatients": "Go to Patients page",
+    "allStatuses": "All statuses",
+    "draft": "Draft",
+    "scheduled": "Scheduled",
+    "sending": "Sending",
+    "sent": "Sent",
+    "completed": "Completed",
+    "archived": "Archived",
+    "duplicateSuccess": "Campaign duplicated successfully",
+    "duplicateError": "Error duplicating campaign",
+    "archiveSuccess": "Campaign archived",
+    "archiveError": "Error archiving campaign"
+  },
+  "referralDetail": {
+    "title": "Referral Details",
+    "notFound": "Referral Not Found",
+    "notFoundDesc": "The referral you're looking for doesn't exist.",
+    "backToReferrals": "Back to Referrals",
+    "testData": "Test Data",
+    "created": "Created",
+    "updated": "Updated",
+    "referrer": "Referrer",
+    "referredPerson": "Referred Person",
+    "code": "Code",
+    "company": "Company",
+    "phone": "Phone",
+    "originType": "Origin Type",
+    "lastAppointment": "Last Appointment",
+    "lifetimeSpending": "Lifetime Spending",
+    "totalAcrossBookings": "Total across all bookings",
+    "viewReferrerDetails": "View Referrer Details",
+    "transactionTitle": "Referral Transaction",
+    "noTransactions": "No transactions yet for this referral",
+    "deleteConfirmTitle": "Delete this referral?",
+    "deleteConfirmDesc": "This action will permanently delete this referral along with all associated bookings and commissions. This action is irreversible.",
+    "deleting": "Deleting...",
+    "bookingDeleteTitle": "Confirm deletion",
+    "bookingDeleteDesc": "Are you sure you want to delete this booking? This action is irreversible and will also delete associated commissions.",
+    "table": {
+      "date": "Date",
+      "service": "Service",
+      "amountSpent": "Amount (spent)",
+      "rateApplied": "Rate Applied",
+      "commission": "Commission",
+      "payoutBatch": "Payout Batch",
+      "batch": "Batch",
+      "first": "First",
+      "repeat": "Repeat",
+      "total": "Total (this referral)",
+      "footnote": "Amounts shown per booking. Summary shows total for this referral."
+    },
+    "editDialog": {
+      "title": "Edit referred person info",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "phone": "Phone",
+      "saving": "Saving..."
+    },
+    "toast": {
+      "deleteSuccess": "Referral deleted successfully",
+      "deleteError": "Error deleting referral",
+      "bookingDeleteSuccess": "Booking deleted successfully",
+      "bookingDeleteError": "Error deleting booking",
+      "updateSuccess": "Information updated",
+      "updateError": "Error updating information",
+      "noPatientError": "Cannot edit: no associated patient",
+      "duplicatePhone": "This phone number is already used by another patient",
+      "duplicateEmail": "This email is already used by another patient",
+      "duplicateValue": "This value already exists in the database"
+    }
+  },
   "payoutDetail": {
     "title": "Payout Detail",
     "batch": "batch",
@@ -382,6 +660,11 @@
     "noReferrers": "No referrer data found",
     "exportSuccess": "Export completed successfully",
     "exportError": "Failed to export"
+  },
+  "notFound": {
+    "title": "404",
+    "description": "This page doesn't exist.",
+    "backHome": "Back to Dashboard"
   },
   "status": {
     "referral": {

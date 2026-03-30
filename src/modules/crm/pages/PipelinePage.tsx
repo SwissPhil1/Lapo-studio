@@ -9,6 +9,7 @@ import {
   type DragStartEvent,
   closestCenter,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   useDroppable,
@@ -18,6 +19,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PipelineCard } from '@/modules/crm/components/pipeline/PipelineCard';
 import { AddToPipelineDialog } from '@/modules/crm/components/pipeline/AddToPipelineDialog';
 import { usePipelineActions } from '@/shared/hooks/usePipelineActions';
@@ -79,6 +81,7 @@ function StageColumn({
 }
 
 export default function Pipeline() {
+  const { t } = useTranslation(['pipeline', 'common']);
   const [activeId, setActiveId] = useState<string | null>(null);
   const { movePatient } = usePipelineActions();
 
@@ -86,6 +89,12 @@ export default function Pipeline() {
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
       },
     })
   );
@@ -350,7 +359,7 @@ export default function Pipeline() {
 
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground">
-          Suivez vos patients du premier contact jusqu'au traitement terminé.
+          {t('pipeline:description')}
         </p>
         <AddToPipelineDialog stages={stages} existingPatientIds={existingPatientIds} />
       </div>
@@ -444,8 +453,8 @@ export default function Pipeline() {
                       ) : (
                         <div className="flex flex-col items-center justify-center h-32 text-muted-foreground border-2 border-dashed border-muted-foreground/20 rounded-lg">
                           <User className="h-8 w-8 mb-2 opacity-50" />
-                          <p className="text-sm">Aucun patient</p>
-                          <p className="text-xs mt-1">Glissez un patient ici</p>
+                          <p className="text-sm">{t('pipeline:noPatients')}</p>
+                          <p className="text-xs mt-1">{t('pipeline:dragHere')}</p>
                         </div>
                       )}
                     </SortableContext>
@@ -471,7 +480,7 @@ export default function Pipeline() {
                     {activePatient.patients?.first_name} {activePatient.patients?.last_name}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {activePatient.patients?.email || 'Pas d\'email'}
+                    {activePatient.patients?.email || t('pipeline:noEmail')}
                   </p>
                 </div>
               </div>

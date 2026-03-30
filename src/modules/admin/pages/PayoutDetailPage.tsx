@@ -305,15 +305,14 @@ export default function PayoutDetail() {
         return;
       }
 
-      // CSV headers in French
       const headers = [
-        "Prenom",
-        "Nom",
-        "Email",
-        "Banque",
-        "Adresse banque",
-        "IBAN",
-        "Montant (CHF)",
+        t("payoutDetail:csvHeaders.firstName"),
+        t("payoutDetail:csvHeaders.lastName"),
+        t("payoutDetail:csvHeaders.email"),
+        t("payoutDetail:csvHeaders.bank"),
+        t("payoutDetail:csvHeaders.bankAddress"),
+        t("payoutDetail:csvHeaders.iban"),
+        t("payoutDetail:csvHeaders.amount"),
       ];
 
       // Helper to wrap fields in quotes if they contain semicolon or quotes

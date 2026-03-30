@@ -73,6 +73,7 @@
     "email": "Courriel",
     "role": "Rôle",
     "language": "Langue",
+    "switchLanguage": "Passer en anglais",
     "all": "Tous",
     "status": "Statut",
     "emptyState": {
@@ -235,6 +236,103 @@
     "reminderSuccess": "Rappel envoyé avec succès",
     "reminderError": "Erreur lors de l'envoi du rappel"
   },
+  "payoutDetail": {
+    "csvHeaders": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "bank": "Banque",
+      "bankAddress": "Adresse banque",
+      "iban": "IBAN",
+      "amount": "Montant (CHF)"
+    }
+  },
+  "referrerDetailPage": {
+    "backToReferrers": "Retour aux référents",
+    "title": "Détails du référent",
+    "editProfile": "Modifier le profil",
+    "deleteBtn": "Supprimer",
+    "notFound": "Référent introuvable",
+    "notFoundDesc": "Le référent que vous cherchez n'existe pas.",
+    "deleteConfirmTitle": "Supprimer ce référent ?",
+    "deleteConfirmDesc": "Cette action supprimera définitivement ce référent ainsi que tous ses parrainages, réservations et commissions associés. Cette action est irréversible.",
+    "deleting": "Suppression...",
+    "deleteSuccess": "Référent supprimé ({{referrals}} parrainages, {{commissions}} commissions)",
+    "deleteError": "Erreur lors de la suppression",
+    "profile": {
+      "title": "Profil du référent",
+      "fullName": "Nom complet",
+      "email": "Email",
+      "phone": "Téléphone",
+      "company": "Entreprise",
+      "createdAt": "Créé le",
+      "bankInfo": "Informations bancaires",
+      "sendPaymentReminder": "Envoyer un rappel d'informations de paiement",
+      "paymentReminderTitle": "Le référent doit compléter ses informations bancaires (IBAN, banque…)",
+      "reminderSending": "Envoi...",
+      "reminderSent": "Rappel envoyé au référent (app + email)",
+      "reminderRecentlySent": "Un rappel a déjà été envoyé au cours des 7 derniers jours",
+      "reminderAlreadyComplete": "Informations bancaires déjà complètes",
+      "reminderError": "Échec de l'envoi du rappel",
+      "lastReminder": "Dernier rappel",
+      "autoPayout": "Versements automatiques",
+      "autoPayoutActive": "Actif",
+      "autoPayoutPaused": "Suspendu",
+      "autoPayoutActiveTooltip": "Les commissions seront versées automatiquement",
+      "autoPayoutPausedTooltip": "Les commissions sont conservées pour conversion en LAPO Cash",
+      "autoPayoutActivate": "Activer",
+      "autoPayoutPause": "Suspendre",
+      "autoPayoutPausedSince": "Suspendu depuis {{date}}",
+      "autoPayoutEnabled": "Versements automatiques activés",
+      "autoPayoutDisabled": "Versements automatiques suspendus",
+      "updateError": "Échec de la mise à jour"
+    },
+    "stats": {
+      "totalReferrals": "Total Parrainages",
+      "booked": "Réservés",
+      "confirmed": "Confirmés",
+      "totalCommissions": "Total Commissions",
+      "pending": "En attente"
+    },
+    "transactions": {
+      "title": "Historique des transactions",
+      "referrals": "Parrainages",
+      "lapoCash": "LAPO Cash",
+      "date": "Date",
+      "type": "Type",
+      "description": "Description",
+      "amount": "Montant",
+      "referredPerson": "Personne parrainée",
+      "status": "Statut",
+      "amountSpent": "Montant dépensé",
+      "commissionEarned": "Commission gagnée"
+    },
+    "changeType": {
+      "title": "Changer le type de référent",
+      "description": "Détermine les règles de commission pour ce référent.",
+      "typeLabel": "Type de référent",
+      "selectPlaceholder": "Sélectionner un type",
+      "done": "Terminé",
+      "saving": "Enregistrement...",
+      "success": "Type de référent mis à jour",
+      "error": "Échec de la mise à jour du type"
+    },
+    "editDialog": {
+      "title": "Modifier le profil",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "iban": "IBAN",
+      "bankName": "Nom de la banque",
+      "bankAddress": "Adresse de la banque",
+      "address": "Adresse",
+      "saving": "Enregistrement...",
+      "save": "Enregistrer",
+      "success": "Profil mis à jour avec succès",
+      "error": "Échec de la mise à jour du profil"
+    }
+  },
   "lapoCash": {
     "pageTitle": "Offrir LAPO Cash",
     "pageDescription": "Gérez les portefeuilles LAPO Cash, transactions et taux de conversion",
@@ -353,6 +451,186 @@
       "lapoCashSpent": "LAPO Cash Dépensé"
     }
   },
+  "pipeline": {
+    "description": "Suivez vos patients du premier contact jusqu'au traitement terminé.",
+    "noPatients": "Aucun patient",
+    "dragHere": "Glissez un patient ici",
+    "noEmail": "Pas d'email",
+    "addToPipeline": "Ajouter au pipeline"
+  },
+  "appointments": {
+    "description": "Calendrier des rendez-vous sécurisé depuis la base de données."
+  },
+  "communications": {
+    "sendMessage": "Envoyer un message",
+    "messageCount": "{{count}} message",
+    "messageCount_plural": "{{count}} messages",
+    "displayOf": "{{displayed}} sur {{total}} messages",
+    "loadMore": "Charger plus ({{remaining}} restants)",
+    "noCommunications": "Aucune communication",
+    "noResultsFilters": "Aucun résultat pour ces filtres.",
+    "emptyDescription": "Commencez à communiquer avec vos patients en envoyant votre premier message.",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier"
+  },
+  "analytics": {
+    "title": "Rapports & Analyses",
+    "description": "Vue d'ensemble de la performance de votre clinique",
+    "export": "Exporter",
+    "vsPreviousPeriod": "vs période précédente",
+    "dateRanges": {
+      "7d": "7 derniers jours",
+      "30d": "30 derniers jours",
+      "90d": "3 derniers mois",
+      "12m": "12 derniers mois",
+      "ytd": "Année en cours"
+    },
+    "tabs": {
+      "performance": "Performance",
+      "demographics": "Démographie",
+      "attribution": "Attribution",
+      "satisfaction": "Satisfaction",
+      "revenue": "Prévisions",
+      "predictions": "IA Risques",
+      "roi": "ROI Pubs",
+      "custom": "Rapports"
+    },
+    "metrics": {
+      "revenue": "Revenus",
+      "newPatients": "Nouveaux patients",
+      "appointments": "Rendez-vous",
+      "conversionRate": "Taux de conversion",
+      "completedPerTotal": "RDV terminés / total",
+      "totalPatients": "Total Patients",
+      "percentFemale": "% Femmes",
+      "avgAge": "Âge moyen",
+      "years": "ans",
+      "topCity": "Top ville"
+    },
+    "charts": {
+      "revenueEvolution": "Évolution des revenus",
+      "treatmentBreakdown": "Répartition par traitement",
+      "staffPerformance": "Performance Staff",
+      "emailEffectiveness": "Efficacité Emails",
+      "referralAnalysis": "Analyse Parrainages",
+      "noShowCancellations": "No-Shows & Annulations",
+      "pipelineFunnel": "Entonnoir Pipeline",
+      "recallMetrics": "Métriques Rappel",
+      "workflows": "Workflows",
+      "campaignPerformance": "Performance des campagnes",
+      "genderDistribution": "Répartition par genre",
+      "ageGroups": "Tranches d'âge",
+      "treatmentsByAge": "Traitements par âge",
+      "treatmentsByGender": "Traitements par genre",
+      "geographicDistribution": "Distribution géographique",
+      "patientGrowth": "Croissance patients",
+      "lifetimeValue": "Valeur vie client (LTV)",
+      "retentionChurn": "Rétention & Churn",
+      "firstTreatmentAnalysis": "Analyse premiers traitements",
+      "dataQuality": "Qualité des données",
+      "attributionSources": "Attribution & Sources",
+      "satisfactionNps": "Satisfaction Patients (NPS & CSAT)",
+      "revenueForecast": "Prévisions de revenus",
+      "churnPrediction": "Prédictions IA - Risque de perte",
+      "adRoi": "ROI Publicitaire"
+    },
+    "descriptions": {
+      "attribution": "Trackez la provenance de vos leads et mesurez le ROI de vos canaux d'acquisition (Google Ads, Meta, SEO, etc.)",
+      "satisfaction": "Suivez la satisfaction de vos patients et identifiez les axes d'amélioration",
+      "forecast": "Projections basées sur le pipeline et les tendances historiques",
+      "churn": "Identifiez les patients à risque de ne pas revenir grâce à l'analyse IA",
+      "roi": "Mesurez le retour sur investissement de vos campagnes publicitaires"
+    },
+    "customReports": {
+      "title": "Mes rapports personnalisés",
+      "description": "Créez et gérez vos propres analyses",
+      "newReport": "Nouveau rapport"
+    },
+    "exportHeaders": {
+      "metric": "Métrique",
+      "value": "Valeur"
+    }
+  },
+  "campaigns": {
+    "title": "Campagnes",
+    "description": "Gérez vos campagnes marketing et suivez leurs performances",
+    "newCampaign": "Nouvelle Campagne",
+    "searchPlaceholder": "Rechercher une campagne...",
+    "refresh": "Rafraîchir",
+    "loading": "Chargement des campagnes...",
+    "noCampaigns": "Aucune campagne",
+    "emptyDescription": "Créez votre première campagne depuis la page Patients en sélectionnant un groupe de patients ou en utilisant la recherche IA.",
+    "goToPatients": "Aller à la page Patients",
+    "allStatuses": "Tous les statuts",
+    "draft": "Brouillon",
+    "scheduled": "Programmée",
+    "sending": "En cours",
+    "sent": "Envoyée",
+    "completed": "Terminée",
+    "archived": "Archivée",
+    "duplicateSuccess": "Campagne dupliquée avec succès",
+    "duplicateError": "Erreur lors de la duplication",
+    "archiveSuccess": "Campagne archivée",
+    "archiveError": "Erreur lors de l'archivage"
+  },
+  "referralDetail": {
+    "title": "Détails du parrainage",
+    "notFound": "Parrainage introuvable",
+    "notFoundDesc": "Le parrainage que vous cherchez n'existe pas.",
+    "backToReferrals": "Retour aux parrainages",
+    "testData": "Données de test",
+    "created": "Créé",
+    "updated": "Modifié",
+    "referrer": "Référent",
+    "referredPerson": "Personne référée",
+    "code": "Code",
+    "company": "Entreprise",
+    "phone": "Téléphone",
+    "originType": "Type d'origine",
+    "lastAppointment": "Dernier rendez-vous",
+    "lifetimeSpending": "Dépenses totales",
+    "totalAcrossBookings": "Total sur toutes les réservations",
+    "viewReferrerDetails": "Voir les détails du référent",
+    "transactionTitle": "Transactions du parrainage",
+    "noTransactions": "Aucune transaction pour ce parrainage",
+    "deleteConfirmTitle": "Supprimer ce parrainage ?",
+    "deleteConfirmDesc": "Cette action supprimera définitivement ce parrainage ainsi que toutes les réservations et commissions associées. Cette action est irréversible.",
+    "deleting": "Suppression...",
+    "bookingDeleteTitle": "Confirmer la suppression",
+    "bookingDeleteDesc": "Êtes-vous sûr de vouloir supprimer cette réservation ? Cette action est irréversible et supprimera également les commissions associées.",
+    "table": {
+      "date": "Date",
+      "service": "Service",
+      "amountSpent": "Montant (dépensé)",
+      "rateApplied": "Taux appliqué",
+      "commission": "Commission",
+      "payoutBatch": "Lot de versement",
+      "batch": "Lot",
+      "first": "Premier",
+      "repeat": "Récurrent",
+      "total": "Total (ce parrainage)",
+      "footnote": "Montants affichés par réservation. Le résumé montre le total pour ce parrainage."
+    },
+    "editDialog": {
+      "title": "Modifier les informations du filleul",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "phone": "Téléphone",
+      "saving": "Enregistrement..."
+    },
+    "toast": {
+      "deleteSuccess": "Parrainage supprimé avec succès",
+      "deleteError": "Erreur lors de la suppression",
+      "bookingDeleteSuccess": "Réservation supprimée avec succès",
+      "bookingDeleteError": "Erreur lors de la suppression de la réservation",
+      "updateSuccess": "Informations mises à jour",
+      "updateError": "Erreur lors de la mise à jour",
+      "noPatientError": "Impossible de modifier : pas de patient associé",
+      "duplicatePhone": "Ce numéro de téléphone est déjà utilisé par un autre patient",
+      "duplicateEmail": "Cette adresse email est déjà utilisée par un autre patient",
+      "duplicateValue": "Cette valeur existe déjà dans la base de données"
+    }
+  },
   "payoutDetail": {
     "title": "Détail du Versement",
     "batch": "lot",
@@ -382,6 +660,11 @@
     "noReferrers": "Aucun référent trouvé",
     "exportSuccess": "Export terminé avec succès",
     "exportError": "Erreur lors de l'export"
+  },
+  "notFound": {
+    "title": "404",
+    "description": "Cette page n'existe pas.",
+    "backHome": "Retour au tableau de bord"
   },
   "status": {
     "referral": {

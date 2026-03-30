@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { StudioLayout } from '@/shared/components/StudioLayout'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
@@ -20,6 +21,7 @@ const PrizesPage = lazy(() => import('@/modules/admin/pages/PrizesPage'))
 const ReferrerDetailPage = lazy(() => import('@/modules/admin/pages/ReferrerDetailPage'))
 const PayoutDetailPage = lazy(() => import('@/modules/admin/pages/PayoutDetailPage'))
 const ReferralsPage = lazy(() => import('@/modules/admin/pages/ReferralsPage'))
+const ReferralDetailPage = lazy(() => import('@/modules/admin/pages/ReferralDetailPage'))
 
 // CRM pages
 const CRMDashboard = lazy(() => import('@/modules/crm/pages/CRMDashboard'))
@@ -49,16 +51,17 @@ function PageLoader() {
 }
 
 function NotFound() {
+  const { t } = useTranslation()
   return (
     <div className="flex min-h-[60vh] items-center justify-center p-8">
       <div className="max-w-md text-center">
-        <h1 className="text-6xl font-bold text-foreground mb-2">404</h1>
-        <p className="text-lg text-muted-foreground mb-6">This page doesn't exist.</p>
+        <h1 className="text-6xl font-bold text-foreground mb-2">{t('notFound.title')}</h1>
+        <p className="text-lg text-muted-foreground mb-6">{t('notFound.description')}</p>
         <Link
           to="/"
           className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
-          Back to Dashboard
+          {t('notFound.backHome')}
         </Link>
       </div>
     </div>
@@ -164,6 +167,14 @@ export default function App() {
                   element={
                     <ProtectedRoute requireAdmin>
                       <ReferralsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/referrals/:id"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <ReferralDetailPage />
                     </ProtectedRoute>
                   }
                 />
