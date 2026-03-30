@@ -235,6 +235,17 @@
     "reminderSuccess": "Reminder sent successfully",
     "reminderError": "Failed to send reminder"
   },
+  "payoutDetail": {
+    "csvHeaders": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "bank": "Bank",
+      "bankAddress": "Bank Address",
+      "iban": "IBAN",
+      "amount": "Amount (CHF)"
+    }
+  },
   "lapoCash": {
     "pageTitle": "Gift LAPO Cash",
     "pageDescription": "Manage LAPO Cash wallets, transactions, and conversion rates",
@@ -352,6 +363,133 @@
       "activePrizes": "Active Prizes",
       "lapoCashSpent": "LAPO Cash Spent"
     }
+  },
+  "pipeline": {
+    "description": "Track your patients from first contact to completed treatment.",
+    "noPatients": "No patients",
+    "dragHere": "Drag a patient here",
+    "noEmail": "No email",
+    "addToPipeline": "Add to Pipeline"
+  },
+  "appointments": {
+    "description": "Appointment calendar secured from the database."
+  },
+  "communications": {
+    "sendMessage": "Send a message",
+    "messageCount": "{{count}} message",
+    "messageCount_plural": "{{count}} messages",
+    "displayOf": "{{displayed}} of {{total}} messages",
+    "loadMore": "Load more ({{remaining}} remaining)",
+    "noCommunications": "No communications",
+    "noResultsFilters": "No results for these filters.",
+    "emptyDescription": "Start communicating with your patients by sending your first message.",
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "analytics": {
+    "title": "Reports & Analytics",
+    "description": "Overview of your clinic's performance",
+    "export": "Export",
+    "vsPreviousPeriod": "vs previous period",
+    "dateRanges": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 3 months",
+      "12m": "Last 12 months",
+      "ytd": "Year to date"
+    },
+    "tabs": {
+      "performance": "Performance",
+      "demographics": "Demographics",
+      "attribution": "Attribution",
+      "satisfaction": "Satisfaction",
+      "revenue": "Forecasts",
+      "predictions": "AI Risks",
+      "roi": "Ad ROI",
+      "custom": "Reports"
+    },
+    "metrics": {
+      "revenue": "Revenue",
+      "newPatients": "New Patients",
+      "appointments": "Appointments",
+      "conversionRate": "Conversion Rate",
+      "completedPerTotal": "Completed / total",
+      "totalPatients": "Total Patients",
+      "percentFemale": "% Female",
+      "avgAge": "Average Age",
+      "years": "years",
+      "topCity": "Top City"
+    },
+    "charts": {
+      "revenueEvolution": "Revenue Evolution",
+      "treatmentBreakdown": "Treatment Breakdown",
+      "staffPerformance": "Staff Performance",
+      "emailEffectiveness": "Email Effectiveness",
+      "referralAnalysis": "Referral Analysis",
+      "noShowCancellations": "No-Shows & Cancellations",
+      "pipelineFunnel": "Pipeline Funnel",
+      "recallMetrics": "Recall Metrics",
+      "workflows": "Workflows",
+      "campaignPerformance": "Campaign Performance",
+      "genderDistribution": "Gender Distribution",
+      "ageGroups": "Age Groups",
+      "treatmentsByAge": "Treatments by Age",
+      "treatmentsByGender": "Treatments by Gender",
+      "geographicDistribution": "Geographic Distribution",
+      "patientGrowth": "Patient Growth",
+      "lifetimeValue": "Customer Lifetime Value (LTV)",
+      "retentionChurn": "Retention & Churn",
+      "firstTreatmentAnalysis": "First Treatment Analysis",
+      "dataQuality": "Data Quality",
+      "attributionSources": "Attribution & Sources",
+      "satisfactionNps": "Patient Satisfaction (NPS & CSAT)",
+      "revenueForecast": "Revenue Forecast",
+      "churnPrediction": "AI Predictions - Churn Risk",
+      "adRoi": "Ad ROI"
+    },
+    "descriptions": {
+      "attribution": "Track lead origins and measure ROI across acquisition channels (Google Ads, Meta, SEO, etc.)",
+      "satisfaction": "Monitor patient satisfaction and identify areas for improvement",
+      "forecast": "Projections based on pipeline and historical trends",
+      "churn": "Identify patients at risk of not returning with AI analysis",
+      "roi": "Measure return on investment from your ad campaigns"
+    },
+    "customReports": {
+      "title": "My Custom Reports",
+      "description": "Create and manage your own analyses",
+      "newReport": "New Report"
+    },
+    "exportHeaders": {
+      "metric": "Metric",
+      "value": "Value"
+    }
+  },
+  "campaigns": {
+    "title": "Campaigns",
+    "description": "Manage your marketing campaigns and track their performance",
+    "newCampaign": "New Campaign",
+    "searchPlaceholder": "Search campaigns...",
+    "refresh": "Refresh",
+    "loading": "Loading campaigns...",
+    "noCampaigns": "No campaigns",
+    "emptyDescription": "Create your first campaign from the Patients page by selecting a group of patients or using AI search.",
+    "goToPatients": "Go to Patients page",
+    "allStatuses": "All statuses",
+    "draft": "Draft",
+    "scheduled": "Scheduled",
+    "sending": "Sending",
+    "sent": "Sent",
+    "completed": "Completed",
+    "archived": "Archived",
+    "duplicateSuccess": "Campaign duplicated successfully",
+    "duplicateError": "Error duplicating campaign",
+    "archiveSuccess": "Campaign archived",
+    "archiveError": "Error archiving campaign"
+  },
+  "notFound": {
+    "title": "404",
+    "description": "This page doesn't exist.",
+    "backHome": "Back to Dashboard"
   },
   "status": {
     "referral": {

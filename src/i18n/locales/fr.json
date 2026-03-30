@@ -235,6 +235,17 @@
     "reminderSuccess": "Rappel envoyé avec succès",
     "reminderError": "Erreur lors de l'envoi du rappel"
   },
+  "payoutDetail": {
+    "csvHeaders": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "bank": "Banque",
+      "bankAddress": "Adresse banque",
+      "iban": "IBAN",
+      "amount": "Montant (CHF)"
+    }
+  },
   "lapoCash": {
     "pageTitle": "Offrir LAPO Cash",
     "pageDescription": "Gérez les portefeuilles LAPO Cash, transactions et taux de conversion",
@@ -352,6 +363,133 @@
       "activePrizes": "Prix Actifs",
       "lapoCashSpent": "LAPO Cash Dépensé"
     }
+  },
+  "pipeline": {
+    "description": "Suivez vos patients du premier contact jusqu'au traitement terminé.",
+    "noPatients": "Aucun patient",
+    "dragHere": "Glissez un patient ici",
+    "noEmail": "Pas d'email",
+    "addToPipeline": "Ajouter au pipeline"
+  },
+  "appointments": {
+    "description": "Calendrier des rendez-vous sécurisé depuis la base de données."
+  },
+  "communications": {
+    "sendMessage": "Envoyer un message",
+    "messageCount": "{{count}} message",
+    "messageCount_plural": "{{count}} messages",
+    "displayOf": "{{displayed}} sur {{total}} messages",
+    "loadMore": "Charger plus ({{remaining}} restants)",
+    "noCommunications": "Aucune communication",
+    "noResultsFilters": "Aucun résultat pour ces filtres.",
+    "emptyDescription": "Commencez à communiquer avec vos patients en envoyant votre premier message.",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier"
+  },
+  "analytics": {
+    "title": "Rapports & Analyses",
+    "description": "Vue d'ensemble de la performance de votre clinique",
+    "export": "Exporter",
+    "vsPreviousPeriod": "vs période précédente",
+    "dateRanges": {
+      "7d": "7 derniers jours",
+      "30d": "30 derniers jours",
+      "90d": "3 derniers mois",
+      "12m": "12 derniers mois",
+      "ytd": "Année en cours"
+    },
+    "tabs": {
+      "performance": "Performance",
+      "demographics": "Démographie",
+      "attribution": "Attribution",
+      "satisfaction": "Satisfaction",
+      "revenue": "Prévisions",
+      "predictions": "IA Risques",
+      "roi": "ROI Pubs",
+      "custom": "Rapports"
+    },
+    "metrics": {
+      "revenue": "Revenus",
+      "newPatients": "Nouveaux patients",
+      "appointments": "Rendez-vous",
+      "conversionRate": "Taux de conversion",
+      "completedPerTotal": "RDV terminés / total",
+      "totalPatients": "Total Patients",
+      "percentFemale": "% Femmes",
+      "avgAge": "Âge moyen",
+      "years": "ans",
+      "topCity": "Top ville"
+    },
+    "charts": {
+      "revenueEvolution": "Évolution des revenus",
+      "treatmentBreakdown": "Répartition par traitement",
+      "staffPerformance": "Performance Staff",
+      "emailEffectiveness": "Efficacité Emails",
+      "referralAnalysis": "Analyse Parrainages",
+      "noShowCancellations": "No-Shows & Annulations",
+      "pipelineFunnel": "Entonnoir Pipeline",
+      "recallMetrics": "Métriques Rappel",
+      "workflows": "Workflows",
+      "campaignPerformance": "Performance des campagnes",
+      "genderDistribution": "Répartition par genre",
+      "ageGroups": "Tranches d'âge",
+      "treatmentsByAge": "Traitements par âge",
+      "treatmentsByGender": "Traitements par genre",
+      "geographicDistribution": "Distribution géographique",
+      "patientGrowth": "Croissance patients",
+      "lifetimeValue": "Valeur vie client (LTV)",
+      "retentionChurn": "Rétention & Churn",
+      "firstTreatmentAnalysis": "Analyse premiers traitements",
+      "dataQuality": "Qualité des données",
+      "attributionSources": "Attribution & Sources",
+      "satisfactionNps": "Satisfaction Patients (NPS & CSAT)",
+      "revenueForecast": "Prévisions de revenus",
+      "churnPrediction": "Prédictions IA - Risque de perte",
+      "adRoi": "ROI Publicitaire"
+    },
+    "descriptions": {
+      "attribution": "Trackez la provenance de vos leads et mesurez le ROI de vos canaux d'acquisition (Google Ads, Meta, SEO, etc.)",
+      "satisfaction": "Suivez la satisfaction de vos patients et identifiez les axes d'amélioration",
+      "forecast": "Projections basées sur le pipeline et les tendances historiques",
+      "churn": "Identifiez les patients à risque de ne pas revenir grâce à l'analyse IA",
+      "roi": "Mesurez le retour sur investissement de vos campagnes publicitaires"
+    },
+    "customReports": {
+      "title": "Mes rapports personnalisés",
+      "description": "Créez et gérez vos propres analyses",
+      "newReport": "Nouveau rapport"
+    },
+    "exportHeaders": {
+      "metric": "Métrique",
+      "value": "Valeur"
+    }
+  },
+  "campaigns": {
+    "title": "Campagnes",
+    "description": "Gérez vos campagnes marketing et suivez leurs performances",
+    "newCampaign": "Nouvelle Campagne",
+    "searchPlaceholder": "Rechercher une campagne...",
+    "refresh": "Rafraîchir",
+    "loading": "Chargement des campagnes...",
+    "noCampaigns": "Aucune campagne",
+    "emptyDescription": "Créez votre première campagne depuis la page Patients en sélectionnant un groupe de patients ou en utilisant la recherche IA.",
+    "goToPatients": "Aller à la page Patients",
+    "allStatuses": "Tous les statuts",
+    "draft": "Brouillon",
+    "scheduled": "Programmée",
+    "sending": "En cours",
+    "sent": "Envoyée",
+    "completed": "Terminée",
+    "archived": "Archivée",
+    "duplicateSuccess": "Campagne dupliquée avec succès",
+    "duplicateError": "Erreur lors de la duplication",
+    "archiveSuccess": "Campagne archivée",
+    "archiveError": "Erreur lors de l'archivage"
+  },
+  "notFound": {
+    "title": "404",
+    "description": "Cette page n'existe pas.",
+    "backHome": "Retour au tableau de bord"
   },
   "status": {
     "referral": {

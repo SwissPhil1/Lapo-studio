@@ -11,6 +11,7 @@ import { CampaignMetrics } from '@/modules/crm/components/campaigns/CampaignMetr
 import { CampaignTable, type CampaignWithMetrics } from '@/modules/crm/components/campaigns/CampaignTable';
 import { CampaignDetailDialog } from '@/modules/crm/components/campaigns/CampaignDetailDialog';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export interface Campaign {
   id: string;
@@ -34,6 +35,7 @@ export interface Campaign {
 const CAMPAIGNS_PER_PAGE = 20;
 
 export default function Campaigns() {
+  const { t } = useTranslation(['campaigns', 'common']);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignWithMetrics | null>(null);
@@ -107,10 +109,10 @@ export default function Campaigns() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['crm-campaigns'] });
-      toast.success('Campagne dupliquée avec succès');
+      toast.success(t('campaigns:duplicateSuccess'));
     },
     onError: () => {
-      toast.error('Erreur lors de la duplication');
+      toast.error(t('campaigns:duplicateError'));
     }
   });
 
@@ -125,10 +127,10 @@ export default function Campaigns() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['crm-campaigns'] });
-      toast.success('Campagne archivée');
+      toast.success(t('campaigns:archiveSuccess'));
     },
     onError: () => {
-      toast.error('Erreur lors de l\'archivage');
+      toast.error(t('campaigns:archiveError'));
     }
   });
 
@@ -161,15 +163,15 @@ export default function Campaigns() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Campagnes</h1>
-            <p className="text-muted-foreground">Gérez vos campagnes marketing et suivez leurs performances</p>
+            <h1 className="text-2xl font-bold text-foreground">{t('campaigns:title')}</h1>
+            <p className="text-muted-foreground">{t('campaigns:description')}</p>
           </div>
-          <Button 
+          <Button
             onClick={() => navigate('/crm/patients')}
             className="gap-2"
           >
             <Plus className="h-4 w-4" />
-            Nouvelle Campagne
+            {t('campaigns:newCampaign')}
           </Button>
         </div>
 
@@ -181,7 +183,7 @@ export default function Campaigns() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Rechercher une campagne..."
+              placeholder={t('campaigns:searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -192,13 +194,13 @@ export default function Campaigns() {
               <SelectValue placeholder="Statut" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tous les statuts</SelectItem>
-              <SelectItem value="draft">Brouillon</SelectItem>
-              <SelectItem value="scheduled">Programmée</SelectItem>
-              <SelectItem value="sending">En cours</SelectItem>
-              <SelectItem value="sent">Envoyée</SelectItem>
-              <SelectItem value="completed">Terminée</SelectItem>
-              <SelectItem value="archived">Archivée</SelectItem>
+              <SelectItem value="all">{t('campaigns:allStatuses')}</SelectItem>
+              <SelectItem value="draft">{t('campaigns:draft')}</SelectItem>
+              <SelectItem value="scheduled">{t('campaigns:scheduled')}</SelectItem>
+              <SelectItem value="sending">{t('campaigns:sending')}</SelectItem>
+              <SelectItem value="sent">{t('campaigns:sent')}</SelectItem>
+              <SelectItem value="completed">{t('campaigns:completed')}</SelectItem>
+              <SelectItem value="archived">{t('campaigns:archived')}</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -206,7 +208,7 @@ export default function Campaigns() {
             size="icon"
             onClick={() => refetch()}
             disabled={isFetching}
-            title="Rafraîchir"
+            title={t('campaigns:refresh')}
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
@@ -218,7 +220,7 @@ export default function Campaigns() {
             <CardContent className="py-12">
               <div className="flex flex-col items-center justify-center gap-3">
                 <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
-                <p className="text-muted-foreground">Chargement des campagnes...</p>
+                <p className="text-muted-foreground">{t('campaigns:loading')}</p>
               </div>
             </CardContent>
           </Card>
@@ -227,16 +229,16 @@ export default function Campaigns() {
             <CardContent className="py-12">
               <div className="flex flex-col items-center justify-center gap-3">
                 <Megaphone className="h-12 w-12 text-muted-foreground/50" />
-                <p className="text-lg font-medium text-foreground">Aucune campagne</p>
+                <p className="text-lg font-medium text-foreground">{t('campaigns:noCampaigns')}</p>
                 <p className="text-muted-foreground text-center max-w-md">
-                  Créez votre première campagne depuis la page Patients en sélectionnant un groupe de patients ou en utilisant la recherche IA.
+                  {t('campaigns:emptyDescription')}
                 </p>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => navigate('/crm/patients')}
                   className="mt-2"
                 >
-                  Aller à la page Patients
+                  {t('campaigns:goToPatients')}
                 </Button>
               </div>
             </CardContent>

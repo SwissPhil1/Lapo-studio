@@ -11,40 +11,40 @@ import { CommunicationMetrics } from '@/modules/crm/components/communications/Co
 import { CommunicationFilters } from '@/modules/crm/components/communications/CommunicationFilters';
 import type { CommunicationLog, ChannelFilter, StatusFilter, DirectionFilter, PeriodFilter } from '@/shared/types/communications';
 import { useDebounce } from '@/shared/hooks/useDebounce';
+import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 50;
 
-function groupCommunicationsByDate(communications: CommunicationLog[]) {
+function groupCommunicationsByDate(communications: CommunicationLog[], todayLabel: string, yesterdayLabel: string) {
   const groups: Record<string, CommunicationLog[]> = {};
-  
+
   communications.forEach(comm => {
     const date = new Date(comm.sent_at);
     let groupKey: string;
-    
+
     if (isToday(date)) {
-      groupKey = "Aujourd'hui";
+      groupKey = todayLabel;
     } else if (isYesterday(date)) {
-      groupKey = 'Hier';
+      groupKey = yesterdayLabel;
     } else if (isThisWeek(date)) {
-      // Show day name for this week
       groupKey = format(date, 'EEEE d MMMM', { locale: fr });
-      // Capitalize first letter
       groupKey = groupKey.charAt(0).toUpperCase() + groupKey.slice(1);
     } else {
       groupKey = format(date, 'MMMM yyyy', { locale: fr });
       groupKey = groupKey.charAt(0).toUpperCase() + groupKey.slice(1);
     }
-    
+
     if (!groups[groupKey]) {
       groups[groupKey] = [];
     }
     groups[groupKey].push(comm);
   });
-  
+
   return groups;
 }
 
 export default function Communications() {
+  const { t } = useTranslation(['communications', 'common']);
   const [channelFilter, setChannelFilter] = useState<ChannelFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
@@ -142,7 +142,7 @@ export default function Communications() {
 
   const displayedCommunications = communications;
   const hasMore = communications.length >= displayCount && communications.length < totalCount;
-  const groupedCommunications = groupCommunicationsByDate(displayedCommunications);
+  const groupedCommunications = groupCommunicationsByDate(displayedCommunications, t('communications:today'), t('communications:yesterday'));
 
   const handleLoadMore = () => {
     setDisplayCount(prev => prev + ITEMS_PER_PAGE);
@@ -184,16 +184,16 @@ export default function Communications() {
 
         <Button onClick={() => setSendDialogOpen(true)} className="gap-2 shrink-0">
           <Plus className="h-4 w-4" />
-          Envoyer un message
+          {t('communications:sendMessage')}
         </Button>
       </div>
 
       {/* Count indicator */}
       {totalCount > 0 && (
         <p className="text-sm text-muted-foreground">
-          {displayCount >= totalCount 
-            ? `${totalCount} message${totalCount > 1 ? 's' : ''}`
-            : `${displayCount} sur ${totalCount} messages`
+          {displayCount >= totalCount
+            ? t('communications:messageCount', { count: totalCount })
+            : t('communications:displayOf', { displayed: displayCount, total: totalCount })
           }
         </p>
       )}
@@ -222,7 +222,7 @@ export default function Communications() {
           {hasMore && (
             <div className="flex justify-center pt-4">
               <Button variant="outline" onClick={handleLoadMore}>
-                Charger plus ({communications.length - displayCount} restants)
+                {t('communications:loadMore', { remaining: communications.length - displayCount })}
               </Button>
             </div>
           )}
@@ -232,16 +232,16 @@ export default function Communications() {
           <div className="h-16 w-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
             <MessageSquare className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">Aucune communication</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">{t('communications:noCommunications')}</h3>
           <p className="text-muted-foreground mb-6">
             {searchQuery || channelFilter !== 'all' || statusFilter !== 'all' || directionFilter !== 'all' || periodFilter !== 'all'
-              ? 'Aucun résultat pour ces filtres.'
-              : 'Commencez à communiquer avec vos patients en envoyant votre premier message.'
+              ? t('communications:noResultsFilters')
+              : t('communications:emptyDescription')
             }
           </p>
           <Button onClick={() => setSendDialogOpen(true)} className="gap-2">
             <Plus className="h-4 w-4" />
-            Envoyer un message
+            {t('communications:sendMessage')}
           </Button>
         </div>
       )}
