@@ -283,10 +283,10 @@ export default function ReferralDetailPage() {
         referrer_id: referralData.referrer_id,
         referrer_code: referrerData?.referrer_code || '—',
         referrer_email: referrerData?.email || '—',
-        referrer_name: referrerData?.patients
-          ? `${referrerData.patients.first_name} ${referrerData.patients.last_name}`
+        referrer_name: (referrerData?.patients as any)
+          ? `${(referrerData?.patients as any).first_name} ${(referrerData?.patients as any).last_name}`
           : null,
-        referrer_company: referrerData?.companies?.name || null,
+        referrer_company: (referrerData?.companies as any)?.name || null,
         referred_patient_id: referralData.referred_patient_id,
         referred_profile_id: referralData.referred_profile_id,
         referred_name,
