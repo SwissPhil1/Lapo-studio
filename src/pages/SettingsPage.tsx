@@ -44,7 +44,7 @@ export default function SettingsPage() {
             className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm text-foreground hover:bg-accent"
           >
             <Globe className="h-4 w-4" />
-            {i18n.language === 'en' ? 'Switch to French' : 'Passer en anglais'}
+            {t('common.switchLanguage')}
           </button>
         </div>
       </div>

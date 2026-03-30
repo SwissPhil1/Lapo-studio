@@ -73,6 +73,7 @@
     "email": "Email",
     "role": "Role",
     "language": "Language",
+    "switchLanguage": "Switch to French",
     "all": "All",
     "status": "Status",
     "emptyState": {

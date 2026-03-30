@@ -73,6 +73,7 @@
     "email": "Courriel",
     "role": "Rôle",
     "language": "Langue",
+    "switchLanguage": "Passer en anglais",
     "all": "Tous",
     "status": "Statut",
     "emptyState": {
