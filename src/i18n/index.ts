@@ -34,6 +34,7 @@ i18n.use(initReactI18next).init({
       calendar: (en as any).calendar,
       tasks: (en as any).tasks,
       segments: (en as any).segments,
+      notifications: (en as any).notifications,
     },
     fr: {
       translation: fr,
@@ -64,6 +65,7 @@ i18n.use(initReactI18next).init({
       calendar: (fr as any).calendar,
       tasks: (fr as any).tasks,
       segments: (fr as any).segments,
+      notifications: (fr as any).notifications,
     },
   },
   lng: localStorage.getItem('lapo-lang') ?? 'en',

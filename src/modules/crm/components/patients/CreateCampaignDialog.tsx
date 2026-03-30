@@ -59,6 +59,7 @@ export function CreateCampaignDialog({
   const [sendOption, setSendOption] = useState<'now' | 'later'>('now');
   const [scheduledDate, setScheduledDate] = useState('');
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -195,26 +196,36 @@ export function CreateCampaignDialog({
     setCustomMessage('');
     setSendOption('now');
     setScheduledDate('');
+    setErrors({});
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const newErrors: Record<string, string> = {};
+
     if (!name.trim()) {
-      toast({ title: t('common:error'), description: t('campaigns:nameCampaignRequired'), variant: 'destructive' });
-      return;
+      newErrors.name = t('campaigns:nameCampaignRequired');
     }
 
-    if (templateId === 'custom' && (!customSubject.trim() || !customMessage.trim())) {
-      toast({ title: t('common:error'), description: t('campaigns:subjectMessageRequired'), variant: 'destructive' });
-      return;
+    if (templateId === 'custom' && !customSubject.trim()) {
+      newErrors.subject = t('campaigns:subjectMessageRequired');
+    }
+
+    if (templateId === 'custom' && !customMessage.trim()) {
+      newErrors.message = t('campaigns:subjectMessageRequired');
     }
 
     if (sendOption === 'later' && !scheduledDate) {
-      toast({ title: t('common:error'), description: t('campaigns:dateRequired'), variant: 'destructive' });
+      newErrors.scheduledDate = t('campaigns:dateRequired');
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
+    setErrors({});
     createCampaignMutation.mutate();
   };
 
@@ -242,9 +253,10 @@ export function CreateCampaignDialog({
               id="campaign-name"
               placeholder={t('campaigns:campaignNamePlaceholder')}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.name; return n; }); }}
               autoFocus
             />
+            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
           </div>
 
           {/* Channel Selection */}
@@ -320,8 +332,9 @@ export function CreateCampaignDialog({
                       id="subject"
                       placeholder={t('campaigns:subjectPlaceholder')}
                       value={customSubject}
-                      onChange={(e) => setCustomSubject(e.target.value)}
+                      onChange={(e) => { setCustomSubject(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.subject; return n; }); }}
                     />
+                    {errors.subject && <p className="text-xs text-destructive mt-1">{errors.subject}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="message">{t('campaigns:message')}</Label>
@@ -329,9 +342,10 @@ export function CreateCampaignDialog({
                       id="message"
                       placeholder={t('campaigns:messagePlaceholder')}
                       value={customMessage}
-                      onChange={(e) => setCustomMessage(e.target.value)}
+                      onChange={(e) => { setCustomMessage(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.message; return n; }); }}
                       rows={5}
                     />
+                    {errors.message && <p className="text-xs text-destructive mt-1">{errors.message}</p>}
                     <p className="text-xs text-muted-foreground">
                       {t('campaigns:availableTags')}
                     </p>
@@ -416,9 +430,10 @@ export function CreateCampaignDialog({
                 id="schedule-date"
                 type="datetime-local"
                 value={scheduledDate}
-                onChange={(e) => setScheduledDate(e.target.value)}
+                onChange={(e) => { setScheduledDate(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.scheduledDate; return n; }); }}
                 min={new Date().toISOString().slice(0, 16)}
               />
+              {errors.scheduledDate && <p className="text-xs text-destructive mt-1">{errors.scheduledDate}</p>}
             </div>
           )}
 

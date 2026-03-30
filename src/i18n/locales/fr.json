@@ -669,8 +669,13 @@
       "revenue": "Prévisions",
       "predictions": "IA Risques",
       "roi": "ROI Pubs",
+      "cohort": "Cohortes",
       "custom": "Rapports"
     },
+    "cohortAnalysis": "Analyse de cohortes",
+    "cohortMonth": "Mois",
+    "cohortRetention": "Rétention",
+    "cohortNewPatients": "Nouveaux patients",
     "metrics": {
       "revenue": "Revenus",
       "newPatients": "Nouveaux patients",
@@ -715,7 +720,8 @@
       "satisfaction": "Suivez la satisfaction de vos patients et identifiez les axes d'amélioration",
       "forecast": "Projections basées sur le pipeline et les tendances historiques",
       "churn": "Identifiez les patients à risque de ne pas revenir grâce à l'analyse IA",
-      "roi": "Mesurez le retour sur investissement de vos campagnes publicitaires"
+      "roi": "Mesurez le retour sur investissement de vos campagnes publicitaires",
+      "cohort": "Suivez la rétention des patients par mois d'acquisition"
     },
     "customReports": {
       "title": "Mes rapports personnalisés",
@@ -1623,7 +1629,8 @@
     "activitySms": "SMS",
     "activityCalls": "Appels",
     "activityTasks": "Tâches",
-    "activityTask": "Tâche"
+    "activityTask": "Tâche",
+    "vsLastPeriod": "vs période précédente"
   },
   "segments": {
     "saved": "Segment sauvegardé",
@@ -1723,5 +1730,13 @@
     "workflowCancelled": "Workflow annulé",
     "statusUpdated": "Statut mis à jour",
     "updateError": "Erreur lors de la mise à jour"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "empty": "Aucune notification",
+    "patientMovedStage": "Patient déplacé vers une nouvelle étape",
+    "patientAddedPipeline": "Patient ajouté au pipeline",
+    "newAppointmentBooked": "Nouveau rendez-vous réservé"
   }
 }

@@ -123,6 +123,20 @@ export default function PatientDetail() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // Inline editing state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    phone: '',
+    date_of_birth: '',
+    address_line_1: '',
+    city: '',
+    postal_code: '',
+  });
+  const [editErrors, setEditErrors] = useState<Record<string, string>>({});
+
   // UI State
   const [addNoteOpen, setAddNoteOpen] = useState(false);
   const [editNoteOpen, setEditNoteOpen] = useState(false);
@@ -164,6 +178,72 @@ export default function PatientDetail() {
       setUpdatingBookingId(null);
     },
   });
+
+  // Patient inline edit mutation
+  const updatePatientMutation = useMutation({
+    mutationFn: async (updates: typeof editForm) => {
+      if (!id) throw new Error('No patient ID');
+      const { error } = await supabase
+        .from('patients')
+        .update({
+          first_name: updates.first_name,
+          last_name: updates.last_name,
+          email: updates.email || null,
+          phone: updates.phone || null,
+          date_of_birth: updates.date_of_birth || null,
+          address_line_1: updates.address_line_1 || null,
+          city: updates.city || null,
+          postal_code: updates.postal_code || null,
+        })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: t('patientDetail:toast.success'), description: t('patientDetail:toast.patientUpdated', { defaultValue: 'Patient updated successfully.' }) });
+      queryClient.invalidateQueries({ queryKey: ['patient-detail', id] });
+      setIsEditing(false);
+      setEditErrors({});
+    },
+    onError: (error: Error) => {
+      toast({ title: t('patientDetail:toast.error'), description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const startEditing = () => {
+    if (!data) return;
+    const p = data.patient;
+    setEditForm({
+      first_name: p.first_name || '',
+      last_name: p.last_name || '',
+      email: p.email || '',
+      phone: p.phone || '',
+      date_of_birth: p.date_of_birth || '',
+      address_line_1: p.address_line_1 || '',
+      city: p.city || '',
+      postal_code: p.postal_code || '',
+    });
+    setEditErrors({});
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    setEditErrors({});
+  };
+
+  const handleSaveEdit = () => {
+    const errors: Record<string, string> = {};
+    if (!editForm.first_name.trim()) errors.first_name = t('patientDetail:validation.firstNameRequired', { defaultValue: 'First name is required' });
+    if (!editForm.last_name.trim()) errors.last_name = t('patientDetail:validation.lastNameRequired', { defaultValue: 'Last name is required' });
+    if (editForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.email)) {
+      errors.email = t('patientDetail:validation.emailInvalid', { defaultValue: 'Invalid email format' });
+    }
+    if (Object.keys(errors).length > 0) {
+      setEditErrors(errors);
+      return;
+    }
+    updatePatientMutation.mutate(editForm);
+  };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['patient-detail', id],
@@ -303,7 +383,7 @@ export default function PatientDetail() {
   };
 
   if (isLoading) {
-    return (<div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>);
+    return (<div className="flex h-64 items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>);
   }
 
   if (error || !data) {
@@ -395,19 +475,100 @@ export default function PatientDetail() {
               {patient.first_name.charAt(0)}{patient.last_name.charAt(0)}
             </span>
           </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl font-bold text-foreground">
-                {patient.first_name} {patient.last_name}
-              </h1>
-              {recallStatus && <RecallStatusBadge status={recallStatus} />}
-            </div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
-              {patient.email && (<span className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" />{patient.email}</span>)}
-              {patient.phone && (<span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" />{patient.phone}</span>)}
-              {patient.date_of_birth && (<span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{format(parseISO(patient.date_of_birth), 'd MMM yyyy', { locale: dateLocale })}</span>)}
-              {hasAddress && (<span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{addressParts.join(', ')}</span>)}
-            </div>
+          <div className="min-w-0 flex-1">
+            {isEditing ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Input
+                      value={editForm.first_name}
+                      onChange={(e) => { setEditForm({ ...editForm, first_name: e.target.value }); setEditErrors(prev => { const n = { ...prev }; delete n.first_name; return n; }); }}
+                      placeholder={t('patientDetail:edit.firstName', { defaultValue: 'First name' })}
+                    />
+                    {editErrors.first_name && <p className="text-xs text-destructive mt-1">{editErrors.first_name}</p>}
+                  </div>
+                  <div>
+                    <Input
+                      value={editForm.last_name}
+                      onChange={(e) => { setEditForm({ ...editForm, last_name: e.target.value }); setEditErrors(prev => { const n = { ...prev }; delete n.last_name; return n; }); }}
+                      placeholder={t('patientDetail:edit.lastName', { defaultValue: 'Last name' })}
+                    />
+                    {editErrors.last_name && <p className="text-xs text-destructive mt-1">{editErrors.last_name}</p>}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Input
+                      value={editForm.email}
+                      onChange={(e) => { setEditForm({ ...editForm, email: e.target.value }); setEditErrors(prev => { const n = { ...prev }; delete n.email; return n; }); }}
+                      placeholder={t('patientDetail:edit.email', { defaultValue: 'Email' })}
+                      type="email"
+                    />
+                    {editErrors.email && <p className="text-xs text-destructive mt-1">{editErrors.email}</p>}
+                  </div>
+                  <div>
+                    <Input
+                      value={editForm.phone}
+                      onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                      placeholder={t('patientDetail:edit.phone', { defaultValue: 'Phone' })}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <Input
+                    value={editForm.date_of_birth}
+                    onChange={(e) => setEditForm({ ...editForm, date_of_birth: e.target.value })}
+                    type="date"
+                    placeholder={t('patientDetail:edit.dob', { defaultValue: 'Date of birth' })}
+                  />
+                  <Input
+                    value={editForm.address_line_1}
+                    onChange={(e) => setEditForm({ ...editForm, address_line_1: e.target.value })}
+                    placeholder={t('patientDetail:edit.address', { defaultValue: 'Address' })}
+                  />
+                  <div className="flex gap-2">
+                    <Input
+                      value={editForm.postal_code}
+                      onChange={(e) => setEditForm({ ...editForm, postal_code: e.target.value })}
+                      placeholder={t('patientDetail:edit.postalCode', { defaultValue: 'Postal code' })}
+                      className="w-24"
+                    />
+                    <Input
+                      value={editForm.city}
+                      onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                      placeholder={t('patientDetail:edit.city', { defaultValue: 'City' })}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" onClick={handleSaveEdit} disabled={updatePatientMutation.isPending}>
+                    {updatePatientMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Check className="h-4 w-4 mr-1" />}
+                    {t('common:save')}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={cancelEditing} disabled={updatePatientMutation.isPending}>
+                    <X className="h-4 w-4 mr-1" />{t('common:cancel')}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-xl font-bold text-foreground">
+                    {patient.first_name} {patient.last_name}
+                  </h1>
+                  {recallStatus && <RecallStatusBadge status={recallStatus} />}
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 ml-1" onClick={startEditing} title={t('common:edit', { defaultValue: 'Edit' })}>
+                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
+                  {patient.email && (<span className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" />{patient.email}</span>)}
+                  {patient.phone && (<span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" />{patient.phone}</span>)}
+                  {patient.date_of_birth && (<span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{format(parseISO(patient.date_of_birth), 'd MMM yyyy', { locale: dateLocale })}</span>)}
+                  {hasAddress && (<span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{addressParts.join(', ')}</span>)}
+                </div>
+              </>
+            )}
           </div>
         </div>
 

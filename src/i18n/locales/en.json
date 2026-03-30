@@ -669,8 +669,13 @@
       "revenue": "Forecasts",
       "predictions": "AI Risks",
       "roi": "Ad ROI",
+      "cohort": "Cohort",
       "custom": "Reports"
     },
+    "cohortAnalysis": "Cohort Analysis",
+    "cohortMonth": "Month",
+    "cohortRetention": "Retention",
+    "cohortNewPatients": "New patients",
     "metrics": {
       "revenue": "Revenue",
       "newPatients": "New Patients",
@@ -715,7 +720,8 @@
       "satisfaction": "Monitor patient satisfaction and identify areas for improvement",
       "forecast": "Projections based on pipeline and historical trends",
       "churn": "Identify patients at risk of not returning with AI analysis",
-      "roi": "Measure return on investment from your ad campaigns"
+      "roi": "Measure return on investment from your ad campaigns",
+      "cohort": "Track patient retention by acquisition month"
     },
     "customReports": {
       "title": "My Custom Reports",
@@ -1623,7 +1629,8 @@
     "activitySms": "SMS",
     "activityCalls": "Calls",
     "activityTasks": "Tasks",
-    "activityTask": "Task"
+    "activityTask": "Task",
+    "vsLastPeriod": "vs last period"
   },
   "segments": {
     "saved": "Segment saved",
@@ -1723,5 +1730,13 @@
     "workflowCancelled": "Workflow cancelled",
     "statusUpdated": "Status updated",
     "updateError": "Error updating"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications yet",
+    "patientMovedStage": "Patient moved to a new stage",
+    "patientAddedPipeline": "Patient added to pipeline",
+    "newAppointmentBooked": "New appointment booked"
   }
 }

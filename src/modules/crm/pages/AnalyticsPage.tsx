@@ -38,6 +38,7 @@ const SatisfactionAnalytics = lazy(() => import('@/modules/crm/components/analyt
 const RevenueForecast = lazy(() => import('@/modules/crm/components/analytics/RevenueForecast').then(m => ({ default: m.RevenueForecast })));
 const ChurnPrediction = lazy(() => import('@/modules/crm/components/analytics/ChurnPrediction').then(m => ({ default: m.ChurnPrediction })));
 const ROICalculator = lazy(() => import('@/modules/crm/components/analytics/ROICalculator').then(m => ({ default: m.ROICalculator })));
+const CohortAnalysis = lazy(() => import('@/modules/crm/components/analytics/CohortAnalysis').then(m => ({ default: m.CohortAnalysis })));
 
 function ChartLoader() {
   return (
@@ -292,9 +293,10 @@ export default function Analytics() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-4xl grid-cols-8">
+        <TabsList className="grid w-full max-w-5xl grid-cols-9">
           <TabsTrigger value="performance">{t('analytics:tabs.performance')}</TabsTrigger>
           <TabsTrigger value="demographics">{t('analytics:tabs.demographics')}</TabsTrigger>
+          <TabsTrigger value="cohort">{t('analytics:tabs.cohort', { defaultValue: 'Cohort' })}</TabsTrigger>
           <TabsTrigger value="attribution">{t('analytics:tabs.attribution')}</TabsTrigger>
           <TabsTrigger value="satisfaction">{t('analytics:tabs.satisfaction')}</TabsTrigger>
           <TabsTrigger value="revenue">{t('analytics:tabs.revenue')}</TabsTrigger>
@@ -431,6 +433,21 @@ export default function Analytics() {
               <h3 className="text-lg font-semibold text-foreground mb-4">{t('analytics:charts.dataQuality')}</h3>
               <DatabaseHealthMetrics />
             </div>
+          </div>
+          </Suspense>
+        </TabsContent>
+
+        {/* Cohort Tab */}
+        <TabsContent value="cohort" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
+          <div className="card-elevated p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
+              {t('analytics:cohortAnalysis', { defaultValue: 'Cohort Analysis' })}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              {t('analytics:cohortRetention', { defaultValue: 'Retention' })} - {t('analytics:descriptions.cohort', { defaultValue: 'Track patient retention by acquisition month' })}
+            </p>
+            <CohortAnalysis />
           </div>
           </Suspense>
         </TabsContent>

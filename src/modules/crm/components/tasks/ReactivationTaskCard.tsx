@@ -9,7 +9,8 @@ import {
   User,
   AlertTriangle,
   Moon,
-  XCircle
+  XCircle,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -246,7 +247,7 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
               {t('common:cancel')}
             </Button>
             <Button onClick={handleComplete} disabled={completeTask.isPending}>
-              {completeTask.isPending ? t('tasks:processing') : t('tasks:complete')}
+              {completeTask.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-1.5" />{t('tasks:complete')}</> : t('tasks:complete')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -315,7 +316,7 @@ export const ReactivationTaskCard = forwardRef<HTMLDivElement, ReactivationTaskC
               {t('common:cancel')}
             </Button>
             <Button onClick={handleLogAttempt} disabled={logAttempt.isPending || snoozeTask.isPending}>
-              {(logAttempt.isPending || snoozeTask.isPending) ? t('tasks:processing') : t('tasks:save')}
+              {(logAttempt.isPending || snoozeTask.isPending) ? <><Loader2 className="h-4 w-4 animate-spin mr-1.5" />{t('tasks:save')}</> : t('tasks:save')}
             </Button>
           </DialogFooter>
         </DialogContent>

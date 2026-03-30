@@ -5,7 +5,11 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-export function UserMenu() {
+interface UserMenuProps {
+  collapsed?: boolean
+}
+
+export function UserMenu({ collapsed }: UserMenuProps) {
   const { user, signOut, role } = useAuth()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -51,12 +55,14 @@ export function UserMenu() {
             initials
           )}
         </div>
-        <div className="flex-1 text-left">
-          <p className="text-sm font-medium text-foreground truncate">
-            {user.full_name}
-          </p>
-          <p className="text-xs text-muted-foreground capitalize">{role}</p>
-        </div>
+        {!collapsed && (
+          <div className="flex-1 text-left">
+            <p className="text-sm font-medium text-foreground truncate">
+              {user.full_name}
+            </p>
+            <p className="text-xs text-muted-foreground capitalize">{role}</p>
+          </div>
+        )}
       </button>
 
       {open && (

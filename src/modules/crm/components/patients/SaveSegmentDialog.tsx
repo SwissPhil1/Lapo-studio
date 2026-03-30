@@ -36,6 +36,7 @@ export function SaveSegmentDialog({
   const { t } = useTranslation(['segments', 'common']);
   const [name, setName] = useState('');
   const [type, setType] = useState<'static' | 'dynamic'>(aiQuery ? 'dynamic' : 'static');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   const saveMutation = useMutation({
@@ -65,6 +66,7 @@ export function SaveSegmentDialog({
         description: t('segments:savedDescription', { name }),
       });
       setName('');
+      setErrors({});
       onOpenChange(false);
       onSuccess?.();
     },
@@ -80,13 +82,10 @@ export function SaveSegmentDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      toast({
-        title: t('common:error'),
-        description: t('segments:nameRequired'),
-        variant: 'destructive',
-      });
+      setErrors({ name: t('segments:nameRequired') });
       return;
     }
+    setErrors({});
     saveMutation.mutate();
   };
 
@@ -110,9 +109,10 @@ export function SaveSegmentDialog({
               id="segment-name"
               placeholder={t('segments:segmentNamePlaceholder')}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.name; return n; }); }}
               autoFocus
             />
+            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
           </div>
 
           {aiQuery && (

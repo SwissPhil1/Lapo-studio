@@ -47,6 +47,7 @@ export function BulkEmailDialog({
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('custom');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Fetch patient details for selected IDs
   const { data: patients = [], isLoading: isLoadingPatients } = useQuery({
@@ -157,6 +158,7 @@ export function BulkEmailDialog({
     setSelectedTemplateId('custom');
     setSubject('');
     setMessage('');
+    setErrors({});
     onOpenChange(false);
   };
 
@@ -239,9 +241,10 @@ export function BulkEmailDialog({
             <Label>{t('patients:subject')}</Label>
             <Input
               value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              onChange={(e) => { setSubject(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.subject; return n; }); }}
               placeholder={t('patients:subjectPlaceholder')}
             />
+            {errors.subject && <p className="text-xs text-destructive mt-1">{errors.subject}</p>}
           </div>
 
           {/* Message content */}
@@ -249,10 +252,11 @@ export function BulkEmailDialog({
             <Label>{t('patients:message')}</Label>
             <Textarea
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => { setMessage(e.target.value); setErrors(prev => { const n = { ...prev }; delete n.message; return n; }); }}
               placeholder={t('patients:messagePlaceholder')}
               rows={6}
             />
+            {errors.message && <p className="text-xs text-destructive mt-1">{errors.message}</p>}
           </div>
         </div>
 
@@ -261,8 +265,18 @@ export function BulkEmailDialog({
             {t('common:cancel')}
           </Button>
           <Button
-            onClick={() => sendMutation.mutate()}
-            disabled={patientsWithEmail.length === 0 || !message.trim() || !subject.trim() || sendMutation.isPending}
+            onClick={() => {
+              const newErrors: Record<string, string> = {};
+              if (!subject.trim()) newErrors.subject = t('patients:bulkEmailNoSubject');
+              if (!message.trim()) newErrors.message = t('patients:bulkEmailNoMessage');
+              if (Object.keys(newErrors).length > 0) {
+                setErrors(newErrors);
+                return;
+              }
+              setErrors({});
+              sendMutation.mutate();
+            }}
+            disabled={patientsWithEmail.length === 0 || sendMutation.isPending}
           >
             {sendMutation.isPending ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t('patients:sending')}</>

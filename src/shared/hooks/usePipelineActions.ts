@@ -31,13 +31,36 @@ export function usePipelineActions() {
 
       if (error) throw error;
     },
+    onMutate: async ({ pipelinePatientId, newStageId }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['pipeline-patients'] });
+
+      // Snapshot previous value
+      const previousData = queryClient.getQueryData(['pipeline-patients']);
+
+      // Optimistically update
+      queryClient.setQueryData(['pipeline-patients'], (old: any) => {
+        if (!old) return old;
+        return old.map((p: any) =>
+          p.id === pipelinePatientId ? { ...p, stage_id: newStageId, entered_at: new Date().toISOString() } : p
+        );
+      });
+
+      return { previousData };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
       toast.success(t('pipeline:patientMoved'));
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(['pipeline-patients'], context.previousData);
+      }
       console.error('Move patient error:', error);
       toast.error(t('pipeline:moveError'));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
     },
   });
 
