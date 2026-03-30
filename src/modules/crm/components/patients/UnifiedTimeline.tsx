@@ -26,7 +26,7 @@ import {
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 
 interface TimelineEvent {
@@ -232,83 +232,75 @@ function TimelineItem({ event, isExpanded, onToggleExpand, t, dateLocale }: Time
             {hasTrackingData && (
               <div className="flex items-center gap-1.5">
                 {event?.metadata?.delivered_at && !isBounced && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="text-green-500">
-                          <CheckCheck className="h-3.5 w-3.5" />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t('patientDetail:timeline.deliveredOn', { date: formatTrackingDate(event?.metadata?.delivered_at) })}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-green-500">
+                        <CheckCheck className="h-3.5 w-3.5" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t('patientDetail:timeline.deliveredOn', { date: formatTrackingDate(event?.metadata?.delivered_at) })}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
 
                 {event?.metadata?.opened_count > 0 && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="flex items-center gap-0.5 text-blue-500">
-                          <Eye className="h-3.5 w-3.5" />
-                          {event?.metadata?.opened_count > 1 && (
-                            <span className="text-[10px] font-medium">{event?.metadata?.opened_count}</span>
-                          )}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t('patientDetail:timeline.openedTimes', { count: event?.metadata?.opened_count })}</p>
-                        {event?.metadata?.opened_at && (
-                          <p className="text-xs text-muted-foreground">
-                            {t('patientDetail:timeline.lastOpened', { date: formatTrackingDate(event?.metadata?.opened_at) })}
-                          </p>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="flex items-center gap-0.5 text-blue-500">
+                        <Eye className="h-3.5 w-3.5" />
+                        {event?.metadata?.opened_count > 1 && (
+                          <span className="text-[10px] font-medium">{event?.metadata?.opened_count}</span>
                         )}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t('patientDetail:timeline.openedTimes', { count: event?.metadata?.opened_count })}</p>
+                      {event?.metadata?.opened_at && (
+                        <p className="text-xs text-muted-foreground">
+                          {t('patientDetail:timeline.lastOpened', { date: formatTrackingDate(event?.metadata?.opened_at) })}
+                        </p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
                 )}
 
                 {event?.metadata?.clicked_count > 0 && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="flex items-center gap-0.5 text-purple-500">
-                          <MousePointerClick className="h-3.5 w-3.5" />
-                          {event?.metadata?.clicked_count > 1 && (
-                            <span className="text-[10px] font-medium">{event?.metadata?.clicked_count}</span>
-                          )}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t('patientDetail:timeline.clickedTimes', { count: event?.metadata?.clicked_count })}</p>
-                        {event?.metadata?.clicked_at && (
-                          <p className="text-xs text-muted-foreground">
-                            {t('patientDetail:timeline.lastClick', { date: formatTrackingDate(event?.metadata?.clicked_at) })}
-                          </p>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="flex items-center gap-0.5 text-purple-500">
+                        <MousePointerClick className="h-3.5 w-3.5" />
+                        {event?.metadata?.clicked_count > 1 && (
+                          <span className="text-[10px] font-medium">{event?.metadata?.clicked_count}</span>
                         )}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t('patientDetail:timeline.clickedTimes', { count: event?.metadata?.clicked_count })}</p>
+                      {event?.metadata?.clicked_at && (
+                        <p className="text-xs text-muted-foreground">
+                          {t('patientDetail:timeline.lastClick', { date: formatTrackingDate(event?.metadata?.clicked_at) })}
+                        </p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
                 )}
 
                 {isBounced && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Badge variant="outline" className="text-destructive bg-destructive/10 border-destructive/30 text-[10px] px-1.5 py-0">
-                          <AlertTriangle className="h-3 w-3 mr-0.5" />
-                          {t('patientDetail:timeline.bounced')}
-                        </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t('patientDetail:timeline.emailRejected')}</p>
-                        {event?.metadata?.bounce_reason && (
-                          <p className="text-xs text-muted-foreground">{event?.metadata?.bounce_reason}</p>
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge variant="outline" className="text-destructive bg-destructive/10 border-destructive/30 text-[10px] px-1.5 py-0">
+                        <AlertTriangle className="h-3 w-3 mr-0.5" />
+                        {t('patientDetail:timeline.bounced')}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t('patientDetail:timeline.emailRejected')}</p>
+                      {event?.metadata?.bounce_reason && (
+                        <p className="text-xs text-muted-foreground">{event?.metadata?.bounce_reason}</p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </div>
             )}

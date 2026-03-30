@@ -15,7 +15,6 @@ import { getTierBadgeStyles } from "@/shared/lib/referrerTierBadge";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -193,18 +192,16 @@ export default function Referrers() {
         const tierStyles = getTierBadgeStyles(row.referrer_type_code, row.referrer_type_name);
         
         return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium cursor-help ${tierStyles.className}`}>
-                  {tierStyles.label}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p className="text-sm">{tooltipText}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium cursor-help ${tierStyles.className}`}>
+                {tierStyles.label}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p className="text-sm">{tooltipText}</p>
+            </TooltipContent>
+          </Tooltip>
         );
       },
     },

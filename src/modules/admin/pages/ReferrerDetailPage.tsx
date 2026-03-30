@@ -25,7 +25,6 @@ import { Label } from "@/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ArrowLeft, Edit, Trash2, Pause, Play } from "lucide-react";
@@ -738,8 +737,7 @@ export default function ReferrerDetail() {
               </AlertDialog>
               
               <Dialog open={typeDialogOpen} onOpenChange={setTypeDialogOpen}>
-                <TooltipProvider>
-                  <Tooltip>
+                <Tooltip>
                     <TooltipTrigger asChild>
                       <DialogTrigger asChild>
                         {(() => {
@@ -758,7 +756,6 @@ export default function ReferrerDetail() {
                       </p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>{t('referrerDetailPage:changeType.title')}</DialogTitle>
@@ -899,8 +896,7 @@ export default function ReferrerDetail() {
               <div className="col-span-2">
                 <span className="text-muted-foreground block mb-1">{t('referrerDetailPage:profile.autoPayout')}</span>
                 <div className="flex items-center gap-3">
-                  <TooltipProvider>
-                    <Tooltip>
+                  <Tooltip>
                       <TooltipTrigger asChild>
                         <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
                           referrer.auto_payout_enabled 
@@ -928,7 +924,6 @@ export default function ReferrerDetail() {
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                  </TooltipProvider>
                   <Button
                     variant="ghost"
                     size="sm"

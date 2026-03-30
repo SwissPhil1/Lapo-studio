@@ -17,7 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/shared/lib/utils';
 import { type CommunicationLog, channelLabels, statusColors, statusLabels } from '@/shared/types/communications';
 
@@ -112,22 +112,20 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
             
             {/* Status badge - compact */}
             {isBounced ? (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge 
-                      variant="outline" 
-                      className="text-[10px] px-1.5 py-0 h-4 font-normal bg-destructive/10 text-destructive border-destructive/20 cursor-help"
-                    >
-                      <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
-                      Échec
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{communication.bounce_reason || 'Email non délivré'}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] px-1.5 py-0 h-4 font-normal bg-destructive/10 text-destructive border-destructive/20 cursor-help"
+                  >
+                    <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
+                    Échec
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{communication.bounce_reason || 'Email non délivré'}</p>
+                </TooltipContent>
+              </Tooltip>
             ) : (
               <Badge 
                 variant="outline" 
@@ -148,52 +146,46 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
           {hasTracking && !isBounced && (
             <div className="hidden sm:flex items-center gap-1">
               {isDelivered && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="text-success">
-                        <CheckCheck className="h-3.5 w-3.5" />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Délivré le {format(new Date(communication.delivered_at!), 'dd/MM à HH:mm', { locale: fr })}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-success">
+                      <CheckCheck className="h-3.5 w-3.5" />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Délivré le {format(new Date(communication.delivered_at!), 'dd/MM à HH:mm', { locale: fr })}</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
               {isOpened && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="flex items-center gap-0.5 text-info">
-                        <Eye className="h-3.5 w-3.5" />
-                        {(communication.opened_count || 0) > 1 && (
-                          <span className="text-[10px]">{communication.opened_count}</span>
-                        )}
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Ouvert {communication.opened_count} fois</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex items-center gap-0.5 text-info">
+                      <Eye className="h-3.5 w-3.5" />
+                      {(communication.opened_count || 0) > 1 && (
+                        <span className="text-[10px]">{communication.opened_count}</span>
+                      )}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Ouvert {communication.opened_count} fois</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
               {isClicked && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="flex items-center gap-0.5 text-primary">
-                        <MousePointerClick className="h-3.5 w-3.5" />
-                        {(communication.clicked_count || 0) > 1 && (
-                          <span className="text-[10px]">{communication.clicked_count}</span>
-                        )}
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{communication.clicked_count} clic(s)</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex items-center gap-0.5 text-primary">
+                      <MousePointerClick className="h-3.5 w-3.5" />
+                      {(communication.clicked_count || 0) > 1 && (
+                        <span className="text-[10px]">{communication.clicked_count}</span>
+                      )}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{communication.clicked_count} clic(s)</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </div>
           )}

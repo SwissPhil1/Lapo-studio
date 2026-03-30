@@ -30,7 +30,6 @@ import {
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
@@ -783,7 +782,6 @@ export default function Patients() {
       )}
 
       {/* Patients Table */}
-      <TooltipProvider>
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -936,7 +934,6 @@ export default function Patients() {
             )}
           </div>
         )}
-      </TooltipProvider>
 
       {/* Bulk Action Bar */}
       <BulkActionBar
