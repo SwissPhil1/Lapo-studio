@@ -34,21 +34,6 @@ export type StatusFilter = 'all' | 'sent' | 'delivered' | 'failed';
 export type DirectionFilter = 'all' | 'inbound' | 'outbound';
 export type PeriodFilter = 'all' | 'today' | 'week' | 'month';
 
-export const channelLabels: Record<string, string> = {
-  email: 'Email',
-  sms: 'SMS',
-  whatsapp: 'WhatsApp',
-  phone: 'Appel',
-};
-
-export const statusLabels: Record<string, string> = {
-  sent: 'Envoyé',
-  delivered: 'Délivré',
-  read: 'Lu',
-  failed: 'Échec',
-  pending: 'En attente',
-};
-
 export const statusColors: Record<string, string> = {
   sent: 'bg-muted text-muted-foreground',
   delivered: 'bg-success/10 text-success',

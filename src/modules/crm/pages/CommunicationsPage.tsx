@@ -3,8 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { Loader2, MessageSquare, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { format, isToday, isYesterday, isThisWeek, startOfDay, subDays } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { format, isToday, isYesterday, isThisWeek, startOfDay, subDays, type Locale } from 'date-fns';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { SendMessageDialog } from '@/modules/crm/components/communications/SendMessageDialog';
 import { CommunicationItem } from '@/modules/crm/components/communications/CommunicationItem';
 import { CommunicationMetrics } from '@/modules/crm/components/communications/CommunicationMetrics';
@@ -15,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 50;
 
-function groupCommunicationsByDate(communications: CommunicationLog[], todayLabel: string, yesterdayLabel: string) {
+function groupCommunicationsByDate(communications: CommunicationLog[], todayLabel: string, yesterdayLabel: string, dateLocale: Locale) {
   const groups: Record<string, CommunicationLog[]> = {};
 
   communications.forEach(comm => {
@@ -27,10 +28,10 @@ function groupCommunicationsByDate(communications: CommunicationLog[], todayLabe
     } else if (isYesterday(date)) {
       groupKey = yesterdayLabel;
     } else if (isThisWeek(date)) {
-      groupKey = format(date, 'EEEE d MMMM', { locale: fr });
+      groupKey = format(date, 'EEEE d MMMM', { locale: dateLocale });
       groupKey = groupKey.charAt(0).toUpperCase() + groupKey.slice(1);
     } else {
-      groupKey = format(date, 'MMMM yyyy', { locale: fr });
+      groupKey = format(date, 'MMMM yyyy', { locale: dateLocale });
       groupKey = groupKey.charAt(0).toUpperCase() + groupKey.slice(1);
     }
 
@@ -44,7 +45,8 @@ function groupCommunicationsByDate(communications: CommunicationLog[], todayLabe
 }
 
 export default function Communications() {
-  const { t } = useTranslation(['communications', 'common']);
+  const { t, i18n } = useTranslation(['communications', 'common']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   const [channelFilter, setChannelFilter] = useState<ChannelFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
@@ -142,7 +144,7 @@ export default function Communications() {
 
   const displayedCommunications = communications;
   const hasMore = communications.length >= displayCount && communications.length < totalCount;
-  const groupedCommunications = groupCommunicationsByDate(displayedCommunications, t('communications:today'), t('communications:yesterday'));
+  const groupedCommunications = groupCommunicationsByDate(displayedCommunications, t('communications:today'), t('communications:yesterday'), dateLocale);
 
   const handleLoadMore = () => {
     setDisplayCount(prev => prev + ITEMS_PER_PAGE);

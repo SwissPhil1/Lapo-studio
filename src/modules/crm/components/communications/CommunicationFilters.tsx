@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Search, Filter, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -33,13 +34,15 @@ export function CommunicationFilters({
   onRefresh,
   isRefreshing,
 }: CommunicationFiltersProps) {
+  const { t } = useTranslation(['communications']);
+
   return (
     <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center">
       {/* Search */}
       <div className="relative flex-1 w-full lg:max-w-xs">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Rechercher un patient..."
+          placeholder={t('communications:searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-9"
@@ -55,48 +58,48 @@ export function CommunicationFilters({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tous</SelectItem>
-            <SelectItem value="email">Email</SelectItem>
-            <SelectItem value="sms">SMS</SelectItem>
-            <SelectItem value="phone">Téléphone</SelectItem>
+            <SelectItem value="all">{t('communications:filterAll')}</SelectItem>
+            <SelectItem value="email">{t('communications:channelEmail')}</SelectItem>
+            <SelectItem value="sms">{t('communications:channelSms')}</SelectItem>
+            <SelectItem value="phone">{t('communications:filterPhone')}</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Status filter */}
         <Select value={statusFilter} onValueChange={(v) => onStatusChange(v as StatusFilter)}>
           <SelectTrigger className="w-[110px]">
-            <SelectValue placeholder="Statut" />
+            <SelectValue placeholder={t('communications:filterStatusLabel')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Statut</SelectItem>
-            <SelectItem value="sent">Envoyé</SelectItem>
-            <SelectItem value="delivered">Délivré</SelectItem>
-            <SelectItem value="failed">Échec</SelectItem>
+            <SelectItem value="all">{t('communications:filterStatusLabel')}</SelectItem>
+            <SelectItem value="sent">{t('communications:filterStatusSent')}</SelectItem>
+            <SelectItem value="delivered">{t('communications:filterStatusDelivered')}</SelectItem>
+            <SelectItem value="failed">{t('communications:filterStatusFailed')}</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Direction filter */}
         <Select value={directionFilter} onValueChange={(v) => onDirectionChange(v as DirectionFilter)}>
           <SelectTrigger className="w-[110px]">
-            <SelectValue placeholder="Direction" />
+            <SelectValue placeholder={t('communications:filterDirectionLabel')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Direction</SelectItem>
-            <SelectItem value="outbound">Sortants</SelectItem>
-            <SelectItem value="inbound">Entrants</SelectItem>
+            <SelectItem value="all">{t('communications:filterDirectionLabel')}</SelectItem>
+            <SelectItem value="outbound">{t('communications:filterOutbound')}</SelectItem>
+            <SelectItem value="inbound">{t('communications:filterInbound')}</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Period filter */}
         <Select value={periodFilter} onValueChange={(v) => onPeriodChange(v as PeriodFilter)}>
           <SelectTrigger className="w-[130px]">
-            <SelectValue placeholder="Période" />
+            <SelectValue placeholder={t('communications:filterPeriodAll')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toute période</SelectItem>
-            <SelectItem value="today">Aujourd'hui</SelectItem>
-            <SelectItem value="week">7 derniers jours</SelectItem>
-            <SelectItem value="month">30 derniers jours</SelectItem>
+            <SelectItem value="all">{t('communications:filterPeriodAll')}</SelectItem>
+            <SelectItem value="today">{t('communications:filterToday')}</SelectItem>
+            <SelectItem value="week">{t('communications:filterWeek')}</SelectItem>
+            <SelectItem value="month">{t('communications:filterMonth')}</SelectItem>
           </SelectContent>
         </Select>
 
