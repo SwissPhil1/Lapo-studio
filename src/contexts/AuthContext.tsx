@@ -32,15 +32,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUserProfile = useCallback(async (userId: string, email: string) => {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('full_name, avatar_url, role')
+      .select('first_name, last_name, role')
       .eq('id', userId)
       .single()
+
+    const firstName = profile?.first_name ?? ''
+    const lastName = profile?.last_name ?? ''
+    const fullName = [firstName, lastName].filter(Boolean).join(' ') || email.split('@')[0]
 
     const appUser: AppUser = {
       id: userId,
       email,
-      full_name: profile?.full_name ?? email.split('@')[0],
-      avatar_url: profile?.avatar_url,
+      full_name: fullName,
       role: (profile?.role as AppRole) ?? 'user',
     }
 
