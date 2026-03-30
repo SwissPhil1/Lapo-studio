@@ -1,16 +1,18 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { format, parseISO, isToday, isYesterday, isThisWeek, isThisMonth } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { 
-  Calendar, 
-  Mail, 
-  MessageSquare, 
-  FileText, 
-  Phone, 
-  CheckCircle, 
-  XCircle, 
+import { useTranslation } from 'react-i18next';
+import { format, parseISO, isToday, isYesterday, isThisWeek, isThisMonth, type Locale } from 'date-fns';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import {
+  Calendar,
+  Mail,
+  MessageSquare,
+  FileText,
+  Phone,
+  CheckCircle,
+  XCircle,
   Clock,
   AlertTriangle,
   Loader2,
@@ -73,75 +75,84 @@ const statusIcons: Record<string, React.ElementType> = {
   failed: XCircle,
 };
 
-function groupEventsByDate(events: TimelineEvent[]): { label: string; events: TimelineEvent[] }[] {
-  const groups: Record<string, TimelineEvent[]> = {};
-  
-  events.forEach(event => {
-    let label: string;
-    const date = event.date;
-    
-    if (isToday(date)) {
-      label = "Aujourd'hui";
-    } else if (isYesterday(date)) {
-      label = 'Hier';
-    } else if (isThisWeek(date)) {
-      label = 'Cette semaine';
-    } else if (isThisMonth(date)) {
-      label = 'Ce mois';
-    } else {
-      label = format(date, 'MMMM yyyy', { locale: fr });
-    }
-    
-    if (!groups[label]) groups[label] = [];
-    groups[label].push(event);
-  });
-  
-  // Sort within each group
-  Object.values(groups).forEach(group => {
-    group.sort((a, b) => b.date.getTime() - a.date.getTime());
-  });
-  
-  // Return in order: Today, Yesterday, This Week, This Month, then by month
-  const orderedLabels = ["Aujourd'hui", 'Hier', 'Cette semaine', 'Ce mois'];
-  const result: { label: string; events: TimelineEvent[] }[] = [];
-  
-  orderedLabels.forEach(label => {
-    if (groups[label]) {
-      result.push({ label, events: groups[label] });
-      delete groups[label];
-    }
-  });
-  
-  // Add remaining groups sorted by date
-  Object.entries(groups)
-    .sort((a, b) => {
-      const dateA = a[1][0]?.date || new Date(0);
-      const dateB = b[1][0]?.date || new Date(0);
-      return dateB.getTime() - dateA.getTime();
-    })
-    .forEach(([label, events]) => {
-      result.push({ label, events });
+function useGroupEventsByDate(events: TimelineEvent[], t: (key: string) => string, dateLocale: Locale): { label: string; events: TimelineEvent[] }[] {
+  return useMemo(() => {
+    const groups: Record<string, TimelineEvent[]> = {};
+
+    events.forEach(event => {
+      let label: string;
+      const date = event.date;
+
+      if (isToday(date)) {
+        label = t('patientDetail:timeline.today');
+      } else if (isYesterday(date)) {
+        label = t('patientDetail:timeline.yesterday');
+      } else if (isThisWeek(date)) {
+        label = t('patientDetail:timeline.thisWeek');
+      } else if (isThisMonth(date)) {
+        label = t('patientDetail:timeline.thisMonth');
+      } else {
+        label = format(date, 'MMMM yyyy', { locale: dateLocale });
+      }
+
+      if (!groups[label]) groups[label] = [];
+      groups[label].push(event);
     });
-  
-  return result;
+
+    // Sort within each group
+    Object.values(groups).forEach(group => {
+      group.sort((a, b) => b.date.getTime() - a.date.getTime());
+    });
+
+    // Return in order: Today, Yesterday, This Week, This Month, then by month
+    const orderedLabels = [
+      t('patientDetail:timeline.today'),
+      t('patientDetail:timeline.yesterday'),
+      t('patientDetail:timeline.thisWeek'),
+      t('patientDetail:timeline.thisMonth'),
+    ];
+    const result: { label: string; events: TimelineEvent[] }[] = [];
+
+    orderedLabels.forEach(label => {
+      if (groups[label]) {
+        result.push({ label, events: groups[label] });
+        delete groups[label];
+      }
+    });
+
+    // Add remaining groups sorted by date
+    Object.entries(groups)
+      .sort((a, b) => {
+        const dateA = a[1][0]?.date || new Date(0);
+        const dateB = b[1][0]?.date || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      })
+      .forEach(([label, events]) => {
+        result.push({ label, events });
+      });
+
+    return result;
+  }, [events, t, dateLocale]);
 }
 
 interface TimelineItemProps {
   event: TimelineEvent;
   isExpanded: boolean;
   onToggleExpand: () => void;
+  t: (key: string, opts?: Record<string, any>) => string;
+  dateLocale: Locale;
 }
 
-function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) {
+function TimelineItem({ event, isExpanded, onToggleExpand, t, dateLocale }: TimelineItemProps) {
   const Icon = eventIcons[event.type] || FileText;
   const colors = eventColors[event.type] || eventColors.note;
   const StatusIcon = event.status ? statusIcons[event.status] : null;
-  
+
   const isEmail = event.type === 'email';
   const hasTrackingData = isEmail && event.metadata;
   const hasFullMessage = isEmail && event.metadata?.full_message;
   const isBounced = event.metadata?.bounced_at;
-  
+
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'completed':
@@ -158,34 +169,34 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
         return 'text-muted-foreground';
     }
   };
-  
+
   const getStatusLabel = (type: string, status?: string) => {
     if (type === 'booking') {
       switch (status) {
-        case 'completed': return 'Terminé';
-        case 'cancelled': return 'Annulé';
-        case 'no_show': return 'Absent';
-        case 'confirmed': return 'Confirmé';
+        case 'completed': return t('patientDetail:timeline.bookingCompleted');
+        case 'cancelled': return t('patientDetail:timeline.bookingCancelled');
+        case 'no_show': return t('patientDetail:timeline.bookingNoShow');
+        case 'confirmed': return t('patientDetail:timeline.bookingConfirmed');
         default: return status;
       }
     }
     if (type === 'email' || type === 'sms') {
       switch (status) {
-        case 'sent': return 'Envoyé';
-        case 'delivered': return 'Délivré';
-        case 'opened': return 'Ouvert';
-        case 'clicked': return 'Cliqué';
-        case 'bounced': return 'Rejeté';
-        case 'failed': return 'Échec';
+        case 'sent': return t('patientDetail:timeline.emailSent');
+        case 'delivered': return t('patientDetail:timeline.emailDelivered');
+        case 'opened': return t('patientDetail:timeline.emailOpened');
+        case 'clicked': return t('patientDetail:timeline.emailClicked');
+        case 'bounced': return t('patientDetail:timeline.emailBounced');
+        case 'failed': return t('patientDetail:timeline.emailFailed');
         default: return status;
       }
     }
     if (type === 'task') {
       switch (status) {
-        case 'pending': return 'En attente';
-        case 'in_progress': return 'En cours';
-        case 'completed': return 'Terminé';
-        case 'cancelled': return 'Annulé';
+        case 'pending': return t('patientDetail:timeline.taskPending');
+        case 'in_progress': return t('patientDetail:timeline.taskInProgress');
+        case 'completed': return t('patientDetail:timeline.taskCompleted');
+        case 'cancelled': return t('patientDetail:timeline.taskCancelled');
         default: return status;
       }
     }
@@ -194,19 +205,19 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
 
   const formatTrackingDate = (dateStr: string) => {
     try {
-      return format(parseISO(dateStr), "d MMM 'à' HH:mm", { locale: fr });
+      return format(parseISO(dateStr), "d MMM 'à' HH:mm", { locale: dateLocale });
     } catch {
       return '';
     }
   };
-  
+
   return (
     <div className="flex gap-3 group">
       {/* Icon */}
       <div className={cn('flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center', colors.bg)}>
         <Icon className={cn('h-4 w-4', colors.text)} />
       </div>
-      
+
       {/* Content */}
       <div className="flex-1 min-w-0 pb-4">
         <div className="flex items-start justify-between gap-2">
@@ -220,7 +231,6 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
             {/* Email tracking indicators */}
             {hasTrackingData && (
               <div className="flex items-center gap-1.5">
-                {/* Delivered indicator */}
                 {event?.metadata?.delivered_at && !isBounced && (
                   <TooltipProvider>
                     <Tooltip>
@@ -230,13 +240,12 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
                         </span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Délivré le {formatTrackingDate(event?.metadata?.delivered_at)}</p>
+                        <p>{t('patientDetail:timeline.deliveredOn', { date: formatTrackingDate(event?.metadata?.delivered_at) })}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
-                
-                {/* Opened indicator */}
+
                 {event?.metadata?.opened_count > 0 && (
                   <TooltipProvider>
                     <Tooltip>
@@ -249,18 +258,17 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
                         </span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Ouvert {event?.metadata?.opened_count} fois</p>
+                        <p>{t('patientDetail:timeline.openedTimes', { count: event?.metadata?.opened_count })}</p>
                         {event?.metadata?.opened_at && (
                           <p className="text-xs text-muted-foreground">
-                            Dernière ouverture: {formatTrackingDate(event?.metadata?.opened_at)}
+                            {t('patientDetail:timeline.lastOpened', { date: formatTrackingDate(event?.metadata?.opened_at) })}
                           </p>
                         )}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
-                
-                {/* Clicked indicator */}
+
                 {event?.metadata?.clicked_count > 0 && (
                   <TooltipProvider>
                     <Tooltip>
@@ -273,29 +281,28 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
                         </span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Cliqué {event?.metadata?.clicked_count} fois</p>
+                        <p>{t('patientDetail:timeline.clickedTimes', { count: event?.metadata?.clicked_count })}</p>
                         {event?.metadata?.clicked_at && (
                           <p className="text-xs text-muted-foreground">
-                            Dernier clic: {formatTrackingDate(event?.metadata?.clicked_at)}
+                            {t('patientDetail:timeline.lastClick', { date: formatTrackingDate(event?.metadata?.clicked_at) })}
                           </p>
                         )}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
-                
-                {/* Bounced indicator */}
+
                 {isBounced && (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Badge variant="outline" className="text-destructive bg-destructive/10 border-destructive/30 text-[10px] px-1.5 py-0">
                           <AlertTriangle className="h-3 w-3 mr-0.5" />
-                          Échec
+                          {t('patientDetail:timeline.bounced')}
                         </Badge>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Email rejeté</p>
+                        <p>{t('patientDetail:timeline.emailRejected')}</p>
                         {event?.metadata?.bounce_reason && (
                           <p className="text-xs text-muted-foreground">{event?.metadata?.bounce_reason}</p>
                         )}
@@ -305,16 +312,14 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
                 )}
               </div>
             )}
-            
-            {/* Status badge for non-email or when no tracking data */}
+
             {StatusIcon && event.status && !hasTrackingData && (
               <div className={cn('flex items-center gap-1 text-xs', getStatusColor(event.status))}>
                 <StatusIcon className="h-3.5 w-3.5" />
                 <span>{getStatusLabel(event.type, event.status)}</span>
               </div>
             )}
-            
-            {/* Expand chevron for emails with full message */}
+
             {hasFullMessage && (
               <div
                 role="button"
@@ -341,12 +346,11 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
             )}
           </div>
         </div>
-        
+
         <p className="text-xs text-muted-foreground mt-1">
-          {format(event.date, 'd MMM yyyy • HH:mm', { locale: fr })}
+          {format(event.date, 'd MMM yyyy • HH:mm', { locale: dateLocale })}
         </p>
-        
-        {/* Metadata display - excluding email tracking (now shown as icons) */}
+
         {event.metadata && !isEmail && (
           <div className="mt-2 flex flex-wrap gap-2">
             {event?.metadata?.service && (
@@ -362,13 +366,12 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
             )}
           </div>
         )}
-        
-        {/* Expanded email content */}
+
         {isExpanded && hasFullMessage && (
           <div className="mt-3 p-3 bg-muted/30 rounded-lg border border-border/50">
-            <div 
+            <div
               className="text-sm prose prose-sm max-w-none dark:prose-invert"
-              dangerouslySetInnerHTML={{ __html: event?.metadata?.full_message }} 
+              dangerouslySetInnerHTML={{ __html: event?.metadata?.full_message }}
             />
           </div>
         )}
@@ -378,47 +381,48 @@ function TimelineItem({ event, isExpanded, onToggleExpand }: TimelineItemProps) 
 }
 
 export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
+  const { t, i18n } = useTranslation(['patientDetail']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
   const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
-  
+
   const toggleEventExpanded = (id: string) => {
     setExpandedEvents(prev => ({
       ...prev,
       [id]: !prev[id]
     }));
   };
-  
+
   const { data: events = [], isLoading, error } = useQuery({
     queryKey: ['patient-timeline', patientId],
     queryFn: async () => {
-      // Check for authenticated session first
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
+
       if (sessionError || !session) {
         throw new Error('SESSION_EXPIRED');
       }
-      
+
       const timelineEvents: TimelineEvent[] = [];
-      
+
       // Fetch bookings
       const { data: bookings, error: bookingsError } = await supabase
         .from('bookings')
         .select('id, booking_date, service, status, booking_value')
         .eq('patient_id', patientId)
         .order('booking_date', { ascending: false });
-      
+
       if (bookingsError) {
         console.error('Error fetching bookings:', bookingsError);
-        throw new Error('Erreur lors du chargement des rendez-vous');
+        throw new Error('LOAD_BOOKINGS_ERROR');
       }
-      
+
       bookings?.forEach(booking => {
         timelineEvents.push({
           id: `booking-${booking.id}`,
           type: 'booking',
-          title: booking.service || 'Rendez-vous',
-          description: booking.booking_value > 0 ? `Valeur: ${booking.booking_value}€` : undefined,
+          title: booking.service || t('patientDetail:timeline.appointment'),
+          description: booking.booking_value > 0 ? t('patientDetail:timeline.value', { amount: booking.booking_value }) : undefined,
           date: parseISO(booking.booking_date),
           status: booking.status || 'confirmed',
           metadata: {
@@ -427,18 +431,18 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
           },
         });
       });
-      
+
       // Fetch CRM notes
       const { data: notes, error: notesError } = await supabase
         .from('crm_notes')
         .select('id, title, content, note_type, created_at')
         .eq('user_id', patientId)
         .order('created_at', { ascending: false });
-      
+
       if (notesError) {
         console.error('Error fetching notes:', notesError);
       }
-      
+
       notes?.forEach(note => {
         timelineEvents.push({
           id: `note-${note.id}`,
@@ -451,24 +455,24 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
           },
         });
       });
-      
-      // Fetch communications with enhanced tracking data
+
+      // Fetch communications
       const { data: communications, error: commsError } = await supabase
         .from('crm_communication_logs')
         .select('id, channel, subject, message_preview, full_message, status, sent_at, opened_count, clicked_count, delivered_at, opened_at, clicked_at, bounced_at, bounce_reason')
         .eq('patient_id', patientId)
         .order('sent_at', { ascending: false });
-      
+
       if (commsError) {
         console.error('Error fetching communications:', commsError);
       }
-      
+
       communications?.forEach(comm => {
         const type = comm.channel === 'sms' ? 'sms' : comm.channel === 'call' ? 'call' : 'email';
         timelineEvents.push({
           id: `comm-${comm.id}`,
           type,
-          title: comm.subject || (type === 'sms' ? 'SMS' : type === 'call' ? 'Appel' : 'Email'),
+          title: comm.subject || (type === 'sms' ? t('patientDetail:timeline.sms') : type === 'call' ? t('patientDetail:timeline.call') : 'Email'),
           description: comm.message_preview || undefined,
           date: parseISO(comm.sent_at),
           status: comm.status,
@@ -485,44 +489,45 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
           },
         });
       });
-      
+
       // Fetch reactivation tasks
       const { data: tasks, error: tasksError } = await supabase
         .from('reactivation_tasks')
         .select('id, task_type, status, notes, created_at')
         .eq('patient_id', patientId)
         .order('created_at', { ascending: false });
-      
+
       if (tasksError) {
         console.error('Error fetching tasks:', tasksError);
       }
-      
+
+      const taskLabelKeys: Record<string, string> = {
+        overdue_recall: 'overdueRecall',
+        dormant: 'dormantPatient',
+        no_show_followup: 'noShowFollowup',
+        manual: 'manualTask',
+      };
+
       tasks?.forEach(task => {
-        const taskLabels: Record<string, string> = {
-          overdue_recall: 'Rappel en retard',
-          dormant: 'Patient inactif',
-          no_show_followup: 'Suivi absence',
-          manual: 'Tâche manuelle',
-        };
         timelineEvents.push({
           id: `task-${task.id}`,
           type: 'task',
-          title: taskLabels[task.task_type] || 'Tâche de relance',
+          title: taskLabelKeys[task.task_type]
+            ? t(`patientDetail:timeline.${taskLabelKeys[task.task_type]}`)
+            : t('patientDetail:timeline.reactivationTask'),
           description: task.notes || undefined,
           date: parseISO(task.created_at),
           status: task.status,
         });
       });
-      
-      // Sort all events by date descending
+
       timelineEvents.sort((a, b) => b.date.getTime() - a.date.getTime());
-      
+
       return timelineEvents;
     },
     enabled: !!patientId,
   });
-  
-  // Count events by type
+
   const eventCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     events.forEach(event => {
@@ -530,13 +535,12 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
     });
     return counts;
   }, [events]);
-  
-  // Filter events based on active filters
+
   const filteredEvents = useMemo(() => {
     if (activeFilters.size === 0) return events;
     return events.filter(event => activeFilters.has(event.type));
   }, [events, activeFilters]);
-  
+
   const toggleFilter = (type: string) => {
     setActiveFilters(prev => {
       const next = new Set(prev);
@@ -548,9 +552,9 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
       return next;
     });
   };
-  
+
   const clearFilters = () => setActiveFilters(new Set());
-  
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -558,50 +562,50 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
       </div>
     );
   }
-  
+
   if (error) {
     const isSessionExpired = error.message === 'SESSION_EXPIRED';
-    
+
     return (
       <div className="card-elevated p-6 text-center">
         <AlertTriangle className="h-12 w-12 mx-auto mb-3 text-warning" />
         <p className="text-foreground font-medium mb-2">
-          {isSessionExpired ? 'Session expirée' : 'Erreur de chargement'}
+          {isSessionExpired ? t('patientDetail:timeline.sessionExpired') : t('patientDetail:timeline.loadingError')}
         </p>
         <p className="text-muted-foreground text-sm mb-4">
-          {isSessionExpired 
-            ? 'Veuillez vous reconnecter pour accéder aux données.' 
-            : 'Erreur lors du chargement de l\'historique'}
+          {isSessionExpired
+            ? t('patientDetail:timeline.reconnectMessage')
+            : t('patientDetail:timeline.historyError')}
         </p>
         {isSessionExpired && (
           <Button onClick={() => navigate('/auth')} variant="default">
-            Se reconnecter
+            {t('patientDetail:timeline.reconnect')}
           </Button>
         )}
       </div>
     );
   }
-  
+
   if (events.length === 0) {
     return (
       <div className="card-elevated p-8 text-center">
         <Clock className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-        <p className="text-muted-foreground">Aucune activité enregistrée</p>
+        <p className="text-muted-foreground">{t('patientDetail:timeline.noActivity')}</p>
       </div>
     );
   }
-  
-  const groupedEvents = groupEventsByDate(filteredEvents);
-  
-  const labels: Record<string, string> = {
-    booking: 'Rendez-vous',
-    note: 'Notes',
-    email: 'Emails',
-    sms: 'SMS',
-    call: 'Appels',
-    task: 'Tâches',
+
+  const groupedEvents = useGroupEventsByDate(filteredEvents, t, dateLocale);
+
+  const labelKeys: Record<string, string> = {
+    booking: 'bookingLabel',
+    note: 'noteLabel',
+    email: 'emailLabel',
+    sms: 'smsLabel',
+    call: 'callLabel',
+    task: 'taskLabel',
   };
-  
+
   return (
     <div className="space-y-6">
       {/* Clickable Legend Filters */}
@@ -611,14 +615,14 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
           const count = eventCounts[type] || 0;
           const isActive = activeFilters.has(type);
           const hasActiveFilters = activeFilters.size > 0;
-          
+
           return (
             <button
               key={type}
               onClick={() => toggleFilter(type)}
               className={cn(
                 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border transition-all duration-200 cursor-pointer',
-                isActive 
+                isActive
                   ? cn(colors.bg, colors.border, 'border-2')
                   : hasActiveFilters
                     ? 'bg-muted/30 border-transparent opacity-50 hover:opacity-80'
@@ -632,7 +636,7 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
                 'font-medium',
                 isActive ? colors.text : 'text-muted-foreground'
               )}>
-                {labels[type]}
+                {t(`patientDetail:timeline.${labelKeys[type]}`)}
               </span>
               {count > 0 && (
                 <span className={cn(
@@ -645,23 +649,23 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
             </button>
           );
         })}
-        
+
         {activeFilters.size > 0 && (
           <button
             onClick={clearFilters}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <XCircle className="h-3.5 w-3.5" />
-            <span>Tout afficher</span>
+            <span>{t('patientDetail:timeline.showAll')}</span>
           </button>
         )}
       </div>
-      
+
       {/* Timeline */}
       {filteredEvents.length === 0 ? (
         <div className="card-elevated p-8 text-center">
           <Clock className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-          <p className="text-muted-foreground">Aucune activité pour ce filtre</p>
+          <p className="text-muted-foreground">{t('patientDetail:timeline.noActivityForFilter')}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -672,11 +676,13 @@ export function UnifiedTimeline({ patientId }: UnifiedTimelineProps) {
               </h4>
               <div className="border-l-2 border-border pl-4 space-y-1">
                 {group.events.map(event => (
-                  <TimelineItem 
-                    key={event.id} 
+                  <TimelineItem
+                    key={event.id}
                     event={event}
                     isExpanded={!!expandedEvents[event.id]}
                     onToggleExpand={() => toggleEventExpanded(event.id)}
+                    t={t}
+                    dateLocale={dateLocale}
                   />
                 ))}
               </div>

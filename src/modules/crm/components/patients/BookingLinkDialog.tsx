@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
 import {
   Dialog,
@@ -31,16 +32,6 @@ interface BookingLinkDialogProps {
   patientEmail: string | null;
 }
 
-// Common treatment types - you can customize these
-const TREATMENT_TYPES = [
-  { value: 'consultation', label: 'Consultation' },
-  { value: 'follow-up', label: 'Suivi' },
-  { value: 'treatment', label: 'Traitement' },
-  { value: 'laser', label: 'Laser' },
-  { value: 'injection', label: 'Injection' },
-  { value: 'other', label: 'Autre' },
-];
-
 function generateToken(length = 12): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
   let result = '';
@@ -57,14 +48,24 @@ export function BookingLinkDialog({
   patientName,
   patientEmail,
 }: BookingLinkDialogProps) {
+  const { t } = useTranslation(['patientDetail']);
   const [treatmentType, setTreatmentType] = useState('');
   const [message, setMessage] = useState('');
   const [expiresInDays, setExpiresInDays] = useState('7');
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const TREATMENT_TYPES = [
+    { value: 'consultation', label: t('patientDetail:bookingLink.consultation') },
+    { value: 'follow-up', label: t('patientDetail:bookingLink.followUp') },
+    { value: 'treatment', label: t('patientDetail:bookingLink.treatment') },
+    { value: 'laser', label: t('patientDetail:bookingLink.laser') },
+    { value: 'injection', label: t('patientDetail:bookingLink.injection') },
+    { value: 'other', label: t('patientDetail:bookingLink.other') },
+  ];
 
   // Fetch protocols for treatment type suggestions
   const { data: protocols } = useQuery({
@@ -83,9 +84,9 @@ export function BookingLinkDialog({
       const token = generateToken();
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + parseInt(expiresInDays));
-      
+
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       const { data, error } = await supabase
         .from('crm_booking_links')
         .insert({
@@ -98,26 +99,25 @@ export function BookingLinkDialog({
         })
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: (data) => {
-      // Generate the booking link URL
       const baseUrl = window.location.origin;
       const link = `${baseUrl}/book/${data.token}`;
       setGeneratedLink(link);
-      
+
       queryClient.invalidateQueries({ queryKey: ['patient-booking-links', patientId] });
-      
+
       toast({
-        title: 'Lien créé',
-        description: 'Le lien de réservation a été généré avec succès.',
+        title: t('patientDetail:bookingLink.linkCreated'),
+        description: t('patientDetail:bookingLink.linkCreatedDesc'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Erreur',
+        title: t('patientDetail:bookingLink.error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -126,37 +126,36 @@ export function BookingLinkDialog({
 
   const handleCopyLink = async () => {
     if (!generatedLink) return;
-    
+
     try {
       await navigator.clipboard.writeText(generatedLink);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      toast({ title: 'Copié', description: 'Lien copié dans le presse-papiers' });
+      toast({ title: t('patientDetail:bookingLink.copied'), description: t('patientDetail:bookingLink.copiedDesc') });
     } catch {
-      toast({ title: 'Erreur', description: 'Impossible de copier', variant: 'destructive' });
+      toast({ title: t('patientDetail:bookingLink.error'), description: t('patientDetail:bookingLink.copyError'), variant: 'destructive' });
     }
   };
 
-  // Send email via Resend edge function
   const sendEmailMutation = useMutation({
     mutationFn: async () => {
       if (!patientEmail || !generatedLink) {
-        throw new Error('Email ou lien manquant');
+        throw new Error(t('patientDetail:bookingLink.emailMissingError'));
       }
 
+      const firstName = patientName.split(' ')[0];
       const htmlBody = `
-        <p>Bonjour ${patientName.split(' ')[0]},</p>
-        <p>${message || 'Nous vous invitons à réserver votre prochain rendez-vous.'}</p>
-        <p>Cliquez sur le lien ci-dessous pour choisir un créneau qui vous convient :</p>
-        <p><a href="${generatedLink}" style="color: #2563eb; text-decoration: underline;">Réserver mon rendez-vous</a></p>
-        <p>Ce lien est valide pendant ${expiresInDays} jours.</p>
-        <p>À bientôt,<br>L'équipe LAPO Skin</p>
+        <p>${t('patientDetail:bookingLink.emailGreeting', { name: firstName })}</p>
+        <p>${message || t('patientDetail:bookingLink.emailDefaultMessage')}</p>
+        <p><a href="${generatedLink}" style="color: #2563eb; text-decoration: underline;">${t('patientDetail:bookingLink.emailCta')}</a></p>
+        <p>${t('patientDetail:bookingLink.emailValidityNote', { days: expiresInDays })}</p>
+        <p>${t('patientDetail:bookingLink.emailSignoff')}<br>${t('patientDetail:bookingLink.emailTeam')}</p>
       `;
 
       const { data, error } = await supabase.functions.invoke('send-email', {
         body: {
           to: patientEmail,
-          subject: 'Réservez votre rendez-vous - LAPO Skin',
+          subject: t('patientDetail:bookingLink.emailSubject'),
           html_body: htmlBody,
           patient_id: patientId,
         },
@@ -167,12 +166,12 @@ export function BookingLinkDialog({
       return data;
     },
     onSuccess: () => {
-      toast({ title: 'Email envoyé', description: 'Le lien a été envoyé au patient.' });
+      toast({ title: t('patientDetail:bookingLink.emailSent'), description: t('patientDetail:bookingLink.emailSentDesc') });
       queryClient.invalidateQueries({ queryKey: ['crm-communication-logs'] });
       queryClient.invalidateQueries({ queryKey: ['patient-timeline', patientId] });
     },
     onError: (error: Error) => {
-      toast({ title: 'Erreur lors de l\'envoi', description: error.message, variant: 'destructive' });
+      toast({ title: t('patientDetail:bookingLink.sendError'), description: error.message, variant: 'destructive' });
     },
   });
 
@@ -189,7 +188,7 @@ export function BookingLinkDialog({
     onOpenChange(false);
   };
 
-  const treatmentOptions = protocols?.length 
+  const treatmentOptions = protocols?.length
     ? protocols.map(p => ({ value: p.treatment_type, label: p.treatment_type }))
     : TREATMENT_TYPES;
 
@@ -199,20 +198,20 @@ export function BookingLinkDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CalendarPlus className="h-5 w-5 text-primary" />
-            Lien de réservation
+            {t('patientDetail:bookingLink.title')}
           </DialogTitle>
           <DialogDescription>
-            Créez un lien personnalisé pour {patientName}
+            {t('patientDetail:bookingLink.description', { name: patientName })}
           </DialogDescription>
         </DialogHeader>
 
         {!generatedLink ? (
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="treatment">Type de soin (optionnel)</Label>
+              <Label htmlFor="treatment">{t('patientDetail:bookingLink.treatmentType')}</Label>
               <Select value={treatmentType} onValueChange={setTreatmentType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un type de soin" />
+                  <SelectValue placeholder={t('patientDetail:bookingLink.treatmentPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {treatmentOptions.map((opt) => (
@@ -225,28 +224,28 @@ export function BookingLinkDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="expires">Validité du lien</Label>
+              <Label htmlFor="expires">{t('patientDetail:bookingLink.validity')}</Label>
               <Select value={expiresInDays} onValueChange={setExpiresInDays}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">1 jour</SelectItem>
-                  <SelectItem value="3">3 jours</SelectItem>
-                  <SelectItem value="7">7 jours</SelectItem>
-                  <SelectItem value="14">14 jours</SelectItem>
-                  <SelectItem value="30">30 jours</SelectItem>
+                  <SelectItem value="1">{t('patientDetail:bookingLink.day1')}</SelectItem>
+                  <SelectItem value="3">{t('patientDetail:bookingLink.day3')}</SelectItem>
+                  <SelectItem value="7">{t('patientDetail:bookingLink.day7')}</SelectItem>
+                  <SelectItem value="14">{t('patientDetail:bookingLink.day14')}</SelectItem>
+                  <SelectItem value="30">{t('patientDetail:bookingLink.day30')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="message">Message personnalisé (optionnel)</Label>
+              <Label htmlFor="message">{t('patientDetail:bookingLink.customMessage')}</Label>
               <Textarea
                 id="message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Un message à inclure dans l'email..."
+                placeholder={t('patientDetail:bookingLink.customMessagePlaceholder')}
                 rows={3}
               />
             </div>
@@ -254,7 +253,7 @@ export function BookingLinkDialog({
         ) : (
           <div className="space-y-4 py-4">
             <div className="p-4 bg-accent/50 rounded-lg border border-border">
-              <Label className="text-xs text-muted-foreground mb-2 block">Lien généré</Label>
+              <Label className="text-xs text-muted-foreground mb-2 block">{t('patientDetail:bookingLink.generatedLink')}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   value={generatedLink}
@@ -278,8 +277,8 @@ export function BookingLinkDialog({
 
             <div className="flex flex-col gap-2">
               {patientEmail && (
-                <Button 
-                  onClick={handleSendEmail} 
+                <Button
+                  onClick={handleSendEmail}
                   className="gap-2"
                   disabled={sendEmailMutation.isPending}
                 >
@@ -288,7 +287,7 @@ export function BookingLinkDialog({
                   ) : (
                     <Send className="h-4 w-4" />
                   )}
-                  Envoyer par email
+                  {t('patientDetail:bookingLink.sendByEmail')}
                 </Button>
               )}
               <Button
@@ -297,7 +296,7 @@ export function BookingLinkDialog({
                 className="gap-2"
               >
                 <ExternalLink className="h-4 w-4" />
-                Ouvrir le lien
+                {t('patientDetail:bookingLink.openLink')}
               </Button>
             </div>
           </div>
@@ -307,7 +306,7 @@ export function BookingLinkDialog({
           {!generatedLink ? (
             <>
               <Button variant="outline" onClick={handleClose}>
-                Annuler
+                {t('patientDetail:bookingLink.cancel')}
               </Button>
               <Button
                 onClick={() => createLinkMutation.mutate()}
@@ -319,12 +318,12 @@ export function BookingLinkDialog({
                 ) : (
                   <CalendarPlus className="h-4 w-4" />
                 )}
-                Générer le lien
+                {t('patientDetail:bookingLink.generate')}
               </Button>
             </>
           ) : (
             <Button variant="outline" onClick={handleClose}>
-              Fermer
+              {t('patientDetail:bookingLink.close')}
             </Button>
           )}
         </DialogFooter>
