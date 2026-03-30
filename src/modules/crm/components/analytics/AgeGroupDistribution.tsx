@@ -3,6 +3,7 @@ import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Loader2 } from 'lucide-react';
 import { differenceInYears } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 const AGE_GROUPS = [
   { label: '18-24', min: 18, max: 24 },
@@ -23,6 +24,7 @@ const COLORS = [
 ];
 
 export function AgeGroupDistribution() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['age-group-distribution'],
     queryFn: async () => {
@@ -74,7 +76,7 @@ export function AgeGroupDistribution() {
   if (!data || data.length === 0) {
     return (
       <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée d'âge disponible
+        {t('analytics:noAgeDataAvailable')}
       </div>
     );
   }

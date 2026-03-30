@@ -5,6 +5,7 @@ import { Loader2, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '@/shared/lib/constants';
 import { differenceInYears } from 'date-fns';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
+import { useTranslation } from 'react-i18next';
 
 const AGE_GROUPS = [
   { label: '18-34', min: 18, max: 34 },
@@ -13,6 +14,7 @@ const AGE_GROUPS = [
 ];
 
 export function PatientLifetimeValue() {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['patient-ltv'],
     queryFn: async () => {
@@ -130,7 +132,7 @@ export function PatientLifetimeValue() {
   if (!data) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

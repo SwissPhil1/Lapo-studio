@@ -131,7 +131,9 @@
     "weekLabel": "Sem.",
     "noDataAvailable": "Aucune donnée disponible",
     "pageOf": "Page {{current}} de {{total}}",
-    "activityLegend": "Légende activité"
+    "activityLegend": "Légende activité",
+    "somethingWentWrong": "Une erreur est survenue",
+    "reloadPage": "Recharger la page"
   },
   "dashboard": {
     "title": "Tableau de Bord Admin",
@@ -743,6 +745,9 @@
     "recallInFollowup": "En suivi",
     "recallNoData": "Sans données",
     "noDataAvailable": "Aucune donnée disponible",
+    "noAgeDataAvailable": "Aucune donnée d'âge disponible",
+    "noAttributionData": "Aucune donnée d'attribution",
+    "attributionEmptyDescription": "Les leads capturés avec des paramètres UTM apparaîtront ici.",
     "retentionRate": "Taux rétention",
     "churnRate": "Taux churn",
     "loyalPatients": "Patients fidèles",
@@ -1637,7 +1642,9 @@
     "statusCancelled": "Annulé",
     "filter": "Filtrer",
     "loadError": "Impossible de charger les rendez-vous",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "appointmentPostponed": "RDV reporté",
+    "viewNewAppointment": "Voir le nouveau RDV"
   },
   "tasks": {
     "overdueRecall": "Rappel en retard",

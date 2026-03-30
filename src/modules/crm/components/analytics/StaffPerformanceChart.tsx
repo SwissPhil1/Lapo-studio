@@ -4,12 +4,14 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Loader2 } from 'lucide-react';
 import { formatCurrency } from '@/shared/lib/constants';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
+import { useTranslation } from 'react-i18next';
 
 interface StaffPerformanceChartProps {
   dateRange: string;
 }
 
 export function StaffPerformanceChart({ dateRange }: StaffPerformanceChartProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['staff-performance', dateRange],
     queryFn: async () => {
@@ -81,7 +83,7 @@ export function StaffPerformanceChart({ dateRange }: StaffPerformanceChartProps)
   if (!data || data.length === 0) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

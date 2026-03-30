@@ -131,7 +131,9 @@
     "weekLabel": "Wk.",
     "noDataAvailable": "No data available",
     "pageOf": "Page {{current}} of {{total}}",
-    "activityLegend": "Activity legend"
+    "activityLegend": "Activity legend",
+    "somethingWentWrong": "Something went wrong",
+    "reloadPage": "Reload page"
   },
   "dashboard": {
     "title": "Admin Dashboard",
@@ -743,6 +745,9 @@
     "recallInFollowup": "In follow-up",
     "recallNoData": "No data",
     "noDataAvailable": "No data available",
+    "noAgeDataAvailable": "No age data available",
+    "noAttributionData": "No attribution data",
+    "attributionEmptyDescription": "Leads captured with UTM parameters will appear here.",
     "retentionRate": "Retention rate",
     "churnRate": "Churn rate",
     "loyalPatients": "Loyal patients",
@@ -1637,7 +1642,9 @@
     "statusCancelled": "Cancelled",
     "filter": "Filter",
     "loadError": "Unable to load appointments",
-    "retry": "Retry"
+    "retry": "Retry",
+    "appointmentPostponed": "Appointment postponed",
+    "viewNewAppointment": "View new appointment"
   },
   "tasks": {
     "overdueRecall": "Overdue recall",

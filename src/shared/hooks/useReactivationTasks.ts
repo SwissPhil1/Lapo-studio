@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { toast } from 'sonner';
 import i18n from '@/i18n';
+import { getLocale } from '@/shared/lib/format';
 
 export type TaskType = 'overdue_recall' | 'dormant' | 'no_show_followup' | 'manual' | 'cancelled_followup';
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'snoozed' | 'cancelled';
@@ -281,11 +282,11 @@ export function useLogAttempt() {
 
       const newAttemptCount = (task?.attempt_count || 0) + 1;
       const methodLabel = method === 'email' ? 'Email' : method === 'sms' ? 'SMS' : method === 'phone' ? i18n.t('common:call') : i18n.t('common:contact');
-      const timestamp = new Date().toLocaleString('fr-FR', { 
-        day: '2-digit', 
-        month: 'short', 
-        hour: '2-digit', 
-        minute: '2-digit' 
+      const timestamp = new Date().toLocaleString(getLocale(), {
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
       });
       const noteText = notes 
         ? `[${methodLabel} - ${timestamp}] ${notes}`

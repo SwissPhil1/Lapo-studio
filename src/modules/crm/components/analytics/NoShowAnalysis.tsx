@@ -7,6 +7,7 @@ import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
 
 interface NoShowAnalysisProps {
   dateRange: string;
@@ -15,6 +16,7 @@ interface NoShowAnalysisProps {
 const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
 export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['noshow-analysis', dateRange],
     queryFn: async () => {
@@ -91,7 +93,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
   if (!data) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

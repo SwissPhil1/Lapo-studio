@@ -3,12 +3,14 @@ import { supabase } from '@/shared/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Loader2, Users, TrendingUp, Banknote } from 'lucide-react';
 import { formatCurrency } from '@/shared/lib/constants';
+import { useTranslation } from 'react-i18next';
 
 interface ReferralAnalyticsProps {
   dateRange: string;
 }
 
 export function ReferralAnalytics({ dateRange }: ReferralAnalyticsProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['referral-analytics', dateRange],
     queryFn: async () => {
@@ -95,7 +97,7 @@ export function ReferralAnalytics({ dateRange }: ReferralAnalyticsProps) {
   if (!data) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

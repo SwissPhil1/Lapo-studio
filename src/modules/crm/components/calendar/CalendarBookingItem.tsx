@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getStatusColors, getStatusLabel, BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 import { ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { CalendarBooking } from '@/shared/hooks/useCalendarBookings';
 
 interface CalendarBookingItemProps {
@@ -11,6 +12,7 @@ interface CalendarBookingItemProps {
 }
 
 export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBookingItemProps) {
+  const { t } = useTranslation(['calendar']);
   const navigate = useNavigate();
   const colors = getStatusColors(booking.status || 'scheduled');
   const statusLabel = getStatusLabel(booking.status || 'scheduled');
@@ -52,7 +54,7 @@ export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBo
             {isRescheduled && booking.rescheduled_to_booking_id && (
               <p className="text-xs text-warning flex items-center gap-1">
                 <ArrowRight className="h-3 w-3" />
-                RDV reporté
+                {t('calendar:appointmentPostponed')}
               </p>
             )}
           </div>
@@ -88,7 +90,7 @@ export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBo
       {isRescheduled && booking.rescheduled_to_booking_id && (
         <div className="mt-1.5 flex items-center gap-1 text-xs text-warning">
           <ArrowRight className="h-3 w-3" />
-          <span>Voir le nouveau RDV</span>
+          <span>{t('calendar:viewNewAppointment')}</span>
         </div>
       )}
     </button>

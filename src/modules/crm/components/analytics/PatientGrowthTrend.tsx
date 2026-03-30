@@ -6,12 +6,14 @@ import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
 
 interface PatientGrowthTrendProps {
   months?: number;
 }
 
 export function PatientGrowthTrend({ months = 12 }: PatientGrowthTrendProps) {
+  const { t } = useTranslation(['analytics']);
   const { data, isLoading } = useQuery({
     queryKey: ['patient-growth-trend', months],
     queryFn: async () => {
@@ -61,7 +63,7 @@ export function PatientGrowthTrend({ months = 12 }: PatientGrowthTrendProps) {
   if (!data || data.length === 0) {
     return (
       <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-        Aucune donnée disponible
+        {t('analytics:noDataAvailable')}
       </div>
     );
   }

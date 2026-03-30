@@ -14,6 +14,7 @@ import { format, parseISO, addDays, differenceInDays } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import i18n from '@/i18n';
+import { getLocale } from '@/shared/lib/format';
 
 interface PipelineSnapshot {
   id: string;
@@ -172,7 +173,7 @@ export function RevenueForecast() {
   }
 
   const formatCHF = (value: number) =>
-    new Intl.NumberFormat('fr-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 }).format(value);
+    new Intl.NumberFormat(getLocale(), { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 }).format(value);
 
   return (
     <div className="space-y-6">
