@@ -1,29 +1,31 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
 import { Mail, CheckCheck, Eye, MousePointer } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function CommunicationMetrics() {
+  const { t } = useTranslation(['communications']);
+
   const { data: metrics, isLoading } = useQuery({
     queryKey: ['communication-metrics'],
     queryFn: async () => {
-      // Get stats for last 7 days
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      
+
       const { data, error } = await supabase
         .from('crm_communication_logs')
         .select('id, status, channel, delivered_at, opened_count, clicked_count, bounced_at')
         .gte('sent_at', sevenDaysAgo.toISOString())
         .eq('channel', 'email');
-      
+
       if (error) throw error;
-      
+
       const total = data.length;
       const delivered = data.filter(d => d.delivered_at).length;
       const opened = data.filter(d => (d.opened_count || 0) > 0).length;
       const clicked = data.filter(d => (d.clicked_count || 0) > 0).length;
-      
+
       return {
         total,
         deliveryRate: total > 0 ? Math.round((delivered / total) * 100) : 0,
@@ -45,33 +47,29 @@ export function CommunicationMetrics() {
 
   const stats = [
     {
-      label: 'Emails envoyés',
+      label: t('communications:emailsSent'),
       value: metrics?.total || 0,
-      subLabel: '7 derniers jours',
       icon: Mail,
       color: 'text-primary',
       bg: 'bg-primary/10',
     },
     {
-      label: 'Taux de livraison',
+      label: t('communications:deliveryRate'),
       value: `${metrics?.deliveryRate || 0}%`,
-      subLabel: 'Délivrés',
       icon: CheckCheck,
       color: 'text-success',
       bg: 'bg-success/10',
     },
     {
-      label: "Taux d'ouverture",
+      label: t('communications:openRate'),
       value: `${metrics?.openRate || 0}%`,
-      subLabel: 'Ouverts',
       icon: Eye,
       color: 'text-accent-foreground',
       bg: 'bg-accent',
     },
     {
-      label: 'Taux de clics',
+      label: t('communications:clickRate'),
       value: `${metrics?.clickRate || 0}%`,
-      subLabel: 'Cliqués',
       icon: MousePointer,
       color: 'text-warning',
       bg: 'bg-warning/10',
