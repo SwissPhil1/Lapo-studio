@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,33 +26,32 @@ interface StageSelectorProps {
   onStageChange?: () => void;
 }
 
-export function StageSelector({ 
-  patientId, 
-  currentStage, 
+export function StageSelector({
+  patientId,
+  currentStage,
   allStages,
-  onStageChange 
+  onStageChange
 }: StageSelectorProps) {
+  const { t } = useTranslation(['patientDetail']);
   const [isUpdating, setIsUpdating] = useState(false);
   const queryClient = useQueryClient();
 
   const handleStageChange = async (newStage: Stage) => {
     if (newStage.id === currentStage?.id) return;
-    
+
     setIsUpdating(true);
     try {
       if (currentStage) {
-        // Update existing pipeline_patients entry
         const { error } = await supabase
           .from('pipeline_patients')
-          .update({ 
+          .update({
             stage_id: newStage.id,
             entered_at: new Date().toISOString(),
           })
           .eq('patient_id', patientId);
-        
+
         if (error) throw error;
       } else {
-        // Insert new pipeline_patients entry
         const { error } = await supabase
           .from('pipeline_patients')
           .insert({
@@ -59,16 +59,16 @@ export function StageSelector({
             stage_id: newStage.id,
             entered_at: new Date().toISOString(),
           });
-        
+
         if (error) throw error;
       }
-      
-      toast.success(`Patient déplacé vers "${newStage.name}"`);
+
+      toast.success(t('patientDetail:stage.movedTo', { name: newStage.name }));
       queryClient.invalidateQueries({ queryKey: ['patient-detail', patientId] });
       queryClient.invalidateQueries({ queryKey: ['pipeline'] });
       onStageChange?.();
     } catch (error: any) {
-      toast.error(`Erreur: ${error.message}`);
+      toast.error(t('patientDetail:stage.error', { message: error.message }));
     } finally {
       setIsUpdating(false);
     }
@@ -77,22 +77,22 @@ export function StageSelector({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           disabled={isUpdating}
           className="gap-2"
         >
           {currentStage ? (
             <>
-              <div 
-                className="h-2 w-2 rounded-full" 
+              <div
+                className="h-2 w-2 rounded-full"
                 style={{ backgroundColor: currentStage.color }}
               />
               <span>{currentStage.name}</span>
             </>
           ) : (
-            <span className="text-muted-foreground">Ajouter au pipeline</span>
+            <span className="text-muted-foreground">{t('patientDetail:stage.addToPipeline')}</span>
           )}
           <ChevronDown className="h-4 w-4" />
         </Button>
@@ -105,8 +105,8 @@ export function StageSelector({
             className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-2">
-              <div 
-                className="h-2 w-2 rounded-full" 
+              <div
+                className="h-2 w-2 rounded-full"
                 style={{ backgroundColor: stage.color }}
               />
               <span>{stage.name}</span>

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
 import { Gift, Wallet, TrendingUp, TrendingDown, Settings, HelpCircle, Filter } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -139,16 +139,14 @@ export default function LapoCash() {
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
                   <p className="text-sm font-medium text-muted-foreground">{t("ratesByTier")}</p>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs">
-                        <p>{t("ratesByTierTooltip")}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <p>{t("ratesByTierTooltip")}</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <button
                     onClick={() => navigate("/admin/referrer-types")}
                     className="text-muted-foreground hover:text-foreground transition-colors"

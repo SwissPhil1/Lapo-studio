@@ -3,7 +3,6 @@ import { activityStatusConfig, type ReferrerActivityStatus } from "@/shared/lib/
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
@@ -38,32 +37,30 @@ export function ActivityLegend({ compact = true }: ActivityLegendProps) {
 
   if (compact) {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-              <HelpCircle className="h-4 w-4" />
-              <span className="text-xs">{isEnglish ? "Activity legend" : "Légende activité"}</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-xs p-3">
-            <div className="space-y-2">
-              {statuses.map((status) => (
-                <div key={status} className="flex items-start gap-2">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0"
-                    style={{ backgroundColor: activityStatusConfig[status].color }}
-                  />
-                  <div>
-                    <p className="text-sm font-medium">{labels[status]}</p>
-                    <p className="text-xs text-muted-foreground">{descriptions[status]}</p>
-                  </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+            <HelpCircle className="h-4 w-4" />
+            <span className="text-xs">{isEnglish ? "Activity legend" : "Légende activité"}</span>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-xs p-3">
+          <div className="space-y-2">
+            {statuses.map((status) => (
+              <div key={status} className="flex items-start gap-2">
+                <div
+                  className="w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0"
+                  style={{ backgroundColor: activityStatusConfig[status].color }}
+                />
+                <div>
+                  <p className="text-sm font-medium">{labels[status]}</p>
+                  <p className="text-xs text-muted-foreground">{descriptions[status]}</p>
                 </div>
-              ))}
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+              </div>
+            ))}
+          </div>
+        </TooltipContent>
+      </Tooltip>
     );
   }
 

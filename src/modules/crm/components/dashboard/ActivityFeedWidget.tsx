@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -584,32 +584,28 @@ export function ActivityFeedWidget({
                     {hasChildren && (
                       <div className="flex items-center gap-1">
                         {hasOpened && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="text-info">
-                                  <Eye className="h-3 w-3" />
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Email ouvert</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="text-info">
+                                <Eye className="h-3 w-3" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Email ouvert</p>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                         {hasClicked && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="text-primary">
-                                  <MousePointerClick className="h-3 w-3" />
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Lien cliqué</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="text-primary">
+                                <MousePointerClick className="h-3 w-3" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Lien cliqué</p>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
                     )}
@@ -622,18 +618,16 @@ export function ActivityFeedWidget({
                   {isEmailSent && (
                     <div className="hidden sm:flex items-center gap-1">
                       {isDelivered && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="text-success">
-                                <CheckCheck className="h-3.5 w-3.5" />
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Délivré</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-success">
+                              <CheckCheck className="h-3.5 w-3.5" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Délivré</p>
+                          </TooltipContent>
+                        </Tooltip>
                       )}
                     </div>
                   )}

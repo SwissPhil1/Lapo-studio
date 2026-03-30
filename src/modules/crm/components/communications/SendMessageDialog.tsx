@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,13 +14,14 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format, addDays } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { cn } from '@/shared/lib/utils';
-import { 
-  getPatientTreatmentInfo, 
-  resolveMergeTags, 
+import {
+  getPatientTreatmentInfo,
+  resolveMergeTags,
   TEMPLATE_CATEGORIES,
-  type TreatmentInfo 
+  type TreatmentInfo
 } from '@/shared/lib/emailMergeTags';
 
 interface SendMessageDialogProps {
@@ -33,17 +35,8 @@ interface SendMessageDialogProps {
     email: string | null;
     phone: string | null;
   };
-  /** If provided, the associated reactivation task will be snoozed after sending */
   taskId?: string;
 }
-
-// Quick follow-up options in days
-const FOLLOW_UP_OPTIONS = [
-  { label: '1 semaine', days: 7 },
-  { label: '2 semaines', days: 14 },
-  { label: '1 mois', days: 30 },
-  { label: '3 mois', days: 90 },
-];
 
 type Channel = 'email' | 'sms' | 'phone';
 
@@ -65,6 +58,8 @@ interface EmailTemplate {
 }
 
 export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPatient, taskId }: SendMessageDialogProps) {
+  const { t, i18n } = useTranslation(['patientDetail']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   const queryClient = useQueryClient();
   const [patientOpen, setPatientOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(preselectedPatient || null);
@@ -75,8 +70,15 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
   const [patientSearch, setPatientSearch] = useState('');
   const [treatmentInfo, setTreatmentInfo] = useState<TreatmentInfo | null>(null);
   const [isLoadingTreatment, setIsLoadingTreatment] = useState(false);
-  const [followUpDate, setFollowUpDate] = useState<Date | null>(addDays(new Date(), 30)); // Default: 1 month
+  const [followUpDate, setFollowUpDate] = useState<Date | null>(addDays(new Date(), 30));
   const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const FOLLOW_UP_OPTIONS = [
+    { label: t('patientDetail:sendMessage.week1'), days: 7 },
+    { label: t('patientDetail:sendMessage.week2'), days: 14 },
+    { label: t('patientDetail:sendMessage.month1'), days: 30 },
+    { label: t('patientDetail:sendMessage.month3'), days: 90 },
+  ];
 
   // Fetch treatment info when patient changes
   useEffect(() => {
@@ -85,7 +87,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
         setTreatmentInfo(null);
         return;
       }
-      
+
       setIsLoadingTreatment(true);
       try {
         const info = await getPatientTreatmentInfo(selectedPatient.id);
@@ -97,7 +99,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
         setIsLoadingTreatment(false);
       }
     }
-    
+
     fetchTreatmentInfo();
   }, [selectedPatient?.id]);
 
@@ -110,11 +112,11 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
         .select('id, first_name, last_name, email, phone')
         .order('last_name')
         .limit(20);
-      
+
       if (patientSearch) {
         query = query.or(`first_name.ilike.%${patientSearch}%,last_name.ilike.%${patientSearch}%,email.ilike.%${patientSearch}%`);
       }
-      
+
       const { data, error } = await query;
       if (error) throw error;
       return data as Patient[];
@@ -131,7 +133,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
         .select('id, key, name, subject, body, category')
         .order('category')
         .order('name');
-      
+
       if (error) throw error;
       return data as EmailTemplate[];
     },
@@ -167,7 +169,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
 
     const processedSubject = resolveMergeTags(template.subject, mergeData);
     const processedBody = resolveMergeTags(template.body, mergeData);
-    
+
     setSubject(processedSubject);
     setMessage(processedBody);
   };
@@ -199,38 +201,36 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
   // Send message mutation
   const sendMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedPatient) throw new Error('Veuillez sélectionner un patient');
-      if (!message.trim()) throw new Error('Veuillez entrer un message');
-      
+      if (!selectedPatient) throw new Error(t('patientDetail:sendMessage.selectPatientError'));
+      if (!message.trim()) throw new Error(t('patientDetail:sendMessage.enterMessageError'));
+
       const followUpDateStr = followUpDate ? format(followUpDate, 'yyyy-MM-dd') : null;
-      
-      // For email, use the edge function to actually send via Resend
+
       if (channel === 'email') {
         if (!selectedPatient.email) {
-          throw new Error('Ce patient n\'a pas d\'adresse email');
+          throw new Error(t('patientDetail:sendMessage.noEmailError'));
         }
-        
+
         const { data, error } = await supabase.functions.invoke('send-email', {
           body: {
             to: selectedPatient.email,
-            subject: subject || 'Message de LAPO Skin',
+            subject: subject || t('patientDetail:sendMessage.defaultSubject'),
             html_body: message,
             patient_id: selectedPatient.id,
             template_id: selectedTemplateId !== 'custom' ? selectedTemplateId : undefined,
             follow_up_date: followUpDateStr,
           },
         });
-        
+
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
-        
+
         return { channel: 'email', followUpDate: followUpDateStr };
       }
-      
-      // For SMS, use the send-sms edge function
+
       if (channel === 'sms') {
         if (!selectedPatient.phone) {
-          throw new Error('Ce patient n\'a pas de numéro de téléphone');
+          throw new Error(t('patientDetail:sendMessage.noPhoneError'));
         }
 
         const { data, error } = await supabase.functions.invoke('send-sms', {
@@ -266,34 +266,37 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
       return { channel, followUpDate: followUpDateStr };
     },
     onSuccess: async (result) => {
-      // Build success message
-      let successMessage = result.channel === 'email' ? 'Email envoyé' : result.channel === 'sms' ? 'SMS envoyé' : 'Note enregistrée';
+      let successMessage = result.channel === 'email'
+        ? t('patientDetail:sendMessage.emailSent')
+        : result.channel === 'sms'
+          ? t('patientDetail:sendMessage.smsSent')
+          : t('patientDetail:sendMessage.noteRecorded');
+
       if (result.followUpDate) {
-        const followUpFormatted = format(new Date(result.followUpDate), 'd MMMM yyyy', { locale: fr });
-        successMessage += ` • Rappel le ${followUpFormatted}`;
+        const followUpFormatted = format(new Date(result.followUpDate), 'd MMMM yyyy', { locale: dateLocale });
+        successMessage += ` • ${t('patientDetail:sendMessage.reminderOn', { date: followUpFormatted })}`;
       }
-      
+
       // If there's an associated task, snooze it and log the attempt
       if (taskId && followUpDate) {
         try {
-          // Use direct update since we don't have access to the hook here
           const { data: task } = await supabase
             .from('reactivation_tasks')
             .select('attempt_count, notes')
             .eq('id', taskId)
             .single();
-          
+
           const newAttemptCount = (task?.attempt_count || 0) + 1;
-          const timestamp = new Date().toLocaleString('fr-FR', { 
-            day: '2-digit', 
-            month: 'short', 
-            hour: '2-digit', 
-            minute: '2-digit' 
+          const timestamp = new Date().toLocaleString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
           });
-          const channelLabel = channel === 'email' ? 'Email' : channel === 'sms' ? 'SMS' : 'Appel';
-          const noteText = `[${channelLabel} - ${timestamp}] Rappel envoyé`;
+          const channelLabel = channel === 'email' ? 'Email' : channel === 'sms' ? 'SMS' : t('patientDetail:timeline.call');
+          const noteText = `[${channelLabel} - ${timestamp}]`;
           const newNotes = `${task?.notes || ''}\n${noteText}`.trim();
-          
+
           await supabase
             .from('reactivation_tasks')
             .update({
@@ -304,7 +307,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
               snoozed_until: format(followUpDate, 'yyyy-MM-dd'),
             })
             .eq('id', taskId);
-          
+
           queryClient.invalidateQueries({ queryKey: ['reactivation-tasks'] });
           queryClient.invalidateQueries({ queryKey: ['reactivation-task-counts'] });
           queryClient.invalidateQueries({ queryKey: ['patient-tasks'] });
@@ -312,25 +315,23 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
           console.error('Error updating task:', err);
         }
       }
-      
+
       toast.success(successMessage);
-      
-      // Invalidate all relevant queries so UI updates immediately
+
       queryClient.invalidateQueries({ queryKey: ['crm-communication-logs'] });
       queryClient.invalidateQueries({ queryKey: ['patient-communications'] });
-      
-      // Refresh patient timeline (Activité tab) and activity widgets
+
       if (selectedPatient) {
         queryClient.invalidateQueries({ queryKey: ['patient-timeline', selectedPatient.id] });
         queryClient.invalidateQueries({ queryKey: ['patient-recent-comms', selectedPatient.id] });
       }
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-      
+
       onSuccess?.();
       handleClose();
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Erreur lors de l\'envoi du message');
+      toast.error(error.message || t('patientDetail:sendMessage.sendError'));
     },
   });
 
@@ -342,7 +343,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
     setMessage('');
     setPatientSearch('');
     setTreatmentInfo(null);
-    setFollowUpDate(addDays(new Date(), 30)); // Reset to default
+    setFollowUpDate(addDays(new Date(), 30));
     setCalendarOpen(false);
     onOpenChange(false);
   };
@@ -354,13 +355,12 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
   const handlePatientSelect = (patient: Patient) => {
     setSelectedPatient(patient);
     setPatientOpen(false);
-    // Template will be re-applied when treatment info loads via useEffect
   };
 
   const channelConfig = {
-    email: { icon: Mail, label: 'Email', placeholder: 'Écrivez votre email...' },
-    sms: { icon: MessageSquare, label: 'SMS', placeholder: 'Écrivez votre SMS (160 caractères max)...' },
-    phone: { icon: Phone, label: 'Note d\'appel', placeholder: 'Notes de l\'appel téléphonique...' },
+    email: { icon: Mail, label: 'Email', placeholder: t('patientDetail:sendMessage.emailPlaceholder') },
+    sms: { icon: MessageSquare, label: 'SMS', placeholder: t('patientDetail:sendMessage.smsPlaceholder') },
+    phone: { icon: Phone, label: t('patientDetail:sendMessage.callNote'), placeholder: t('patientDetail:sendMessage.callPlaceholder') },
   };
 
   const ChannelIcon = channelConfig[channel].icon;
@@ -371,14 +371,14 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <ChannelIcon className="h-5 w-5" />
-            Envoyer un message
+            {t('patientDetail:sendMessage.title')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4 overflow-y-auto flex-1">
           {/* Patient selector */}
           <div className="space-y-2">
-            <Label>Patient</Label>
+            <Label>{t('patientDetail:sendMessage.patient')}</Label>
             <Popover open={patientOpen} onOpenChange={setPatientOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -396,20 +396,20 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
                   ) : (
                     <span className="text-muted-foreground flex items-center gap-2">
                       <Search className="h-4 w-4" />
-                      Rechercher un patient...
+                      {t('patientDetail:sendMessage.searchPatient')}
                     </span>
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0" align="start">
                 <Command>
-                  <CommandInput 
-                    placeholder="Rechercher par nom ou email..." 
+                  <CommandInput
+                    placeholder={t('patientDetail:sendMessage.searchPlaceholder')}
                     value={patientSearch}
                     onValueChange={setPatientSearch}
                   />
                   <CommandList>
-                    <CommandEmpty>Aucun patient trouvé.</CommandEmpty>
+                    <CommandEmpty>{t('patientDetail:sendMessage.noPatientFound')}</CommandEmpty>
                     <CommandGroup>
                       {patients.map((patient) => (
                         <CommandItem
@@ -419,7 +419,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
                         >
                           <div className="flex flex-col">
                             <span className="font-medium">{patient.first_name} {patient.last_name}</span>
-                            <span className="text-xs text-muted-foreground">{patient.email || 'Pas d\'email'}</span>
+                            <span className="text-xs text-muted-foreground">{patient.email || t('patientDetail:sendMessage.noEmail')}</span>
                           </div>
                         </CommandItem>
                       ))}
@@ -428,18 +428,17 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
                 </Command>
               </PopoverContent>
             </Popover>
-            
-            {/* Treatment info indicator */}
+
             {selectedPatient && treatmentInfo && !isLoadingTreatment && (
               <p className="text-xs text-muted-foreground">
-                Dernier soin : {treatmentInfo.treatment_name} • Rappel : {treatmentInfo.recall_days} jours
+                {t('patientDetail:sendMessage.lastTreatment', { name: treatmentInfo.treatment_name, days: treatmentInfo.recall_days })}
               </p>
             )}
           </div>
 
           {/* Channel selector */}
           <div className="space-y-2">
-            <Label>Canal</Label>
+            <Label>{t('patientDetail:sendMessage.channel')}</Label>
             <Select value={channel} onValueChange={(v) => setChannel(v as Channel)}>
               <SelectTrigger>
                 <SelectValue />
@@ -457,24 +456,24 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
                 </SelectItem>
                 <SelectItem value="phone">
                   <span className="flex items-center gap-2">
-                    <Phone className="h-4 w-4" /> Note d'appel
+                    <Phone className="h-4 w-4" /> {t('patientDetail:sendMessage.callNote')}
                   </span>
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Template selector - grouped by category */}
+          {/* Template selector */}
           {channel === 'email' && templates.length > 0 && (
             <div className="space-y-2">
-              <Label>Modèle</Label>
+              <Label>{t('patientDetail:sendMessage.template')}</Label>
               <Select value={selectedTemplateId} onValueChange={handleTemplateChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choisir un modèle..." />
+                  <SelectValue placeholder={t('patientDetail:sendMessage.templatePlaceholder')} />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
-                  <SelectItem value="custom">Message personnalisé</SelectItem>
-                  
+                  <SelectItem value="custom">{t('patientDetail:sendMessage.customMessage')}</SelectItem>
+
                   {Object.entries(templatesByCategory).map(([category, categoryTemplates]) => (
                     <SelectGroup key={category}>
                       <SelectLabel className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -495,18 +494,18 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
           {/* Subject (for email only) */}
           {channel === 'email' && (
             <div className="space-y-2">
-              <Label>Objet</Label>
+              <Label>{t('patientDetail:sendMessage.subject')}</Label>
               <Input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="Objet de l'email..."
+                placeholder={t('patientDetail:sendMessage.subjectPlaceholder')}
               />
             </div>
           )}
 
           {/* Message content */}
           <div className="space-y-2">
-            <Label>Message</Label>
+            <Label>{t('patientDetail:sendMessage.message')}</Label>
             <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -516,14 +515,14 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
             />
             {channel === 'sms' && (
               <p className="text-xs text-muted-foreground text-right">
-                {message.length}/160 caractères
+                {t('patientDetail:sendMessage.smsCount', { count: message.length })}
               </p>
             )}
           </div>
 
           {/* Follow-up date selector */}
           <div className="space-y-2">
-            <Label>Prochain rappel dans</Label>
+            <Label>{t('patientDetail:sendMessage.followUpIn')}</Label>
             <div className="flex flex-wrap gap-2">
               {FOLLOW_UP_OPTIONS.map((option) => (
                 <Button
@@ -545,7 +544,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
                     className={cn(!followUpDate && "text-muted-foreground")}
                   >
                     <CalendarIcon className="h-4 w-4 mr-1" />
-                    Personnalisé
+                    {t('patientDetail:sendMessage.custom')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -559,14 +558,14 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
                     disabled={(date) => date < new Date()}
                     initialFocus
                     className={cn("p-3 pointer-events-auto")}
-                    locale={fr}
+                    locale={dateLocale}
                   />
                 </PopoverContent>
               </Popover>
             </div>
             {followUpDate && (
               <p className="text-xs text-muted-foreground">
-                Rappel prévu le {format(followUpDate, 'd MMMM yyyy', { locale: fr })}
+                {t('patientDetail:sendMessage.followUpDate', { date: format(followUpDate, 'd MMMM yyyy', { locale: dateLocale }) })}
               </p>
             )}
           </div>
@@ -574,16 +573,16 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Annuler
+            {t('patientDetail:sendMessage.cancel')}
           </Button>
-          <Button 
-            onClick={() => sendMutation.mutate()} 
+          <Button
+            onClick={() => sendMutation.mutate()}
             disabled={!selectedPatient || !message.trim() || sendMutation.isPending}
           >
             {sendMutation.isPending ? (
-              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Envoi...</>
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t('patientDetail:sendMessage.sending')}</>
             ) : (
-              <>Envoyer</>
+              <>{t('patientDetail:sendMessage.send')}</>
             )}
           </Button>
         </DialogFooter>
