@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,14 +58,7 @@ import { isBookingForRecall, isPastBookingUnprocessed, BOOKING_STATUS } from '@/
 
 type PatientFilter = 'all' | 'to_contact' | 'in_followup' | 'scheduled' | 'new_leads' | 'overdue';
 
-const FILTER_LABELS: Record<PatientFilter, string> = {
-  all: 'Tous les patients',
-  to_contact: 'À contacter',
-  in_followup: 'En suivi',
-  scheduled: 'RDV planifié',
-  new_leads: 'Nouveaux leads',
-  overdue: 'Rappel en retard',
-};
+const FILTER_KEYS: PatientFilter[] = ['all', 'to_contact', 'in_followup', 'scheduled', 'new_leads', 'overdue'];
 
 const PATIENTS_PER_PAGE = 50;
 
@@ -122,6 +116,7 @@ interface Segment {
 }
 
 export default function Patients() {
+  const { t } = useTranslation(['patients', 'common']);
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<PatientFilter>('all');
@@ -175,7 +170,7 @@ export default function Patients() {
     const urlAiQuery = searchParams.get('aiQuery');
     const urlPatientIds = searchParams.get('patientIds');
     
-    if (urlFilter && Object.keys(FILTER_LABELS).includes(urlFilter)) {
+    if (urlFilter && FILTER_KEYS.includes(urlFilter as PatientFilter)) {
       setFilter(urlFilter as PatientFilter);
     }
     if (urlPage) {
@@ -242,7 +237,7 @@ export default function Patients() {
       });
       
       if (error) {
-        throw new Error(error.message || 'Erreur lors de la recherche AI');
+        throw new Error(error.message || t('patients:aiSearchErrorGeneric'));
       }
       
       if (data.error) {
@@ -260,8 +255,8 @@ export default function Patients() {
     } catch (err) {
       console.error('AI Search error:', err);
       toast({
-        title: "Erreur de recherche",
-        description: err instanceof Error ? err.message : "Une erreur est survenue",
+        title: t('patients:aiSearchError'),
+        description: err instanceof Error ? err.message : t('patients:aiSearchErrorGeneric'),
         variant: "destructive"
       });
     } finally {
@@ -562,17 +557,17 @@ export default function Patients() {
       queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
       setIsDialogOpen(false);
       setNewPatient({ first_name: '', last_name: '', email: '', phone_number: '', date_of_birth: '', is_business_contact: false });
-      toast({ title: 'Patient ajouté', description: 'Le patient a été ajouté avec succès.' });
+      toast({ title: t('patients:toast.added'), description: t('patients:toast.addedDesc') });
     },
     onError: (error: Error) => {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: t('patients:toast.error'), description: error.message, variant: 'destructive' });
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPatient.first_name || !newPatient.last_name) {
-      toast({ title: 'Erreur', description: 'Le prénom et le nom sont requis.', variant: 'destructive' });
+      toast({ title: t('patients:toast.error'), description: t('patients:dialog.nameRequired'), variant: 'destructive' });
       return;
     }
     createMutation.mutate(newPatient);
@@ -622,11 +617,11 @@ export default function Patients() {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-4">
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold text-foreground">Session expirée</h3>
-          <p className="text-muted-foreground">Veuillez vous reconnecter pour accéder aux patients.</p>
+          <h3 className="text-lg font-semibold text-foreground">{t('patients:sessionExpired')}</h3>
+          <p className="text-muted-foreground">{t('patients:sessionExpiredDesc')}</p>
         </div>
         <Button onClick={() => navigate('/auth')} variant="gradient">
-          Se reconnecter
+          {t('patients:reconnect')}
         </Button>
       </div>
     );
@@ -639,12 +634,12 @@ export default function Patients() {
         <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
           <Sparkles className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium text-foreground">
-            {staticPatientIds 
-              ? `Segment statique appliqué (${staticPatientIds.length} patients)` 
-              : `Recherche IA: "${currentAIQuery}"`}
+            {staticPatientIds
+              ? t('patients:staticSegment', { count: staticPatientIds.length })
+              : t('patients:aiQueryLabel', { query: currentAIQuery })}
           </span>
           <Button variant="ghost" size="sm" onClick={clearAISearch} className="ml-auto h-7 text-xs">
-            Effacer le filtre
+            {t('patients:clearFilter')}
           </Button>
         </div>
       )}
@@ -655,7 +650,7 @@ export default function Patients() {
           <div className="relative flex-1 min-w-[200px] max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Rechercher..."
+              placeholder={t('patients:search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
@@ -670,11 +665,11 @@ export default function Patients() {
           >
             <SelectTrigger className="w-[180px]">
               <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Filtrer" />
+              <SelectValue placeholder={t('patients:filters.all')} />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(FILTER_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>{label}</SelectItem>
+              {FILTER_KEYS.map((key) => (
+                <SelectItem key={key} value={key}>{t(`patients:filters.${key}`)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -685,7 +680,7 @@ export default function Patients() {
             className={isAISearchMode ? "bg-accent text-accent-foreground border-primary/30" : ""}
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            Recherche IA
+            {t('patients:aiSearch')}
           </Button>
 
           {/* Saved Segments - Popover button */}
@@ -699,17 +694,17 @@ export default function Patients() {
           <DialogTrigger asChild>
             <Button variant="gradient">
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter un patient
+              {t('patients:addPatient')}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Nouveau patient</DialogTitle>
+              <DialogTitle>{t('patients:dialog.title')}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="first_name">Prénom *</Label>
+                  <Label htmlFor="first_name">{t('patients:dialog.firstName')}</Label>
                   <Input
                     id="first_name"
                     value={newPatient.first_name}
@@ -718,7 +713,7 @@ export default function Patients() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="last_name">Nom *</Label>
+                  <Label htmlFor="last_name">{t('patients:dialog.lastName')}</Label>
                   <Input
                     id="last_name"
                     value={newPatient.last_name}
@@ -728,7 +723,7 @@ export default function Patients() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('patients:dialog.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -737,7 +732,7 @@ export default function Patients() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone">{t('patients:dialog.phone')}</Label>
                 <Input
                   id="phone"
                   value={newPatient.phone_number}
@@ -745,7 +740,7 @@ export default function Patients() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="dob">Date de naissance</Label>
+                <Label htmlFor="dob">{t('patients:dialog.dob')}</Label>
                 <Input
                   id="dob"
                   type="date"
@@ -760,15 +755,15 @@ export default function Patients() {
                   onCheckedChange={(checked) => setNewPatient({ ...newPatient, is_business_contact: checked === true })}
                 />
                 <Label htmlFor="is_business_contact" className="text-sm font-normal text-muted-foreground cursor-pointer">
-                  Contact professionnel (pas un patient)
+                  {t('patients:dialog.businessContact')}
                 </Label>
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Annuler
+                  {t('patients:dialog.cancel')}
                 </Button>
                 <Button type="submit" variant="gradient" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ajouter'}
+                  {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t('patients:dialog.add')}
                 </Button>
               </div>
             </form>
@@ -803,32 +798,32 @@ export default function Patients() {
                       <Checkbox
                         checked={allSelected}
                         onCheckedChange={handleSelectAll}
-                        aria-label="Sélectionner tout"
+                        aria-label={t('patients:table.selectAll')}
                       />
                     </TableHead>
-                    <TableHead className="w-[220px]">Patient</TableHead>
-                    <TableHead className="w-[80px]">Signaux</TableHead>
+                    <TableHead className="w-[220px]">{t('patients:table.patient')}</TableHead>
+                    <TableHead className="w-[80px]">{t('patients:table.signals')}</TableHead>
                     <TableHead className="w-[140px]">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="flex items-center gap-1 cursor-help">
-                            Action requise
+                            {t('patients:table.actionRequired')}
                             <HelpCircle className="h-3 w-3 text-muted-foreground" />
                           </div>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-xs">
                           <div className="space-y-1">
-                            <p className="font-semibold">Prochaine action à effectuer</p>
+                            <p className="font-semibold">{t('patients:table.actionRequiredTitle')}</p>
                             <p className="text-xs text-muted-foreground">
-                              Affiche la tâche active ou suggère de créer un rappel si le patient est en retard.
+                              {t('patients:table.actionRequiredDesc')}
                             </p>
                           </div>
                         </TooltipContent>
                       </Tooltip>
                     </TableHead>
-                    <TableHead>Prochain RDV</TableHead>
-                    <TableHead>Rappel</TableHead>
-                    <TableHead className="text-right">Valeur</TableHead>
+                    <TableHead>{t('patients:table.nextAppointment')}</TableHead>
+                    <TableHead>{t('patients:table.recall')}</TableHead>
+                    <TableHead className="text-right">{t('patients:table.value')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -868,7 +863,7 @@ export default function Patients() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
-                  Affichage de {((page - 1) * PATIENTS_PER_PAGE) + 1} à {Math.min(page * PATIENTS_PER_PAGE, totalCount)} sur {totalCount} patients
+                  {t('patients:pagination.showing', { from: ((page - 1) * PATIENTS_PER_PAGE) + 1, to: Math.min(page * PATIENTS_PER_PAGE, totalCount), total: totalCount })}
                 </p>
                 <Pagination>
                   <PaginationContent>
@@ -922,21 +917,21 @@ export default function Patients() {
               )}
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              {isAISearchMode && aiSearchResults !== null 
-                ? 'Aucun patient correspondant' 
-                : 'Aucun patient trouvé'}
+              {isAISearchMode && aiSearchResults !== null
+                ? t('patients:empty.noMatch')
+                : t('patients:empty.noPatients')}
             </h3>
             <p className="text-muted-foreground mb-4">
               {isAISearchMode && aiSearchResults !== null
-                ? 'Essayez de reformuler votre recherche IA.'
-                : search 
-                  ? 'Essayez de modifier vos critères de recherche.' 
-                  : 'Commencez par ajouter votre premier patient.'}
+                ? t('patients:empty.aiNoMatch')
+                : search
+                  ? t('patients:empty.searchNoMatch')
+                  : t('patients:empty.firstPatient')}
             </p>
             {!search && !isAISearchMode && (
               <Button variant="gradient" onClick={() => setIsDialogOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Ajouter un patient
+                {t('patients:addPatient')}
               </Button>
             )}
           </div>

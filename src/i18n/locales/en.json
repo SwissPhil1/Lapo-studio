@@ -694,5 +694,160 @@
       "expiration": "Expiration",
       "other": "Other"
     }
+  },
+  "patients": {
+    "title": "Patients",
+    "addPatient": "Add patient",
+    "search": "Search...",
+    "clearFilter": "Clear filter",
+    "staticSegment": "Static segment applied ({{count}} patients)",
+    "aiQueryLabel": "AI Search: \"{{query}}\"",
+    "aiSearch": "AI Search",
+    "aiSearchError": "Search error",
+    "aiSearchErrorGeneric": "An error occurred",
+    "filters": {
+      "all": "All patients",
+      "to_contact": "To contact",
+      "in_followup": "In follow-up",
+      "scheduled": "Appointment scheduled",
+      "new_leads": "New leads",
+      "overdue": "Recall overdue"
+    },
+    "table": {
+      "patient": "Patient",
+      "signals": "Signals",
+      "actionRequired": "Action required",
+      "actionRequiredTitle": "Next action to take",
+      "actionRequiredDesc": "Shows the active task or suggests creating a recall if the patient is overdue.",
+      "nextAppointment": "Next appt.",
+      "recall": "Recall",
+      "value": "Value",
+      "selectAll": "Select all"
+    },
+    "signals": {
+      "noShowHistory": "No-show history",
+      "noShowDesc": "This patient missed an appointment. Consider confirming future appointments.",
+      "unprocessedBooking": "Unprocessed booking",
+      "unprocessedBookingDesc": "This patient has a past booking still marked as 'confirmed'. Mark it as completed or no-show.",
+      "referredBy": "Referred by {{name}}",
+      "referredByDesc": "This patient was referred. Remember to thank the referrer after the first appointment."
+    },
+    "actions": {
+      "recall": "Recall",
+      "dormant": "Dormant patient",
+      "noShowFollowup": "No-show follow-up",
+      "manual": "Manual follow-up",
+      "cancelledFollowup": "Cancellation follow-up",
+      "createRecall": "Create recall",
+      "recallSoon": "Recall soon",
+      "taskOverdue": "overdue",
+      "taskToDo": "to do",
+      "overdueRecallTip": "Patient overdue for recall (+{{days}}d). Create a follow-up task.",
+      "recallSoonTip": "This patient's recall is coming up soon. Plan ahead.",
+      "taskTooltip": "{{type}} task {{status}}"
+    },
+    "dialog": {
+      "title": "New patient",
+      "firstName": "First Name *",
+      "lastName": "Last Name *",
+      "email": "Email",
+      "phone": "Phone",
+      "dob": "Date of birth",
+      "businessContact": "Business contact (not a patient)",
+      "cancel": "Cancel",
+      "add": "Add",
+      "nameRequired": "First and last name are required."
+    },
+    "toast": {
+      "added": "Patient added",
+      "addedDesc": "The patient has been added successfully.",
+      "error": "Error"
+    },
+    "pagination": {
+      "showing": "Showing {{from}} to {{to}} of {{total}} patients"
+    },
+    "empty": {
+      "noMatch": "No matching patients",
+      "noPatients": "No patients found",
+      "aiNoMatch": "Try rephrasing your AI search.",
+      "searchNoMatch": "Try modifying your search criteria.",
+      "firstPatient": "Start by adding your first patient."
+    },
+    "sessionExpired": "Session expired",
+    "sessionExpiredDesc": "Please log in again to access patients.",
+    "reconnect": "Log in again"
+  },
+  "patientDetail": {
+    "backToPatients": "Back to patients",
+    "notFound": "Patient not found",
+    "notFoundDesc": "The requested patient could not be found.",
+    "followup": {
+      "inProgress": "Follow-up in progress",
+      "lastReminderSent": "Last reminder sent {{time}} ({{count}} attempt(s) in the last 7 days).",
+      "noBookingYet": "The patient has not yet booked an appointment.",
+      "actionRequired": "Action required",
+      "overdueNoAppointment": "This patient is overdue for recall and has no upcoming appointment.",
+      "recommendation": "Recommendation",
+      "recallSoon": "This patient's recall is coming up soon. Consider reaching out to schedule their next appointment."
+    },
+    "tabs": {
+      "activity": "Activity",
+      "appointments": "Appointments",
+      "communications": "Communications",
+      "notes": "Notes",
+      "stats": "Statistics"
+    },
+    "appointments": {
+      "noAppointments": "No appointments found",
+      "completed": "Completed",
+      "noShow": "No-show",
+      "absent": "Absent",
+      "cancelled": "Cancelled"
+    },
+    "notes": {
+      "addNote": "Add a note",
+      "noNotes": "No notes found",
+      "medical": "Medical",
+      "followup": "Follow-up",
+      "general": "General",
+      "noteTitle": "Title",
+      "noteTitlePlaceholder": "Note title...",
+      "noteContent": "Content *",
+      "noteContentPlaceholder": "Note content...",
+      "noteType": "Type",
+      "save": "Save",
+      "addDialog": "Add a note",
+      "editDialog": "Edit note",
+      "noteAdded": "Note added",
+      "noteEdited": "Note edited",
+      "noteDeleted": "Note deleted"
+    },
+    "stats": {
+      "financialSummary": "Financial summary",
+      "totalValue": "Total value",
+      "averagePerVisit": "Average per visit",
+      "totalAppointments": "Total appointments",
+      "engagement": "Engagement",
+      "favoriteTreatment": "Favorite treatment",
+      "noShows": "No-shows",
+      "cancellations": "Cancellations",
+      "avgBetweenVisits": "Average between visits",
+      "days": "{{count}} days",
+      "history": "History",
+      "patientSince": "Patient since",
+      "nextAppointment": "Next appointment",
+      "lastVisit": "Last visit",
+      "none": "None"
+    },
+    "toast": {
+      "success": "Success",
+      "error": "Error",
+      "markedAs": "Marked as {{status}}"
+    },
+    "bookingStatus": {
+      "completed": "completed",
+      "noShow": "no-show",
+      "cancelled": "cancelled"
+    }
   }
 }

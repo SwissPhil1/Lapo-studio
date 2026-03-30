@@ -694,5 +694,160 @@
       "expiration": "Expiration",
       "other": "Autre"
     }
+  },
+  "patients": {
+    "title": "Patients",
+    "addPatient": "Ajouter un patient",
+    "search": "Rechercher...",
+    "clearFilter": "Effacer le filtre",
+    "staticSegment": "Segment statique appliqué ({{count}} patients)",
+    "aiQueryLabel": "Recherche IA : \"{{query}}\"",
+    "aiSearch": "Recherche IA",
+    "aiSearchError": "Erreur de recherche",
+    "aiSearchErrorGeneric": "Une erreur est survenue",
+    "filters": {
+      "all": "Tous les patients",
+      "to_contact": "À contacter",
+      "in_followup": "En suivi",
+      "scheduled": "RDV planifié",
+      "new_leads": "Nouveaux leads",
+      "overdue": "Rappel en retard"
+    },
+    "table": {
+      "patient": "Patient",
+      "signals": "Signaux",
+      "actionRequired": "Action requise",
+      "actionRequiredTitle": "Prochaine action à effectuer",
+      "actionRequiredDesc": "Affiche la tâche active ou suggère de créer un rappel si le patient est en retard.",
+      "nextAppointment": "Prochain RDV",
+      "recall": "Rappel",
+      "value": "Valeur",
+      "selectAll": "Sélectionner tout"
+    },
+    "signals": {
+      "noShowHistory": "Historique no-show",
+      "noShowDesc": "Ce patient a manqué un rendez-vous par le passé. Pensez à confirmer ses prochains RDV.",
+      "unprocessedBooking": "RDV non traité",
+      "unprocessedBookingDesc": "Ce patient a un rendez-vous passé encore marqué comme 'confirmé'. Marquez-le comme terminé ou non présenté.",
+      "referredBy": "Parrainé par {{name}}",
+      "referredByDesc": "Ce patient a été référé. N'oubliez pas de remercier le parrain après le premier RDV."
+    },
+    "actions": {
+      "recall": "Rappel",
+      "dormant": "Patient inactif",
+      "noShowFollowup": "Suivi absence",
+      "manual": "Suivi manuel",
+      "cancelledFollowup": "Suivi annulation",
+      "createRecall": "Rappel à créer",
+      "recallSoon": "Rappel bientôt",
+      "taskOverdue": "en retard",
+      "taskToDo": "à traiter",
+      "overdueRecallTip": "Patient en retard de rappel (+{{days}}j). Créez une tâche de suivi.",
+      "recallSoonTip": "Le rappel de ce patient arrive bientôt. Anticipez le contact.",
+      "taskTooltip": "Tâche {{type}} {{status}}"
+    },
+    "dialog": {
+      "title": "Nouveau patient",
+      "firstName": "Prénom *",
+      "lastName": "Nom *",
+      "email": "Email",
+      "phone": "Téléphone",
+      "dob": "Date de naissance",
+      "businessContact": "Contact professionnel (pas un patient)",
+      "cancel": "Annuler",
+      "add": "Ajouter",
+      "nameRequired": "Le prénom et le nom sont requis."
+    },
+    "toast": {
+      "added": "Patient ajouté",
+      "addedDesc": "Le patient a été ajouté avec succès.",
+      "error": "Erreur"
+    },
+    "pagination": {
+      "showing": "Affichage de {{from}} à {{to}} sur {{total}} patients"
+    },
+    "empty": {
+      "noMatch": "Aucun patient correspondant",
+      "noPatients": "Aucun patient trouvé",
+      "aiNoMatch": "Essayez de reformuler votre recherche IA.",
+      "searchNoMatch": "Essayez de modifier vos critères de recherche.",
+      "firstPatient": "Commencez par ajouter votre premier patient."
+    },
+    "sessionExpired": "Session expirée",
+    "sessionExpiredDesc": "Veuillez vous reconnecter pour accéder aux patients.",
+    "reconnect": "Se reconnecter"
+  },
+  "patientDetail": {
+    "backToPatients": "Retour aux patients",
+    "notFound": "Patient non trouvé",
+    "notFoundDesc": "Le patient demandé n'a pas pu être trouvé.",
+    "followup": {
+      "inProgress": "Suivi en cours",
+      "lastReminderSent": "Dernier rappel envoyé {{time}} ({{count}} tentative(s) ces 7 derniers jours).",
+      "noBookingYet": "Le patient n'a pas encore pris rendez-vous.",
+      "actionRequired": "Action requise",
+      "overdueNoAppointment": "Ce patient est en retard pour son rappel et n'a pas de prochain rendez-vous programmé.",
+      "recommendation": "Recommandation",
+      "recallSoon": "Le rappel de ce patient arrive bientôt. Pensez à le contacter pour programmer son prochain rendez-vous."
+    },
+    "tabs": {
+      "activity": "Activité",
+      "appointments": "Rendez-vous",
+      "communications": "Communications",
+      "notes": "Notes",
+      "stats": "Statistiques"
+    },
+    "appointments": {
+      "noAppointments": "Aucun rendez-vous trouvé",
+      "completed": "Terminé",
+      "noShow": "Non présenté",
+      "absent": "Absent",
+      "cancelled": "Annulé"
+    },
+    "notes": {
+      "addNote": "Ajouter une note",
+      "noNotes": "Aucune note trouvée",
+      "medical": "Médical",
+      "followup": "Suivi",
+      "general": "Général",
+      "noteTitle": "Titre",
+      "noteTitlePlaceholder": "Titre de la note...",
+      "noteContent": "Contenu *",
+      "noteContentPlaceholder": "Contenu de la note...",
+      "noteType": "Type",
+      "save": "Enregistrer",
+      "addDialog": "Ajouter une note",
+      "editDialog": "Modifier la note",
+      "noteAdded": "Note ajoutée",
+      "noteEdited": "Note modifiée",
+      "noteDeleted": "Note supprimée"
+    },
+    "stats": {
+      "financialSummary": "Résumé financier",
+      "totalValue": "Valeur totale",
+      "averagePerVisit": "Moyenne par visite",
+      "totalAppointments": "Total RDV",
+      "engagement": "Engagement",
+      "favoriteTreatment": "Traitement favori",
+      "noShows": "No-shows",
+      "cancellations": "Annulations",
+      "avgBetweenVisits": "Moyenne entre visites",
+      "days": "{{count}} jours",
+      "history": "Historique",
+      "patientSince": "Patient depuis",
+      "nextAppointment": "Prochain RDV",
+      "lastVisit": "Dernière visite",
+      "none": "Aucun"
+    },
+    "toast": {
+      "success": "Succès",
+      "error": "Erreur",
+      "markedAs": "Marqué comme {{status}}"
+    },
+    "bookingStatus": {
+      "completed": "terminé",
+      "noShow": "non présenté",
+      "cancelled": "annulé"
+    }
   }
 }

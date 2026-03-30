@@ -26,6 +26,8 @@ i18n.use(initReactI18next).init({
       campaigns: (en as any).campaigns,
       referralDetail: (en as any).referralDetail,
       notFound: (en as any).notFound,
+      patients: (en as any).patients,
+      patientDetail: (en as any).patientDetail,
     },
     fr: {
       translation: fr,
@@ -48,6 +50,8 @@ i18n.use(initReactI18next).init({
       campaigns: (fr as any).campaigns,
       referralDetail: (fr as any).referralDetail,
       notFound: (fr as any).notFound,
+      patients: (fr as any).patients,
+      patientDetail: (fr as any).patientDetail,
     },
   },
   lng: localStorage.getItem('lapo-lang') ?? 'en',

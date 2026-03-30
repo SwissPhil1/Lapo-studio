@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +9,8 @@ import { ArrowLeft, Mail, Phone, Calendar, Loader2, MapPin, Check, X, UserX, Pen
 import { UnifiedTimeline } from '@/modules/crm/components/patients/UnifiedTimeline';
 import { formatCurrency } from '@/shared/lib/constants';
 import { format, parseISO, differenceInDays } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { ReferralBanner } from '@/modules/crm/components/patients/ReferralBanner';
 import { TreatmentTimeline } from '@/modules/crm/components/patients/TreatmentTimeline';
 import { RecallStatusBadge } from '@/modules/crm/components/patients/RecallStatusBadge';
@@ -107,6 +109,8 @@ interface PipelineStage {
 }
 
 export default function PatientDetail() {
+  const { t, i18n } = useTranslation(['patientDetail', 'common']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -137,16 +141,17 @@ export default function PatientDetail() {
       setUpdatingBookingId(bookingId);
     },
     onSuccess: (status) => {
-      const statusLabels: Record<string, string> = {
-        [BOOKING_STATUS.COMPLETED]: 'terminé',
-        [BOOKING_STATUS.NO_SHOW]: 'non présenté',
-        [BOOKING_STATUS.CANCELLED]: 'annulé',
+      const statusKeys: Record<string, string> = {
+        [BOOKING_STATUS.COMPLETED]: 'completed',
+        [BOOKING_STATUS.NO_SHOW]: 'noShow',
+        [BOOKING_STATUS.CANCELLED]: 'cancelled',
       };
-      toast({ title: 'Succès', description: `Marqué comme ${statusLabels[status] || status}` });
+      const statusKey = statusKeys[status] || status;
+      toast({ title: t('patientDetail:toast.success'), description: t('patientDetail:toast.markedAs', { status: t(`patientDetail:bookingStatus.${statusKey}`) }) });
       queryClient.invalidateQueries({ queryKey: ['patient-detail', id] });
     },
     onError: (error: Error) => {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: t('patientDetail:toast.error'), description: error.message, variant: 'destructive' });
     },
     onSettled: () => {
       setUpdatingBookingId(null);
@@ -245,18 +250,24 @@ export default function PatientDetail() {
     enabled: !!id,
   });
 
-  // Helper to format relative time in French
+  // Helper to format relative time
   const formatTimeAgo = (date: Date): string => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffMinutes < 60) return "il y a moins d'une heure";
-    if (diffHours < 24) return `il y a ${diffHours}h`;
-    if (diffDays === 1) return "hier";
-    return `il y a ${diffDays} jours`;
+
+    if (i18n.language === 'fr') {
+      if (diffMinutes < 60) return "il y a moins d'une heure";
+      if (diffHours < 24) return `il y a ${diffHours}h`;
+      if (diffDays === 1) return 'hier';
+      return `il y a ${diffDays} jours`;
+    }
+    if (diffMinutes < 60) return 'less than an hour ago';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return 'yesterday';
+    return `${diffDays} days ago`;
   };
 
   const handleAddNote = async () => {
@@ -279,14 +290,14 @@ export default function PatientDetail() {
       
       if (error) throw error;
       
-      toast({ title: 'Note ajoutée' });
+      toast({ title: t('patientDetail:notes.noteAdded') });
       setAddNoteOpen(false);
       setNoteTitle('');
       setNoteContent('');
       setNoteType('general');
       queryClient.invalidateQueries({ queryKey: ['patient-detail', id] });
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: t('patientDetail:toast.error'), description: error.message, variant: 'destructive' });
     } finally {
       setIsSubmittingNote(false);
     }
@@ -308,7 +319,7 @@ export default function PatientDetail() {
       
       if (error) throw error;
       
-      toast({ title: 'Note modifiée' });
+      toast({ title: t('patientDetail:notes.noteEdited') });
       setEditNoteOpen(false);
       setEditingNote(null);
       setNoteTitle('');
@@ -316,7 +327,7 @@ export default function PatientDetail() {
       setNoteType('general');
       queryClient.invalidateQueries({ queryKey: ['patient-detail', id] });
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: t('patientDetail:toast.error'), description: error.message, variant: 'destructive' });
     } finally {
       setIsSubmittingNote(false);
     }
@@ -329,13 +340,13 @@ export default function PatientDetail() {
         .from('crm_notes')
         .delete()
         .eq('id', noteId);
-      
+
       if (error) throw error;
-      
-      toast({ title: 'Note supprimée' });
+
+      toast({ title: t('patientDetail:notes.noteDeleted') });
       queryClient.invalidateQueries({ queryKey: ['patient-detail', id] });
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: t('patientDetail:toast.error'), description: error.message, variant: 'destructive' });
     } finally {
       setIsDeletingNote(null);
     }
@@ -360,11 +371,11 @@ export default function PatientDetail() {
   if (error || !data) {
     return (
       <div className="card-elevated p-8 text-center">
-        <h3 className="text-lg font-semibold text-foreground mb-2">Patient non trouvé</h3>
-        <p className="text-muted-foreground mb-4">Le patient demandé n'a pas pu être trouvé.</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">{t('patientDetail:notFound')}</h3>
+        <p className="text-muted-foreground mb-4">{t('patientDetail:notFoundDesc')}</p>
         <Button variant="outline" onClick={() => navigate('/crm/patients')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Retour aux patients
+          {t('patientDetail:backToPatients')}
         </Button>
       </div>
     );
@@ -450,7 +461,7 @@ export default function PatientDetail() {
       {/* Back Button */}
       <Button variant="ghost" onClick={() => navigate('/crm/patients')} className="mb-2">
         <ArrowLeft className="h-4 w-4 mr-2" />
-        Retour aux patients
+        {t('patientDetail:backToPatients')}
       </Button>
 
       {/* Header Section with Quick Actions */}
@@ -489,7 +500,7 @@ export default function PatientDetail() {
               {patient.date_of_birth && (
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  <span>{format(parseISO(patient.date_of_birth), 'd MMM yyyy', { locale: fr })}</span>
+                  <span>{format(parseISO(patient.date_of_birth), 'd MMM yyyy', { locale: dateLocale })}</span>
                 </div>
               )}
             </div>
@@ -562,12 +573,12 @@ export default function PatientDetail() {
           return (
             <div className="card-elevated p-4 border-l-4 border-l-primary bg-primary/5">
               <h3 className="text-sm font-medium text-foreground mb-2">
-                📧 Suivi en cours
+                {t('patientDetail:followup.inProgress')}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Dernier rappel envoyé {formatTimeAgo(lastContactDate)} ({attemptCount} tentative{attemptCount > 1 ? 's' : ''} ces 7 derniers jours).
+                {t('patientDetail:followup.lastReminderSent', { time: formatTimeAgo(lastContactDate), count: attemptCount })}
                 <br />
-                Le patient n'a pas encore pris rendez-vous.
+                {t('patientDetail:followup.noBookingYet')}
               </p>
             </div>
           );
@@ -578,10 +589,10 @@ export default function PatientDetail() {
           return (
             <div className="card-elevated p-4 border-l-4 border-l-destructive bg-destructive/5">
               <h3 className="text-sm font-medium text-foreground mb-2">
-                ⚠️ Action requise
+                {t('patientDetail:followup.actionRequired')}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Ce patient est en retard pour son rappel et n'a pas de prochain rendez-vous programmé.
+                {t('patientDetail:followup.overdueNoAppointment')}
               </p>
             </div>
           );
@@ -591,10 +602,10 @@ export default function PatientDetail() {
         return (
           <div className="card-elevated p-4 border-l-4 border-l-warning bg-warning/5">
             <h3 className="text-sm font-medium text-foreground mb-2">
-              📋 Recommandation
+              {t('patientDetail:followup.recommendation')}
             </h3>
             <p className="text-sm text-muted-foreground">
-              Le rappel de ce patient arrive bientôt. Pensez à le contacter pour programmer son prochain rendez-vous.
+              {t('patientDetail:followup.recallSoon')}
             </p>
           </div>
         );
@@ -609,15 +620,15 @@ export default function PatientDetail() {
             <TabsList>
               <TabsTrigger value="activity" className="flex items-center gap-1">
                 <Activity className="h-3.5 w-3.5" />
-                Activité
+                {t('patientDetail:tabs.activity')}
               </TabsTrigger>
-              <TabsTrigger value="appointments">Rendez-vous</TabsTrigger>
+              <TabsTrigger value="appointments">{t('patientDetail:tabs.appointments')}</TabsTrigger>
               <TabsTrigger value="communications" className="flex items-center gap-1">
                 <MessageSquare className="h-3.5 w-3.5" />
-                Communications
+                {t('patientDetail:tabs.communications')}
               </TabsTrigger>
-              <TabsTrigger value="notes">Notes ({notes.length})</TabsTrigger>
-              <TabsTrigger value="stats">Statistiques</TabsTrigger>
+              <TabsTrigger value="notes">{t('patientDetail:tabs.notes')} ({notes.length})</TabsTrigger>
+              <TabsTrigger value="stats">{t('patientDetail:tabs.stats')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="activity" className="space-y-4">
@@ -657,7 +668,7 @@ export default function PatientDetail() {
                           <div>
                             <div className="font-medium text-foreground">{booking.service}</div>
                             <div className="text-sm text-muted-foreground">
-                              {format(parseISO(booking.booking_date), 'd MMMM yyyy', { locale: fr })}
+                              {format(parseISO(booking.booking_date), 'd MMMM yyyy', { locale: dateLocale })}
                             </div>
                           </div>
                           <div className="text-right">
@@ -693,11 +704,11 @@ export default function PatientDetail() {
                               ) : (
                                 <Check className="h-4 w-4 mr-1" />
                               )}
-                              Terminé
+                              {t('patientDetail:appointments.completed')}
                             </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
+                            <Button
+                              size="sm"
+                              variant="outline"
                               className="flex-1 text-destructive border-destructive/20 hover:bg-destructive/10"
                               disabled={updatingBookingId === booking.id}
                               onClick={(e) => {
@@ -713,11 +724,11 @@ export default function PatientDetail() {
                               ) : (
                                 <UserX className="h-4 w-4 mr-1" />
                               )}
-                              Absent
+                              {t('patientDetail:appointments.absent')}
                             </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
+                            <Button
+                              size="sm"
+                              variant="outline"
                               className="text-muted-foreground"
                               disabled={updatingBookingId === booking.id}
                               onClick={(e) => {
@@ -733,7 +744,7 @@ export default function PatientDetail() {
                               ) : (
                                 <X className="h-4 w-4 mr-1" />
                               )}
-                              Annulé
+                              {t('patientDetail:appointments.cancelled')}
                             </Button>
                           </div>
                         )}
@@ -743,7 +754,7 @@ export default function PatientDetail() {
                 </div>
               ) : (
                 <div className="card-elevated p-8 text-center text-muted-foreground">
-                  Aucun rendez-vous trouvé
+                  {t('patientDetail:appointments.noAppointments')}
                 </div>
               )}
             </TabsContent>
@@ -755,7 +766,7 @@ export default function PatientDetail() {
             <TabsContent value="notes" className="space-y-4">
               <div className="flex justify-end">
                 <Button size="sm" onClick={() => setAddNoteOpen(true)}>
-                  Ajouter une note
+                  {t('patientDetail:notes.addNote')}
                 </Button>
               </div>
               
@@ -767,7 +778,7 @@ export default function PatientDetail() {
                         <div>
                           <h4 className="font-medium text-foreground">{note.title}</h4>
                           <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                            {note.note_type === 'medical' ? 'Médical' : note.note_type === 'followup' ? 'Suivi' : 'Général'}
+                            {t(`patientDetail:notes.${note.note_type === 'medical' ? 'medical' : note.note_type === 'followup' ? 'followup' : 'general'}`)}
                           </span>
                         </div>
                         <div className="flex gap-1">
@@ -792,14 +803,14 @@ export default function PatientDetail() {
                       </div>
                       <p className="text-sm text-muted-foreground whitespace-pre-wrap">{note.content}</p>
                       <div className="text-xs text-muted-foreground mt-2">
-                        {format(parseISO(note.created_at), 'd MMM yyyy • HH:mm', { locale: fr })}
+                        {format(parseISO(note.created_at), 'd MMM yyyy • HH:mm', { locale: dateLocale })}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="card-elevated p-8 text-center text-muted-foreground">
-                  Aucune note trouvée
+                  {t('patientDetail:notes.noNotes')}
                 </div>
               )}
             </TabsContent>
@@ -809,22 +820,22 @@ export default function PatientDetail() {
               <div className="card-elevated p-4">
                 <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  Résumé financier
+                  {t('patientDetail:stats.financialSummary')}
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <div className="text-2xl font-bold text-foreground">{formatCurrency(lifetimeValue)}</div>
-                    <div className="text-xs text-muted-foreground">Valeur totale</div>
+                    <div className="text-xs text-muted-foreground">{t('patientDetail:stats.totalValue')}</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-foreground">
                       {formatCurrency(completedBookings.length > 0 ? lifetimeValue / completedBookings.length : 0)}
                     </div>
-                    <div className="text-xs text-muted-foreground">Moyenne par visite</div>
+                    <div className="text-xs text-muted-foreground">{t('patientDetail:stats.averagePerVisit')}</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-foreground">{bookings.length}</div>
-                    <div className="text-xs text-muted-foreground">Total RDV</div>
+                    <div className="text-xs text-muted-foreground">{t('patientDetail:stats.totalAppointments')}</div>
                   </div>
                 </div>
               </div>
@@ -833,29 +844,29 @@ export default function PatientDetail() {
               <div className="card-elevated p-4">
                 <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  Engagement
+                  {t('patientDetail:stats.engagement')}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Traitement favori</span>
+                    <span className="text-muted-foreground">{t('patientDetail:stats.favoriteTreatment')}</span>
                     <span className="font-medium text-foreground">{favoriteTreatment}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">No-shows</span>
+                    <span className="text-muted-foreground">{t('patientDetail:stats.noShows')}</span>
                     <span className={`font-medium ${noShows > 0 ? 'text-destructive' : 'text-foreground'}`}>
                       {noShows}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Annulations</span>
+                    <span className="text-muted-foreground">{t('patientDetail:stats.cancellations')}</span>
                     <span className={`font-medium ${cancellations > 0 ? 'text-warning' : 'text-foreground'}`}>
                       {cancellations}
                     </span>
                   </div>
                   {avgDaysBetweenVisits !== null && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Moyenne entre visites</span>
-                      <span className="font-medium text-foreground">{avgDaysBetweenVisits} jours</span>
+                      <span className="text-muted-foreground">{t('patientDetail:stats.avgBetweenVisits')}</span>
+                      <span className="font-medium text-foreground">{t('patientDetail:stats.days', { count: avgDaysBetweenVisits })}</span>
                     </div>
                   )}
                 </div>
@@ -865,29 +876,29 @@ export default function PatientDetail() {
               <div className="card-elevated p-4">
                 <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
                   <CalendarDays className="h-4 w-4" />
-                  Historique
+                  {t('patientDetail:stats.history')}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Patient depuis</span>
+                    <span className="text-muted-foreground">{t('patientDetail:stats.patientSince')}</span>
                     <span className="font-medium text-foreground">
-                      {format(parseISO(patient.created_at), 'd MMM yyyy', { locale: fr })}
+                      {format(parseISO(patient.created_at), 'd MMM yyyy', { locale: dateLocale })}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Prochain RDV</span>
+                    <span className="text-muted-foreground">{t('patientDetail:stats.nextAppointment')}</span>
                     <span className="font-medium text-foreground">
-                      {nextAppointment 
-                        ? format(parseISO(nextAppointment.booking_date), 'd MMM yyyy', { locale: fr })
-                        : 'Aucun'
+                      {nextAppointment
+                        ? format(parseISO(nextAppointment.booking_date), 'd MMM yyyy', { locale: dateLocale })
+                        : t('patientDetail:stats.none')
                       }
                     </span>
                   </div>
                   {lastCompletedBooking && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Dernière visite</span>
+                      <span className="text-muted-foreground">{t('patientDetail:stats.lastVisit')}</span>
                       <span className="font-medium text-foreground">
-                        {format(parseISO(lastCompletedBooking.booking_date), 'd MMM yyyy', { locale: fr })}
+                        {format(parseISO(lastCompletedBooking.booking_date), 'd MMM yyyy', { locale: dateLocale })}
                       </span>
                     </div>
                   )}
@@ -913,36 +924,36 @@ export default function PatientDetail() {
       <Dialog open={addNoteOpen} onOpenChange={setAddNoteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Ajouter une note</DialogTitle>
+            <DialogTitle>{t('patientDetail:notes.addDialog')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Titre</Label>
+              <Label>{t('patientDetail:notes.noteTitle')}</Label>
               <Input
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
-                placeholder="Titre de la note..."
+                placeholder={t('patientDetail:notes.noteTitlePlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Contenu *</Label>
+              <Label>{t('patientDetail:notes.noteContent')}</Label>
               <Textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
-                placeholder="Contenu de la note..."
+                placeholder={t('patientDetail:notes.noteContentPlaceholder')}
                 rows={4}
               />
             </div>
             <div className="space-y-2">
-              <Label>Type</Label>
+              <Label>{t('patientDetail:notes.noteType')}</Label>
               <Select value={noteType} onValueChange={setNoteType}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">Général</SelectItem>
-                  <SelectItem value="medical">Médical</SelectItem>
-                  <SelectItem value="followup">Suivi</SelectItem>
+                  <SelectItem value="general">{t('patientDetail:notes.general')}</SelectItem>
+                  <SelectItem value="medical">{t('patientDetail:notes.medical')}</SelectItem>
+                  <SelectItem value="followup">{t('patientDetail:notes.followup')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -952,7 +963,7 @@ export default function PatientDetail() {
               disabled={isSubmittingNote || !noteContent.trim()}
             >
               {isSubmittingNote ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Enregistrer
+              {t('patientDetail:notes.save')}
             </Button>
           </div>
         </DialogContent>
@@ -962,36 +973,36 @@ export default function PatientDetail() {
       <Dialog open={editNoteOpen} onOpenChange={setEditNoteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Modifier la note</DialogTitle>
+            <DialogTitle>{t('patientDetail:notes.editDialog')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Titre</Label>
+              <Label>{t('patientDetail:notes.noteTitle')}</Label>
               <Input
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
-                placeholder="Titre de la note..."
+                placeholder={t('patientDetail:notes.noteTitlePlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Contenu *</Label>
+              <Label>{t('patientDetail:notes.noteContent')}</Label>
               <Textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
-                placeholder="Contenu de la note..."
+                placeholder={t('patientDetail:notes.noteContentPlaceholder')}
                 rows={4}
               />
             </div>
             <div className="space-y-2">
-              <Label>Type</Label>
+              <Label>{t('patientDetail:notes.noteType')}</Label>
               <Select value={noteType} onValueChange={setNoteType}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">Général</SelectItem>
-                  <SelectItem value="medical">Médical</SelectItem>
-                  <SelectItem value="followup">Suivi</SelectItem>
+                  <SelectItem value="general">{t('patientDetail:notes.general')}</SelectItem>
+                  <SelectItem value="medical">{t('patientDetail:notes.medical')}</SelectItem>
+                  <SelectItem value="followup">{t('patientDetail:notes.followup')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1001,7 +1012,7 @@ export default function PatientDetail() {
               disabled={isSubmittingNote || !noteContent.trim()}
             >
               {isSubmittingNote ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Enregistrer
+              {t('patientDetail:notes.save')}
             </Button>
           </div>
         </DialogContent>
