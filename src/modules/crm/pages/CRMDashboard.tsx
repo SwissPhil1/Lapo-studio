@@ -4,13 +4,15 @@ import { supabase } from '@/shared/lib/supabase';
 import { Users, AlertTriangle, Link2, Banknote, UserCheck, CalendarClock, Calendar } from 'lucide-react';
 import { formatCurrency } from '@/shared/lib/constants';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useReactivationTaskCounts, useReactivationTasks } from '@/shared/hooks/useReactivationTasks';
 import { ReactivationTaskCard } from '@/modules/crm/components/tasks/ReactivationTaskCard';
 import { CreateTaskDialog } from '@/modules/crm/components/tasks/CreateTaskDialog';
 import { ActivityFeedWidget } from '@/modules/crm/components/dashboard/ActivityFeedWidget';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 interface StatCardProps {
   title: string;
   value: string | number;
@@ -58,6 +60,8 @@ function StatCard({ title, value, icon, subtitle, onClick, variant = 'default' }
 export default function Dashboard() {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const { t, i18n } = useTranslation(['crmDashboard', 'common']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   
   // Monthly revenue
   const { data: monthlyRevenue = 0 } = useQuery({
@@ -239,13 +243,13 @@ export default function Dashboard() {
             </div>
             <div className="flex-1">
               <p className="font-medium text-foreground">
-                {unmappedServicesCount} service{unmappedServicesCount !== 1 ? 's' : ''} non mappé{unmappedServicesCount !== 1 ? 's' : ''}
+                {t('crmDashboard:unmappedServices', { count: unmappedServicesCount })}
               </p>
               <p className="text-sm text-muted-foreground">
-                Associez ces services à un protocole pour activer le suivi de rappel
+                {t('crmDashboard:unmappedServicesDesc')}
               </p>
             </div>
-            <span className="text-sm text-primary font-medium">Configurer →</span>
+            <span className="text-sm text-primary font-medium">{t('crmDashboard:configure')} →</span>
           </div>
         </div>
       )}
@@ -262,16 +266,16 @@ export default function Dashboard() {
             </div>
             <div className="flex-1">
               <p className="font-medium text-foreground">
-                {totalAttentionItems} RDV à traiter
-                {needsAttentionPatients > 0 && ` (${needsAttentionPatients} patient${needsAttentionPatients !== 1 ? 's' : ''})`}
+                {t('crmDashboard:appointmentsToProcess', { count: totalAttentionItems })}
+                {needsAttentionPatients > 0 && ` (${t('crmDashboard:patients', { count: needsAttentionPatients })})`}
               </p>
               <p className="text-sm text-muted-foreground">
-                {needsAttentionCount > 0 && `${needsAttentionCount} RDV non traité${needsAttentionCount !== 1 ? 's' : ''}`}
+                {needsAttentionCount > 0 && t('crmDashboard:unprocessedAppointments', { count: needsAttentionCount })}
                 {needsAttentionCount > 0 && noShowCount > 0 && ' • '}
-                {noShowCount > 0 && `${noShowCount} no-show${noShowCount !== 1 ? 's' : ''}`}
+                {noShowCount > 0 && t('crmDashboard:noShows', { count: noShowCount })}
               </p>
             </div>
-            <span className="text-sm text-primary font-medium">Traiter →</span>
+            <span className="text-sm text-primary font-medium">{t('crmDashboard:process')} →</span>
           </div>
         </div>
       )}
@@ -280,26 +284,26 @@ export default function Dashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Patients actifs"
+          title={t('crmDashboard:activePatients')}
           value={activePatients}
           icon={<Users className="h-6 w-6 text-primary" />}
-          subtitle="12 derniers mois"
+          subtitle={t('crmDashboard:last12Months')}
         />
         <StatCard
-          title="Revenus du mois"
+          title={t('crmDashboard:monthlyRevenue')}
           value={formatCurrency(monthlyRevenue)}
           icon={<Banknote className="h-6 w-6 text-primary" />}
         />
         <StatCard
-          title="RDV cette semaine"
+          title={t('crmDashboard:weeklyAppointments')}
           value={weeklyAppointments}
           icon={<CalendarClock className="h-6 w-6 text-primary" />}
         />
         <StatCard
-          title="Taux de fidélisation"
+          title={t('crmDashboard:retentionRate')}
           value={`${retentionRate}%`}
           icon={<UserCheck className="h-6 w-6 text-primary" />}
-          subtitle="Patients avec 2+ RDV"
+          subtitle={t('crmDashboard:patientsWithMultipleAppts')}
         />
       </div>
 
@@ -307,28 +311,28 @@ export default function Dashboard() {
       <div className="card-elevated p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
-            Relances à effectuer ({pendingTasks.length})
+            {t('crmDashboard:followUps')} ({pendingTasks.length})
           </h3>
           <div className="flex items-center gap-3">
             <div className="flex gap-2 text-sm">
               {taskCounts.overdue_recall > 0 && (
                 <span className="px-2 py-1 rounded bg-destructive/10 text-destructive">
-                  {taskCounts.overdue_recall} rappel{taskCounts.overdue_recall !== 1 ? 's' : ''}
+                  {t('crmDashboard:recalls', { count: taskCounts.overdue_recall })}
                 </span>
               )}
               {taskCounts.dormant > 0 && (
                 <span className="px-2 py-1 rounded bg-warning/10 text-warning">
-                  {taskCounts.dormant} inactif{taskCounts.dormant !== 1 ? 's' : ''}
+                  {t('crmDashboard:inactive', { count: taskCounts.dormant })}
                 </span>
               )}
               {taskCounts.no_show_followup > 0 && (
                 <span className="px-2 py-1 rounded bg-warning/10 text-warning">
-                  {taskCounts.no_show_followup} no-show{taskCounts.no_show_followup !== 1 ? 's' : ''}
+                  {t('crmDashboard:noShows', { count: taskCounts.no_show_followup })}
                 </span>
               )}
               {taskCounts.manual > 0 && (
                 <span className="px-2 py-1 rounded bg-primary/10 text-primary">
-                  {taskCounts.manual} manuel{taskCounts.manual !== 1 ? 's' : ''}
+                  {t('crmDashboard:manual', { count: taskCounts.manual })}
                 </span>
               )}
             </div>
@@ -345,13 +349,13 @@ export default function Dashboard() {
                 onClick={() => navigate('/crm/patients?filter=overdue')}
                 className="w-full text-center text-sm text-primary hover:underline py-2"
               >
-                Voir les {pendingTasks.length - 5} autres tâches →
+                {t('crmDashboard:viewMore', { count: pendingTasks.length - 5 })} →
               </button>
             )}
           </div>
         ) : (
           <div className="text-center py-6 text-muted-foreground">
-            <p>Aucune relance en attente</p>
+            <p>{t('crmDashboard:noFollowUps')}</p>
           </div>
         )}
       </div>
@@ -360,10 +364,10 @@ export default function Dashboard() {
       <div className="card-elevated p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
-            RDV du jour ({todayAppointments.length})
+            {t('crmDashboard:todayAppointments')} ({todayAppointments.length})
           </h3>
           <span className="text-sm text-muted-foreground">
-            {format(new Date(), 'EEEE d MMMM', { locale: fr })}
+            {format(new Date(), 'EEEE d MMMM', { locale: dateLocale })}
           </span>
         </div>
         
@@ -393,10 +397,10 @@ export default function Dashboard() {
                   apt.status === BOOKING_STATUS.NO_SHOW ? 'bg-destructive/10 text-destructive' :
                   'bg-primary/10 text-primary'
                 }`}>
-                  {apt.status === BOOKING_STATUS.COMPLETED ? 'Payé' :
-                   apt.status === BOOKING_STATUS.NO_SHOW ? 'Absent' :
-                   apt.status === BOOKING_STATUS.CANCELLED ? 'Annulé' :
-                   'Planifié'}
+                  {apt.status === BOOKING_STATUS.COMPLETED ? t('crmDashboard:statusPaid') :
+                   apt.status === BOOKING_STATUS.NO_SHOW ? t('crmDashboard:statusAbsent') :
+                   apt.status === BOOKING_STATUS.CANCELLED ? t('crmDashboard:statusCancelled') :
+                   t('crmDashboard:statusScheduled')}
                 </span>
               </div>
             ))}
@@ -404,7 +408,7 @@ export default function Dashboard() {
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p>Aucun rendez-vous aujourd'hui</p>
+            <p>{t('crmDashboard:noAppointmentsToday')}</p>
           </div>
         )}
       </div>

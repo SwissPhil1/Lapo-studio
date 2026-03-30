@@ -2,6 +2,8 @@
  * Shared helper for computing referrer activity status
  */
 
+import i18n from '@/i18n';
+
 export type ReferrerActivityStatus = 'active' | 'dormant' | 'cold';
 
 interface ActivityStatusParams {
@@ -40,20 +42,41 @@ export function getReferrerActivityStatus({
   }
 }
 
+export function getActivityStatusConfig() {
+  return {
+    active: {
+      color: '#2ecc71',
+      label: i18n.t('common:activityActive'),
+      tooltip: i18n.t('common:activityActiveTooltip'),
+    },
+    dormant: {
+      color: '#f1c40f',
+      label: i18n.t('common:activityDormant'),
+      tooltip: i18n.t('common:activityDormantTooltip'),
+    },
+    cold: {
+      color: '#e74c3c',
+      label: i18n.t('common:activityCold'),
+      tooltip: i18n.t('common:activityColdTooltip'),
+    },
+  };
+}
+
+/** @deprecated Use getActivityStatusConfig() instead */
 export const activityStatusConfig = {
   active: {
     color: '#2ecc71',
-    label: 'Actif',
-    tooltip: 'Actif – a fait un parrainage récemment',
+    get label() { return i18n.t('common:activityActive'); },
+    get tooltip() { return i18n.t('common:activityActiveTooltip'); },
   },
   dormant: {
     color: '#f1c40f',
-    label: 'À relancer',
-    tooltip: 'À relancer – aucun parrainage dans les 2 derniers mois',
+    get label() { return i18n.t('common:activityDormant'); },
+    get tooltip() { return i18n.t('common:activityDormantTooltip'); },
   },
   cold: {
     color: '#e74c3c',
-    label: 'Inactif',
-    tooltip: 'Inactif – aucun parrainage depuis plus de 6 mois',
+    get label() { return i18n.t('common:activityCold'); },
+    get tooltip() { return i18n.t('common:activityColdTooltip'); },
   },
 } as const;

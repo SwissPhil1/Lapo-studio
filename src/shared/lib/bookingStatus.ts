@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+
 /**
  * Booking Status Constants and Helpers
  * 
@@ -83,8 +85,8 @@ export function isBookingForRecall(status: string, bookingDate: string): boolean
 /**
  * Get the display label for a status
  */
-export function getStatusLabel(status: string, locale: 'fr' | 'en' = 'en'): string {
-  const labels = locale === 'fr' ? BOOKING_STATUS_LABELS_FR : BOOKING_STATUS_LABELS_EN;
+export function getStatusLabel(status: string): string {
+  const labels = i18n.language === 'fr' ? BOOKING_STATUS_LABELS_FR : BOOKING_STATUS_LABELS_EN;
   return labels[status] || status;
 }
 

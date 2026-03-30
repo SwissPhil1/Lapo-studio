@@ -16,7 +16,7 @@ import {
 import { ArrowLeft, Mail, Phone, Calendar, Loader2, MapPin, Check, X, UserX, Pencil, Trash2, MoreHorizontal, Gift, MessageSquare, Activity } from 'lucide-react';
 import { UnifiedTimeline } from '@/modules/crm/components/patients/UnifiedTimeline';
 import { formatCurrency } from '@/shared/lib/constants';
-import { format, parseISO, differenceInDays } from 'date-fns';
+import { format, parseISO, differenceInDays, formatDistanceToNow } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import { TreatmentTimeline } from '@/modules/crm/components/patients/TreatmentTimeline';
@@ -249,22 +249,7 @@ export default function PatientDetail() {
   });
 
   const formatTimeAgo = (date: Date): string => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (i18n.language === 'fr') {
-      if (diffMinutes < 60) return "il y a moins d'une heure";
-      if (diffHours < 24) return `il y a ${diffHours}h`;
-      if (diffDays === 1) return 'hier';
-      return `il y a ${diffDays} jours`;
-    }
-    if (diffMinutes < 60) return 'less than an hour ago';
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays === 1) return 'yesterday';
-    return `${diffDays} days ago`;
+    return formatDistanceToNow(date, { addSuffix: true, locale: dateLocale });
   };
 
   const handleAddNote = async () => {

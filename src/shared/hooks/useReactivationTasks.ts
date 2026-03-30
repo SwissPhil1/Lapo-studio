@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { toast } from 'sonner';
+import i18n from '@/i18n';
 
 export type TaskType = 'overdue_recall' | 'dormant' | 'no_show_followup' | 'manual' | 'cancelled_followup';
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'snoozed' | 'cancelled';
@@ -180,7 +181,7 @@ export function useCreateReactivationTask() {
       if (error) {
         // Handle unique constraint violation (task already exists)
         if (error.code === '23505') {
-          throw new Error('Une tâche active existe déjà pour ce patient');
+          throw new Error(i18n.t('common:taskAlreadyExists'));
         }
         throw error;
       }
@@ -246,7 +247,7 @@ export function useUpdateReactivationTask() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reactivation-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['reactivation-task-counts'] });
-      toast.success('Tâche mise à jour');
+      toast.success(i18n.t('common:taskUpdated'));
     },
     onError: (error: Error) => {
       toast.error(`Erreur: ${error.message}`);
@@ -279,7 +280,7 @@ export function useLogAttempt() {
         .single();
 
       const newAttemptCount = (task?.attempt_count || 0) + 1;
-      const methodLabel = method === 'email' ? 'Email' : method === 'sms' ? 'SMS' : method === 'phone' ? 'Appel' : 'Contact';
+      const methodLabel = method === 'email' ? 'Email' : method === 'sms' ? 'SMS' : method === 'phone' ? i18n.t('common:call') : i18n.t('common:contact');
       const timestamp = new Date().toLocaleString('fr-FR', { 
         day: '2-digit', 
         month: 'short', 
@@ -288,7 +289,7 @@ export function useLogAttempt() {
       });
       const noteText = notes 
         ? `[${methodLabel} - ${timestamp}] ${notes}`
-        : `[${methodLabel} - ${timestamp}] Tentative de contact`;
+        : `[${methodLabel} - ${timestamp}] ${i18n.t('common:contactAttempt')}`;
       const newNotes = `${task?.notes || ''}\n${noteText}`.trim();
 
       // Calculate snooze date if snoozeDays provided
@@ -322,9 +323,9 @@ export function useLogAttempt() {
       queryClient.invalidateQueries({ queryKey: ['reactivation-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['reactivation-task-counts'] });
       queryClient.invalidateQueries({ queryKey: ['patient-tasks'] });
-      const message = variables.snoozeDays 
-        ? `Tentative enregistrée • Rappel dans ${variables.snoozeDays} jours`
-        : 'Tentative enregistrée';
+      const message = variables.snoozeDays
+        ? i18n.t('common:attemptRecordedReminder', { days: variables.snoozeDays })
+        : i18n.t('common:attemptRecorded');
       toast.success(message);
     },
     onError: (error: Error) => {

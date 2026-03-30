@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { format, subDays, subMonths, eachDayOfInterval, eachMonthOfInterval, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader2 } from 'lucide-react';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
@@ -75,8 +77,8 @@ export function RevenueChart({ dateRange }: RevenueChartProps) {
           ? format(date, 'yyyy-MM-dd')
           : format(date, 'yyyy-MM');
         const label = granularity === 'day'
-          ? format(date, 'd MMM', { locale: fr })
-          : format(date, 'MMM yy', { locale: fr });
+          ? format(date, 'd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS })
+          : format(date, 'MMM yy', { locale: i18n.language === 'fr' ? frLocale : enUS });
         
         return {
           date: key,

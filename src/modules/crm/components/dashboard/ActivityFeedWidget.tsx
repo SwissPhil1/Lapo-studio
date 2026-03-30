@@ -23,7 +23,9 @@ import {
   CheckCheck
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -174,15 +176,17 @@ const getActivityCategory = (activity: ActivityItem): string => {
   }
 };
 
-// Labels matching UnifiedTimeline exactly
-const categoryLabels: Record<string, string> = {
-  booking: 'Rendez-vous',
-  note: 'Notes',
-  email: 'Emails',
-  sms: 'SMS',
-  call: 'Appels',
-  task: 'Tâches',
-};
+// Labels resolved via i18n at render time
+function getCategoryLabels(t: (key: string) => string): Record<string, string> {
+  return {
+    booking: t('crmDashboard:activityBooking'),
+    note: t('crmDashboard:activityNotes'),
+    email: t('crmDashboard:activityEmails'),
+    sms: t('crmDashboard:activitySms'),
+    call: t('crmDashboard:activityCalls'),
+    task: t('crmDashboard:activityTasks'),
+  };
+}
 
 // Colors matching UnifiedTimeline exactly
 const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
@@ -220,6 +224,9 @@ export function ActivityFeedWidget({
   collapsedLimit = 3 
 }: ActivityFeedWidgetProps) {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation(['crmDashboard']);
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
+  const categoryLabels = getCategoryLabels(t);
   const [expanded, setExpanded] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
@@ -376,7 +383,7 @@ export function ActivityFeedWidget({
           <div className="p-4 border-b border-border">
             <h3 className="font-semibold flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />
-              Activité récente
+              {t('crmDashboard:recentActivity')}
             </h3>
           </div>
         )}
@@ -392,7 +399,7 @@ export function ActivityFeedWidget({
       <div className={cn("card-elevated p-4", className)}>
         <div className="flex items-center gap-2 text-destructive">
           <AlertCircle className="h-4 w-4" />
-          <span className="text-sm">Erreur de chargement</span>
+          <span className="text-sm">{t('crmDashboard:loadingError')}</span>
         </div>
       </div>
     );
@@ -405,12 +412,12 @@ export function ActivityFeedWidget({
           <div className="p-4 border-b border-border">
             <h3 className="font-semibold flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />
-              Activité récente
+              {t('crmDashboard:recentActivity')}
             </h3>
           </div>
         )}
         <div className="p-6 text-center text-muted-foreground text-sm">
-          Aucune activité récente
+          {t('crmDashboard:noRecentActivity')}
         </div>
       </div>
     );
@@ -423,7 +430,7 @@ export function ActivityFeedWidget({
           <div className="flex items-center justify-between">
             <h3 className="font-semibold flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />
-              Activité récente
+              {t('crmDashboard:recentActivity')}
             </h3>
             {/* Email engagement badges */}
             {(emailEngagementCounts.opened > 0 || emailEngagementCounts.clicked > 0) && (
@@ -494,7 +501,7 @@ export function ActivityFeedWidget({
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <XCircle className="h-3.5 w-3.5" />
-            <span>Tout afficher</span>
+            <span>{t('crmDashboard:showAll')}</span>
           </button>
         )}
       </div>
@@ -519,7 +526,7 @@ export function ActivityFeedWidget({
           const Icon = config.icon;
           const patientName = activity.patient 
             ? `${activity.patient.first_name} ${activity.patient.last_name}`
-            : 'Patient inconnu';
+            : t('crmDashboard:unknownPatient');
 
           // Extract email tracking from metadata
           const metadata = activity.metadata as Record<string, unknown> | null;
@@ -535,8 +542,8 @@ export function ActivityFeedWidget({
           // Format timestamp like Communications page
           const activityDate = parseISO(activity.created_at);
           const isToday = new Date().toDateString() === activityDate.toDateString();
-          const timeStr = format(activityDate, 'HH:mm', { locale: fr });
-          const dateStr = isToday ? 'Auj.' : format(activityDate, 'd MMM', { locale: fr });
+          const timeStr = format(activityDate, 'HH:mm', { locale: dateLocale });
+          const dateStr = isToday ? t('crmDashboard:todayShort') : format(activityDate, 'd MMM', { locale: dateLocale });
 
           // Get a short summary for second line
           const getShortSummary = () => {
@@ -591,7 +598,7 @@ export function ActivityFeedWidget({
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Email ouvert</p>
+                              <p>{t('crmDashboard:emailOpened')}</p>
                             </TooltipContent>
                           </Tooltip>
                         )}
@@ -603,7 +610,7 @@ export function ActivityFeedWidget({
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Lien cliqué</p>
+                              <p>{t('crmDashboard:linkClicked')}</p>
                             </TooltipContent>
                           </Tooltip>
                         )}
@@ -625,7 +632,7 @@ export function ActivityFeedWidget({
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Délivré</p>
+                            <p>{t('crmDashboard:delivered')}</p>
                           </TooltipContent>
                         </Tooltip>
                       )}
@@ -673,9 +680,9 @@ export function ActivityFeedWidget({
                 <div className="ml-11 pl-4 border-l-2 border-muted">
                   {activity.children.map((child) => {
                     const childDate = parseISO(child.created_at);
-                    const childTimeStr = format(childDate, 'HH:mm', { locale: fr });
+                    const childTimeStr = format(childDate, 'HH:mm', { locale: dateLocale });
                     const isChildToday = new Date().toDateString() === childDate.toDateString();
-                    const childDateStr = isChildToday ? 'Auj.' : format(childDate, 'd MMM', { locale: fr });
+                    const childDateStr = isChildToday ? t('crmDashboard:todayShort') : format(childDate, 'd MMM', { locale: dateLocale });
                     
                     const childConfig = activityConfig[child.activity_type] || defaultConfig;
                     const ChildIcon = childConfig.icon;
@@ -719,12 +726,12 @@ export function ActivityFeedWidget({
             {expanded ? (
               <>
                 <ChevronUp className="h-4 w-4 mr-1" />
-                Voir moins
+                {t('crmDashboard:showLess')}
               </>
             ) : (
               <>
                 <ChevronDown className="h-4 w-4 mr-1" />
-                Voir plus ({filteredActivities.length - collapsedLimit})
+                {t('crmDashboard:showMore', { count: filteredActivities.length - collapsedLimit })}
               </>
             )}
           </Button>

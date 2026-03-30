@@ -13,7 +13,7 @@ interface CalendarBookingItemProps {
 export function CalendarBookingItem({ booking, variant = 'compact' }: CalendarBookingItemProps) {
   const navigate = useNavigate();
   const colors = getStatusColors(booking.status || 'scheduled');
-  const statusLabel = getStatusLabel(booking.status || 'scheduled', 'fr');
+  const statusLabel = getStatusLabel(booking.status || 'scheduled');
   const isRescheduled = booking.status === BOOKING_STATUS.RESCHEDULED;
 
   const handleClick = () => {

@@ -3,7 +3,9 @@ import { supabase } from '@/shared/lib/supabase';
 import type { ReportConfig, ReportDataPoint } from '@/shared/types/reports';
 import { REPORT_SOURCES } from '@/shared/lib/reportSources';
 import { subDays, subMonths, format, startOfMonth, startOfWeek } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
 
 function getDateRange(config: ReportConfig): { start: Date; end: Date } {
   const end = new Date();
@@ -33,21 +35,23 @@ function getDateRange(config: ReportConfig): { start: Date; end: Date } {
 }
 
 function formatDimensionValue(value: string | null, dimension: string, transform?: string): string {
-  if (!value) return 'Non défini';
-  
+  if (!value) return i18n.t('common:undefined');
+
+  const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
+
   if (transform === 'month') {
     try {
       const date = new Date(value);
-      return format(startOfMonth(date), 'MMM yyyy', { locale: fr });
+      return format(startOfMonth(date), 'MMM yyyy', { locale: dateLocale });
     } catch {
       return value;
     }
   }
-  
+
   if (transform === 'week') {
     try {
       const date = new Date(value);
-      return `Sem. ${format(startOfWeek(date, { locale: fr }), 'dd/MM', { locale: fr })}`;
+      return `${i18n.t('common:weekLabel')} ${format(startOfWeek(date, { locale: dateLocale }), 'dd/MM', { locale: dateLocale })}`;
     } catch {
       return value;
     }
@@ -56,23 +60,23 @@ function formatDimensionValue(value: string | null, dimension: string, transform
   // Format known values
   if (dimension === 'status') {
     const statusLabels: Record<string, string> = {
-      scheduled: 'Planifié',
-      completed: 'Complété',
-      cancelled: 'Annulé',
-      no_show: 'Absent',
-      rescheduled: 'Reporté',
-      pending: 'En attente',
-      booked: 'Réservé',
-      confirmed: 'Confirmé',
+      scheduled: i18n.t('common:statusScheduled'),
+      completed: i18n.t('common:statusCompleted'),
+      cancelled: i18n.t('common:statusCancelled'),
+      no_show: i18n.t('common:statusNoShow'),
+      rescheduled: i18n.t('common:statusRescheduled'),
+      pending: i18n.t('common:statusPending'),
+      booked: i18n.t('common:statusBooked'),
+      confirmed: i18n.t('common:statusConfirmed'),
     };
     return statusLabels[value] || value;
   }
 
   if (dimension === 'gender') {
     const genderLabels: Record<string, string> = {
-      male: 'Homme',
-      female: 'Femme',
-      other: 'Autre',
+      male: i18n.t('common:genderMale'),
+      female: i18n.t('common:genderFemale'),
+      other: i18n.t('common:genderOther'),
     };
     return genderLabels[value.toLowerCase()] || value;
   }

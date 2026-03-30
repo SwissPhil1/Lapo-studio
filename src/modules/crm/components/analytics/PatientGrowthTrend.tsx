@@ -3,7 +3,9 @@ import { supabase } from '@/shared/lib/supabase';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader2 } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
 
 interface PatientGrowthTrendProps {
   months?: number;
@@ -38,7 +40,7 @@ export function PatientGrowthTrend({ months = 12 }: PatientGrowthTrendProps) {
         cumulative += monthPatients.length;
 
         monthlyData.push({
-          month: format(month, 'MMM yy', { locale: fr }),
+          month: format(month, 'MMM yy', { locale: i18n.language === 'fr' ? frLocale : enUS }),
           nouveaux: monthPatients.length,
           cumul: cumulative,
         });

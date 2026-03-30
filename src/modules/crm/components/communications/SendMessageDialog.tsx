@@ -20,7 +20,7 @@ import { cn } from '@/shared/lib/utils';
 import {
   getPatientTreatmentInfo,
   resolveMergeTags,
-  TEMPLATE_CATEGORIES,
+  getTemplateCategories,
   type TreatmentInfo
 } from '@/shared/lib/emailMergeTags';
 
@@ -477,7 +477,7 @@ export function SendMessageDialog({ open, onOpenChange, onSuccess, preselectedPa
                   {Object.entries(templatesByCategory).map(([category, categoryTemplates]) => (
                     <SelectGroup key={category}>
                       <SelectLabel className="text-xs uppercase tracking-wider text-muted-foreground">
-                        {TEMPLATE_CATEGORIES[category] || category}
+                        {getTemplateCategories()[category] || category}
                       </SelectLabel>
                       {categoryTemplates.map((template) => (
                         <SelectItem key={template.id} value={template.id}>

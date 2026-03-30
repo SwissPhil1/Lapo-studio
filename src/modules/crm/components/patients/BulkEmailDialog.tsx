@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Loader2, Mail, Users, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { TEMPLATE_CATEGORIES } from '@/shared/lib/emailMergeTags';
+import { getTemplateCategories } from '@/shared/lib/emailMergeTags';
 
 interface PatientBasic {
   id: string;
@@ -215,7 +215,7 @@ export function BulkEmailDialog({
                   {Object.entries(templatesByCategory).map(([category, categoryTemplates]) => (
                     <SelectGroup key={category}>
                       <SelectLabel className="text-xs uppercase tracking-wider text-muted-foreground">
-                        {TEMPLATE_CATEGORIES[category] || category}
+                        {getTemplateCategories()[category] || category}
                       </SelectLabel>
                       {categoryTemplates.map((template) => (
                         <SelectItem key={template.id} value={template.id}>

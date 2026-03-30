@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface MovePatientParams {
   pipelinePatientId: string;
@@ -16,12 +17,13 @@ interface AddPatientParams {
 
 export function usePipelineActions() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation(['pipeline']);
 
   const movePatient = useMutation({
     mutationFn: async ({ pipelinePatientId, newStageId }: MovePatientParams) => {
       const { error } = await supabase
         .from('pipeline_patients')
-        .update({ 
+        .update({
           stage_id: newStageId,
           entered_at: new Date().toISOString()
         })
@@ -31,11 +33,11 @@ export function usePipelineActions() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
-      toast.success('Patient déplacé avec succès');
+      toast.success(t('pipeline:patientMoved'));
     },
     onError: (error) => {
       console.error('Move patient error:', error);
-      toast.error('Erreur lors du déplacement du patient');
+      toast.error(t('pipeline:moveError'));
     },
   });
 
@@ -49,7 +51,7 @@ export function usePipelineActions() {
         .maybeSingle();
 
       if (existing) {
-        throw new Error('Ce patient est déjà dans le pipeline');
+        throw new Error(t('pipeline:alreadyInPipeline'));
       }
 
       const { error } = await supabase
@@ -66,11 +68,11 @@ export function usePipelineActions() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
-      toast.success('Patient ajouté au pipeline');
+      toast.success(t('pipeline:patientAdded'));
     },
     onError: (error: Error) => {
       console.error('Add patient error:', error);
-      toast.error(error.message || 'Erreur lors de l\'ajout du patient');
+      toast.error(error.message || t('pipeline:addError'));
     },
   });
 
@@ -85,11 +87,11 @@ export function usePipelineActions() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
-      toast.success('Patient retiré du pipeline');
+      toast.success(t('pipeline:patientRemoved'));
     },
     onError: (error) => {
       console.error('Remove patient error:', error);
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('pipeline:removeError'));
     },
   });
 

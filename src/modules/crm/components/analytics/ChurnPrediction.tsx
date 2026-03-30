@@ -4,7 +4,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Loader2, AlertTriangle, Users, TrendingDown, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
 
 interface AtRiskPatient {
   id: string;
@@ -181,7 +183,7 @@ export function ChurnPrediction() {
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {patient.last_visit_date
-                      ? `Derni\u00e8re visite: ${format(new Date(patient.last_visit_date), 'dd MMM yyyy', { locale: fr })}`
+                      ? `Derni\u00e8re visite: ${format(new Date(patient.last_visit_date), 'dd MMM yyyy', { locale: i18n.language === 'fr' ? frLocale : enUS })}`
                       : 'Aucune visite enregistr\u00e9e'}
                   </p>
                 </div>

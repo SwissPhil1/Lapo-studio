@@ -1,5 +1,11 @@
+import i18n from '@/i18n';
+
+function getLocale() {
+  return i18n.language === 'fr' ? 'fr-CH' : 'en-US';
+}
+
 export function formatCurrency(amount: number, currency: string = "CHF"): string {
-  return new Intl.NumberFormat("fr-CH", {
+  return new Intl.NumberFormat(getLocale(), {
     style: "currency",
     currency: currency,
     minimumFractionDigits: 2,
@@ -8,14 +14,14 @@ export function formatCurrency(amount: number, currency: string = "CHF"): string
 }
 
 export function formatLapoCash(amount: number): string {
-  return new Intl.NumberFormat("fr-CH", {
+  return new Intl.NumberFormat(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount) + " LC";
 }
 
 export function formatDate(date: string | Date): string {
-  return new Intl.DateTimeFormat("fr-CH", {
+  return new Intl.DateTimeFormat(getLocale(), {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -23,7 +29,7 @@ export function formatDate(date: string | Date): string {
 }
 
 export function formatDateTime(date: string | Date): string {
-  return new Intl.DateTimeFormat("fr-CH", {
+  return new Intl.DateTimeFormat(getLocale(), {
     year: "numeric",
     month: "short",
     day: "numeric",

@@ -11,7 +11,9 @@ import {
 } from 'recharts';
 import { Loader2, TrendingUp, DollarSign, Clock, Target } from 'lucide-react';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
 
 interface PipelineSnapshot {
   id: string;
@@ -113,7 +115,7 @@ export function RevenueForecast() {
       const trendData = Array.from(dateMap.entries())
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([date, value]) => ({
-          date: format(parseISO(date), 'dd MMM', { locale: fr }),
+          date: format(parseISO(date), 'dd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
           valeur: Math.round(value),
         }));
 
@@ -124,15 +126,15 @@ export function RevenueForecast() {
         ...(trendData.length > 0
           ? [
               {
-                date: format(addDays(today, 30), 'dd MMM', { locale: fr }),
+                date: format(addDays(today, 30), 'dd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
                 valeur: forecast30,
               },
               {
-                date: format(addDays(today, 60), 'dd MMM', { locale: fr }),
+                date: format(addDays(today, 60), 'dd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
                 valeur: forecast60,
               },
               {
-                date: format(addDays(today, 90), 'dd MMM', { locale: fr }),
+                date: format(addDays(today, 90), 'dd MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
                 valeur: forecast90,
               },
             ]

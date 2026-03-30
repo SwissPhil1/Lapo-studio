@@ -4,7 +4,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Loader2, AlertTriangle, XCircle, TrendingDown } from 'lucide-react';
 import { formatCurrency } from '@/shared/lib/constants';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
 
 interface NoShowAnalysisProps {
   dateRange: string;
@@ -58,7 +60,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
         const monthNoShows = monthBookings.filter(b => b.status === 'no_show').length;
         
         monthlyData.push({
-          month: format(month, 'MMM', { locale: fr }),
+          month: format(month, 'MMM', { locale: i18n.language === 'fr' ? frLocale : enUS }),
           rate: monthBookings.length > 0 ? Math.round((monthNoShows / monthBookings.length) * 100) : 0,
         });
       }

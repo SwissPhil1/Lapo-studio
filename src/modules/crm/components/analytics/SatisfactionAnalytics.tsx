@@ -13,7 +13,9 @@ import {
 } from 'recharts';
 import { Loader2, ThumbsUp, TrendingUp, Users, MessageSquare } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import i18n from '@/i18n';
 
 interface SurveyResponse {
   id: string;
@@ -98,7 +100,7 @@ export function SatisfactionAnalytics() {
       const trendData = Array.from(monthMap.entries())
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([month, d]) => ({
-          month: format(parseISO(`${month}-01`), 'MMM yy', { locale: fr }),
+          month: format(parseISO(`${month}-01`), 'MMM yy', { locale: i18n.language === 'fr' ? frLocale : enUS }),
           nps: d.total > 0 ? Math.round(((d.promoters - d.detractors) / d.total) * 100) : 0,
         }));
 
