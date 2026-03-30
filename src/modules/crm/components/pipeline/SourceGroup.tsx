@@ -33,13 +33,13 @@ interface SourceGroupProps {
 
 const sourceConfig = {
   referral: {
-    labelKey: 'pipeline:referrals',
+    label: 'Referrals',
     icon: Link2,
     className: 'text-primary',
     bgClassName: 'bg-primary/10',
   },
   organic: {
-    labelKey: 'pipeline:organic',
+    label: 'Organic',
     icon: UserCircle,
     className: 'text-muted-foreground',
     bgClassName: 'bg-muted',
@@ -47,7 +47,7 @@ const sourceConfig = {
 };
 
 export function SourceGroup({ source, patients, stageId }: SourceGroupProps) {
-  const { t } = useTranslation(['pipeline']);
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const config = sourceConfig[source];
   const Icon = config.icon;
@@ -61,16 +61,18 @@ export function SourceGroup({ source, patients, stageId }: SourceGroupProps) {
     <div className="space-y-2">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+        aria-expanded={isExpanded}
+        aria-label={isExpanded ? t('common.accessibility.collapseGroup', { group: config.label }) : t('common.accessibility.expandGroup', { group: config.label })}
+        className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {isExpanded ? (
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
         ) : (
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
         )}
-        <Icon className={cn('h-4 w-4', config.className)} />
-        <span className="text-sm font-medium text-foreground">{t(config.labelKey)}</span>
-        <span className={cn('ml-auto text-xs px-2 py-0.5 rounded-full', config.bgClassName, config.className)}>
+        <Icon className={cn('h-4 w-4', config.className)} aria-hidden="true" />
+        <span className="text-sm font-medium text-foreground">{config.label}</span>
+        <span className={cn('ml-auto text-xs px-2 py-0.5 rounded-full', config.bgClassName, config.className)} aria-hidden="true">
           {patients.length}
         </span>
       </button>
@@ -93,7 +95,7 @@ export function SourceGroup({ source, patients, stageId }: SourceGroupProps) {
               ))
             ) : (
               <div className="flex items-center justify-center h-12 text-muted-foreground text-xs">
-                {t('pipeline:noPatients')}
+                Aucun patient
               </div>
             )}
           </SortableContext>

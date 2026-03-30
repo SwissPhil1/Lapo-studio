@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useAuditTrail } from '@/shared/hooks/useAuditTrail';
 
 interface MovePatientParams {
   pipelinePatientId: string;
@@ -18,6 +19,7 @@ interface AddPatientParams {
 export function usePipelineActions() {
   const queryClient = useQueryClient();
   const { t } = useTranslation(['pipeline']);
+  const { logAction } = useAuditTrail();
 
   const movePatient = useMutation({
     mutationFn: async ({ pipelinePatientId, newStageId }: MovePatientParams) => {
@@ -48,7 +50,8 @@ export function usePipelineActions() {
 
       return { previousData };
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      logAction('status_change', 'patient', variables.pipelinePatientId, { newStageId: variables.newStageId });
       toast.success(t('pipeline:patientMoved'));
     },
     onError: (error, _variables, context) => {
@@ -89,7 +92,8 @@ export function usePipelineActions() {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      logAction('enroll', 'patient', variables.patientId, { stageId: variables.stageId });
       queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
       toast.success(t('pipeline:patientAdded'));
     },
@@ -108,7 +112,8 @@ export function usePipelineActions() {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      logAction('delete', 'patient', variables as unknown as string, { action: 'removed_from_pipeline' });
       queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
       toast.success(t('pipeline:patientRemoved'));
     },

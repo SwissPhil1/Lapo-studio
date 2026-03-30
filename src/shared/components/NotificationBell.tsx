@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import { cn } from '@/shared/lib/utils';
+import { motion, AnimatePresence } from '@/shared/components/motion';
 
 interface AppNotification {
   id: string;
@@ -114,21 +115,40 @@ export function NotificationBell() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!open)}
+        aria-label={unreadCount > 0
+          ? t('common:accessibility.notificationCount', { count: unreadCount })
+          : t('common:accessibility.notifications')}
+        aria-expanded={open}
+        aria-haspopup="true"
         className={cn(
           'relative rounded-lg p-2 transition-colors',
-          'text-muted-foreground hover:bg-accent hover:text-foreground'
+          'text-muted-foreground hover:bg-accent hover:text-foreground',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
         )}
       >
-        <Bell className="h-5 w-5" />
+        <Bell className="h-5 w-5" aria-hidden="true" />
         {unreadCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-wow-coral text-[10px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-wow-coral text-[10px] font-bold text-white" aria-hidden="true">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {unreadCount > 0 && t('common:accessibility.notificationCount', { count: unreadCount })}
+      </div>
+
+      <AnimatePresence>
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 rounded-lg border border-border bg-card shadow-xl z-50">
+        <motion.div
+          initial={{ opacity: 0, y: -8, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -8, scale: 0.97 }}
+          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+          role="region"
+          aria-label={t('common:accessibility.notifications')}
+          className="absolute right-0 top-full mt-2 w-80 rounded-lg border border-border bg-card shadow-xl z-50"
+        >
           <div className="flex items-center justify-between border-b border-border p-3">
             <h3 className="text-sm font-semibold text-foreground">
               {t('notifications:title', { defaultValue: 'Notifications' })}
@@ -153,9 +173,12 @@ export function NotificationBell() {
                 </p>
               </div>
             ) : (
-              notifications.map((notif) => (
-                <div
+              notifications.map((notif, idx) => (
+                <motion.div
                   key={notif.id}
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.04, duration: 0.2 }}
                   className={cn(
                     'flex items-start gap-3 p-3 border-b border-border/50 last:border-b-0 transition-colors',
                     !notif.read && 'bg-primary/5'
@@ -185,12 +208,13 @@ export function NotificationBell() {
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

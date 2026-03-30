@@ -26,24 +26,25 @@ interface PipelineCardProps {
   hasActiveWorkflow?: boolean;
 }
 
-function getPriorityInfo(priority: string | number | null, t: (key: string) => string): { label: string; className: string } | null {
+// Helper to handle both numeric and string priority values
+function getPriorityInfo(priority: string | number | null): { label: string; className: string } | null {
   if (priority === 'high' || priority === 3) {
-    return { label: t('pipeline:priorityHigh'), className: 'bg-destructive/20 text-destructive' };
+    return { label: 'Haute', className: 'bg-destructive/20 text-destructive' };
   }
   if (priority === 'medium' || priority === 2) {
-    return { label: t('pipeline:priorityMedium'), className: 'bg-warning/20 text-warning-foreground' };
+    return { label: 'Moyenne', className: 'bg-warning/20 text-warning-foreground' };
   }
   if (priority === 'low' || priority === 1) {
-    return { label: t('pipeline:priorityLow'), className: 'bg-muted text-muted-foreground' };
+    return { label: 'Basse', className: 'bg-muted text-muted-foreground' };
   }
   return null;
 }
 
 export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
   function PipelineCard({ patient, hasActiveWorkflow = false }, _ref) {
-    const { t } = useTranslation(['pipeline']);
     const navigate = useNavigate();
-
+    const { t } = useTranslation();
+    
     const {
       attributes,
       listeners,
@@ -68,29 +69,44 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
       }
     };
 
-    const priorityInfo = getPriorityInfo(patient.priority, t);
+    const priorityInfo = getPriorityInfo(patient.priority);
+
+    const patientName = `${patient.patients?.first_name || ''} ${patient.patients?.last_name || ''}`.trim();
+    const priorityLabel = priorityInfo
+      ? priorityInfo.label === 'Haute' ? t('common.accessibility.priorityHigh')
+        : priorityInfo.label === 'Moyenne' ? t('common.accessibility.priorityMedium')
+        : t('common.accessibility.priorityLow')
+      : '';
+    const daysLabel = daysInStage === 0
+      ? t('common.accessibility.daysInStageToday')
+      : t('common.accessibility.daysInStage', { count: daysInStage });
 
     return (
       <div
         ref={setNodeRef}
         style={style}
+        role="article"
+        aria-roledescription={t('common.accessibility.pipelineCard')}
+        aria-label={`${patientName}${priorityLabel ? `, ${priorityLabel}` : ''}, ${daysLabel}`}
         className={cn(
           'bg-card border border-border rounded-lg p-4 cursor-pointer hover:shadow-md transition-all',
+          'focus-within:ring-2 focus-within:ring-ring',
           isDragging && 'opacity-50 shadow-lg ring-2 ring-primary'
         )}
       >
         <div className="flex items-start gap-3">
           <button
-            className="mt-1 p-1 rounded hover:bg-muted cursor-grab active:cursor-grabbing touch-none"
+            className="mt-1 p-1 rounded hover:bg-muted cursor-grab active:cursor-grabbing touch-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={t('common.accessibility.dragHandle')}
             {...attributes}
             {...listeners}
           >
-            <GripVertical className="h-4 w-4 text-muted-foreground" />
+            <GripVertical className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           </button>
-
-          <div className="flex-1 min-w-0" onClick={handleClick}>
+          
+          <div className="flex-1 min-w-0" onClick={handleClick} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } }}>
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+              <div className="h-9 w-9 rounded-full bg-accent flex items-center justify-center flex-shrink-0" aria-hidden="true">
                 <span className="text-sm font-medium text-accent-foreground">
                   {patient.patients?.first_name?.charAt(0)}
                   {patient.patients?.last_name?.charAt(0)}
@@ -101,20 +117,20 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
                   {patient.patients?.first_name} {patient.patients?.last_name}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {patient.patients?.email || t('pipeline:noEmail')}
+                  {patient.patients?.email || 'Pas d\'email'}
                 </p>
               </div>
             </div>
 
             <div className="mt-2 flex flex-wrap gap-1.5">
               {hasActiveWorkflow && (
-                <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">
-                  <Zap className="h-3 w-3" />
-                  {t('pipeline:inSequence')}
+                <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600" aria-label={t('common.accessibility.inWorkflow')}>
+                  <Zap className="h-3 w-3" aria-hidden="true" />
+                  En séquence
                 </span>
               )}
               {priorityInfo && (
-                <span className={cn('text-xs px-2 py-0.5 rounded-full', priorityInfo.className)}>
+                <span className={cn('text-xs px-2 py-0.5 rounded-full', priorityInfo.className)} aria-label={priorityLabel}>
                   {priorityInfo.label}
                 </span>
               )}
@@ -126,14 +142,14 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
               </p>
             )}
 
-            <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3" />
+            <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground" aria-label={daysLabel}>
+              <Calendar className="h-3 w-3" aria-hidden="true" />
               <span>
-                {daysInStage === 0
-                  ? t('pipeline:today')
-                  : daysInStage === 1
-                    ? t('pipeline:yesterday')
-                    : t('pipeline:daysAgo', { count: daysInStage })}
+                {daysInStage === 0 
+                  ? "Aujourd'hui" 
+                  : daysInStage === 1 
+                    ? 'Hier' 
+                    : `Il y a ${daysInStage} jours`}
               </span>
             </div>
           </div>

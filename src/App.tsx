@@ -23,6 +23,7 @@ const ReferrerDetailPage = lazy(() => import('@/modules/admin/pages/ReferrerDeta
 const PayoutDetailPage = lazy(() => import('@/modules/admin/pages/PayoutDetailPage'))
 const ReferralsPage = lazy(() => import('@/modules/admin/pages/ReferralsPage'))
 const ReferralDetailPage = lazy(() => import('@/modules/admin/pages/ReferralDetailPage'))
+const AuditTrailPage = lazy(() => import('@/modules/admin/pages/AuditTrailPage'))
 
 // CRM pages
 const CRMDashboard = lazy(() => import('@/modules/crm/pages/CRMDashboard'))
@@ -33,6 +34,8 @@ const AppointmentsPage = lazy(() => import('@/modules/crm/pages/AppointmentsPage
 const CommunicationsPage = lazy(() => import('@/modules/crm/pages/CommunicationsPage'))
 const AnalyticsPage = lazy(() => import('@/modules/crm/pages/AnalyticsPage'))
 const CampaignsPage = lazy(() => import('@/modules/crm/pages/CampaignsPage'))
+const WorkflowsPage = lazy(() => import('@/modules/crm/pages/WorkflowsPage'))
+const StatisticsPage = lazy(() => import('@/modules/crm/pages/StatisticsPage'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -181,6 +184,15 @@ export default function App() {
                   }
                 />
 
+                <Route
+                  path="admin/audit-trail"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AuditTrailPage />
+                    </ProtectedRoute>
+                  }
+                />
+
                 {/* CRM routes */}
                 <Route
                   path="crm/dashboard"
@@ -243,6 +255,23 @@ export default function App() {
                   element={
                     <ProtectedRoute requireCRM>
                       <CampaignsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="crm/workflows"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <WorkflowsPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="crm/statistics"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <StatisticsPage />
                     </ProtectedRoute>
                   }
                 />

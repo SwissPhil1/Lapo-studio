@@ -27,6 +27,7 @@ import { PipelineMetrics } from '@/modules/crm/components/pipeline/PipelineMetri
 import { SourceGroup } from '@/modules/crm/components/pipeline/SourceGroup';
 import { FollowupGroup } from '@/modules/crm/components/pipeline/FollowupGroup';
 import { cn } from '@/shared/lib/utils';
+import { motion, staggerContainer, slideUp } from '@/shared/components/motion';
 
 interface PipelineStage {
   id: string;
@@ -370,23 +371,31 @@ export default function Pipeline() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {stages.map((stage, index) => {
+        <motion.div
+          className="flex gap-4 overflow-x-auto pb-4"
+          role="region"
+          aria-label={t('pipeline:board', { defaultValue: 'Pipeline board' })}
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          {stages.map((stage) => {
             const isNewLeadStage = stage.id === newLeadStage?.id;
             const isNeedsFollowupStage = stage.id === needsFollowupStage?.id;
             const stagePatients = getPatientsByStage(stage.id);
 
             return (
-              <div
+              <motion.div
                 key={stage.id}
-                className="flex-shrink-0 w-80 animate-slide-up"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="flex-shrink-0 w-80"
+                variants={slideUp}
               >
                 {/* Stage Header */}
                 <div className="flex items-center gap-2 mb-3 px-1">
                   <div
                     className="h-3 w-3 rounded-full"
                     style={{ backgroundColor: stage.color || '#6b7280' }}
+                    aria-hidden="true"
                   />
                   <h3 className="font-semibold text-foreground">{stage.name}</h3>
                   <span className="ml-auto text-sm text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
@@ -460,10 +469,10 @@ export default function Pipeline() {
                     </SortableContext>
                   )}
                 </StageColumn>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         <DragOverlay>
           {activePatient ? (

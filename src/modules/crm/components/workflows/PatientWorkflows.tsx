@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
+import { useAuditTrail } from '@/shared/hooks/useAuditTrail';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Zap, Pause, Play, X } from 'lucide-react';
@@ -32,6 +33,7 @@ interface WorkflowStep {
 
 export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
   const { t, i18n } = useTranslation(['tasks', 'common']);
+  const { logAction } = useAuditTrail();
   const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
   const queryClient = useQueryClient();
 
@@ -84,7 +86,8 @@ export function PatientWorkflows({ patientId }: PatientWorkflowsProps) {
 
       if (error) throw error;
     },
-    onSuccess: (_, { status }) => {
+    onSuccess: (_, { id, status }) => {
+      logAction('status_change', 'workflow', id, { newStatus: status, patientId });
       queryClient.invalidateQueries({ queryKey: ['patient-enrollments', patientId] });
       const messages: Record<string, string> = {
         paused: t('tasks:workflowPaused'),

@@ -35,6 +35,8 @@ i18n.use(initReactI18next).init({
       tasks: (en as any).tasks,
       segments: (en as any).segments,
       notifications: (en as any).notifications,
+      workflows: (en as any).workflows,
+      audit: (en as any).audit,
     },
     fr: {
       translation: fr,
@@ -66,6 +68,8 @@ i18n.use(initReactI18next).init({
       tasks: (fr as any).tasks,
       segments: (fr as any).segments,
       notifications: (fr as any).notifications,
+      workflows: (fr as any).workflows,
+      audit: (fr as any).audit,
     },
   },
   lng: localStorage.getItem('lapo-lang') ?? 'en',

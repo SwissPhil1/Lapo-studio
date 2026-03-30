@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
+import { useAuditTrail } from '@/shared/hooks/useAuditTrail';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -118,6 +119,7 @@ interface PipelineStage {
 export default function PatientDetail() {
   const { t, i18n } = useTranslation(['patientDetail', 'common']);
   const dateLocale = i18n.language === 'fr' ? frLocale : enUS;
+  const { logAction } = useAuditTrail();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -161,7 +163,8 @@ export default function PatientDetail() {
     onMutate: ({ bookingId }) => {
       setUpdatingBookingId(bookingId);
     },
-    onSuccess: (status) => {
+    onSuccess: (status, variables) => {
+      logAction('status_change', 'booking', variables.bookingId, { newStatus: status });
       const statusKeys: Record<string, string> = {
         [BOOKING_STATUS.COMPLETED]: 'completed',
         [BOOKING_STATUS.NO_SHOW]: 'noShow',
@@ -439,7 +442,7 @@ export default function PatientDetail() {
   // ─── Redesigned render ───────────────────────────────────────────
 
   return (
-    <div className="space-y-5 animate-fade-in max-w-5xl mx-auto p-4 md:p-8">
+    <div className="space-y-5 max-w-5xl mx-auto p-4 md:p-8">
       {/* Navigation + Actions */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={() => navigate('/crm/patients')} className="-ml-2">

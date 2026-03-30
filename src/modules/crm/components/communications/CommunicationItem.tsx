@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from '@/shared/components/motion';
 import {
   Mail,
   MessageSquare,
@@ -47,7 +48,7 @@ function safeString(value: unknown): string {
   return String(value);
 }
 
-export function CommunicationItem({ communication, index }: CommunicationItemProps) {
+export function CommunicationItem({ communication, index: _index }: CommunicationItemProps) {
   const { t, i18n } = useTranslation(['communications']);
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
@@ -94,8 +95,7 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
 
   return (
     <div
-      className="group border-b border-border/50 last:border-b-0 hover:bg-muted/30 transition-colors animate-fade-in"
-      style={{ animationDelay: `${Math.min(index * 20, 200)}ms` }}
+      className="group border-b border-border/50 last:border-b-0 hover:bg-muted/30 transition-colors"
     >
       {/* Main row - compact */}
       <div className="flex items-center gap-3 px-4 py-2.5">
@@ -245,8 +245,15 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
       </div>
 
       {/* Expanded content */}
+      <AnimatePresence>
       {expanded && (
-        <div className="px-4 pb-3 pt-2 ml-11 border-t border-border/30 bg-muted/20 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="px-4 pb-3 pt-2 ml-11 border-t border-border/30 bg-muted/20 overflow-hidden"
+        >
           {/* Subject on mobile */}
           <div className="sm:hidden mb-2">
             <span className="text-xs text-muted-foreground font-medium">{t('communications:subjectLabel')}</span>
@@ -292,8 +299,9 @@ export function CommunicationItem({ communication, index }: CommunicationItemPro
               )}
             </div>
           )}
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -39,6 +39,8 @@ const RevenueForecast = lazy(() => import('@/modules/crm/components/analytics/Re
 const ChurnPrediction = lazy(() => import('@/modules/crm/components/analytics/ChurnPrediction').then(m => ({ default: m.ChurnPrediction })));
 const ROICalculator = lazy(() => import('@/modules/crm/components/analytics/ROICalculator').then(m => ({ default: m.ROICalculator })));
 const CohortAnalysis = lazy(() => import('@/modules/crm/components/analytics/CohortAnalysis').then(m => ({ default: m.CohortAnalysis })));
+const LTVAnalysis = lazy(() => import('@/modules/crm/components/analytics/LTVAnalysis').then(m => ({ default: m.LTVAnalysis })));
+const CACAnalysis = lazy(() => import('@/modules/crm/components/analytics/CACAnalysis').then(m => ({ default: m.CACAnalysis })));
 
 function ChartLoader() {
   return (
@@ -263,7 +265,7 @@ export default function Analytics() {
   };
   
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -293,10 +295,12 @@ export default function Analytics() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-5xl grid-cols-9">
+        <TabsList className="grid w-full max-w-6xl grid-cols-11">
           <TabsTrigger value="performance">{t('analytics:tabs.performance')}</TabsTrigger>
           <TabsTrigger value="demographics">{t('analytics:tabs.demographics')}</TabsTrigger>
           <TabsTrigger value="cohort">{t('analytics:tabs.cohort', { defaultValue: 'Cohort' })}</TabsTrigger>
+          <TabsTrigger value="ltv">{t('analytics:tabs.ltv', { defaultValue: 'LTV' })}</TabsTrigger>
+          <TabsTrigger value="cac">{t('analytics:tabs.cac', { defaultValue: 'CAC' })}</TabsTrigger>
           <TabsTrigger value="attribution">{t('analytics:tabs.attribution')}</TabsTrigger>
           <TabsTrigger value="satisfaction">{t('analytics:tabs.satisfaction')}</TabsTrigger>
           <TabsTrigger value="revenue">{t('analytics:tabs.revenue')}</TabsTrigger>
@@ -449,6 +453,20 @@ export default function Analytics() {
             </p>
             <CohortAnalysis />
           </div>
+          </Suspense>
+        </TabsContent>
+
+        {/* LTV Tab */}
+        <TabsContent value="ltv" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
+            <LTVAnalysis />
+          </Suspense>
+        </TabsContent>
+
+        {/* CAC Tab */}
+        <TabsContent value="cac" className="space-y-6">
+          <Suspense fallback={<ChartLoader />}>
+            <CACAnalysis />
           </Suspense>
         </TabsContent>
 

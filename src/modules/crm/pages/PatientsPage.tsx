@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
+import { useAuditTrail } from '@/shared/hooks/useAuditTrail';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -116,6 +117,7 @@ interface Segment {
 
 export default function Patients() {
   const { t } = useTranslation(['patients', 'common']);
+  const { logAction } = useAuditTrail();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<PatientFilter>('all');
@@ -588,7 +590,8 @@ export default function Patients() {
       }]);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      logAction('create', 'patient', '', { name: `${variables.first_name} ${variables.last_name}` });
       queryClient.invalidateQueries({ queryKey: ['patients-list'] });
       queryClient.invalidateQueries({ queryKey: ['pipeline-patients'] });
       setIsDialogOpen(false);

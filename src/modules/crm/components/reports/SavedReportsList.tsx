@@ -4,11 +4,11 @@ import type { CustomReport, ReportConfig } from '@/shared/types/reports';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Star, StarOff, Trash2, ExternalLink, BarChart3, LineChart, PieChart, Table, AreaChart } from 'lucide-react';
+import { useAuditTrail } from '@/shared/hooks/useAuditTrail';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { REPORT_SOURCES } from '@/shared/lib/reportSources';
 import {
   AlertDialog,
@@ -46,9 +46,9 @@ function parseReportConfig(config: unknown): ReportConfig | null {
 }
 
 export function SavedReportsList() {
-  const { t } = useTranslation(['reports', 'common']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { logAction } = useAuditTrail();
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ['custom-reports'],
@@ -85,12 +85,13 @@ export function SavedReportsList() {
         .eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['custom-reports'] });
-      toast.success(t('reports:reportDeleted'));
+      logAction('delete', 'report', id);
+      toast.success('Rapport supprimé');
     },
     onError: () => {
-      toast.error(t('reports:deleteError'));
+      toast.error('Erreur lors de la suppression');
     },
   });
 
@@ -118,9 +119,9 @@ export function SavedReportsList() {
     return (
       <div className="text-center py-12">
         <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium">{t('reports:noCustomReports')}</h3>
+        <h3 className="text-lg font-medium">Aucun rapport personnalisé</h3>
         <p className="text-muted-foreground mt-1">
-          {t('reports:createFirstReport')}
+          Créez votre premier rapport pour commencer
         </p>
       </div>
     );
@@ -152,11 +153,11 @@ export function SavedReportsList() {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {sourceDef?.label || t('reports:unknownSource')}
-                    {config && ` • ${config.metrics.length} ${t('reports:metrics')}`}
+                    {sourceDef?.label || 'Source inconnue'}
+                    {config && ` • ${config.metrics.length} métrique(s)`}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {t('reports:modified')} {formatDistanceToNow(new Date(report.updated_at), { addSuffix: true, locale: fr })}
+                    Modifié {formatDistanceToNow(new Date(report.updated_at), { addSuffix: true, locale: fr })}
                   </p>
                 </div>
               </div>
@@ -189,18 +190,18 @@ export function SavedReportsList() {
                   </AlertDialogTrigger>
                   <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>{t('reports:deleteReportConfirm')}</AlertDialogTitle>
+                      <AlertDialogTitle>Supprimer ce rapport ?</AlertDialogTitle>
                       <AlertDialogDescription>
                         Cette action est irréversible. Le rapport "{report.name}" sera définitivement supprimé.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => deleteReport.mutate(report.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        {t('common:delete')}
+                        Supprimer
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
