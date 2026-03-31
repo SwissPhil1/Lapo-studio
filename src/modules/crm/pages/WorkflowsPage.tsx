@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { WorkflowTemplateLibrary } from '@/modules/crm/components/workflows/WorkflowTemplateLibrary';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { Input } from '@/components/ui/input';
@@ -362,6 +363,15 @@ export default function WorkflowsPage() {
           ))}
         </div>
       )}
+
+      {/* Template Library */}
+      <WorkflowTemplateLibrary
+        onUseTemplate={() => {
+          setEditingWorkflow(null);
+          setEditingSteps([]);
+          setBuilderOpen(true);
+        }}
+      />
 
       {/* Delete confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
