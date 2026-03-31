@@ -48,7 +48,7 @@ export function BulkActionBar({
               Email
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Envoyer un email rapide</TooltipContent>
+          <TooltipContent>{t('analytics.bulkActions.sendQuickEmail', { defaultValue: 'Send a quick email' })}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -64,7 +64,7 @@ export function BulkActionBar({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            {hasAIQuery ? 'Sauvegarder comme segment dynamique' : 'Sauvegarder comme segment'}
+            {hasAIQuery ? t('analytics.bulkActions.saveDynamicSegment', { defaultValue: 'Save as dynamic segment' }) : t('analytics.bulkActions.saveSegment', { defaultValue: 'Save as segment' })}
           </TooltipContent>
         </Tooltip>
 
@@ -80,7 +80,7 @@ export function BulkActionBar({
               Campagne
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Créer une campagne trackée</TooltipContent>
+          <TooltipContent>{t('analytics.bulkActions.createTrackedCampaign', { defaultValue: 'Create a tracked campaign' })}</TooltipContent>
         </Tooltip>
         
         <Button

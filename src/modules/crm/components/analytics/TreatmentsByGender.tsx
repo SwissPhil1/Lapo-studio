@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 
 export function TreatmentsByGender() {
-  const { t } = useTranslation(['analytics']);
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['treatments-by-gender'],
     queryFn: async () => {
@@ -63,7 +63,7 @@ export function TreatmentsByGender() {
   if (!data || data.length === 0) {
     return (
       <div className="h-[280px] flex items-center justify-center text-muted-foreground">
-        {t('analytics:noDataAvailable')}
+        {t('analytics.noDataAvailable', { defaultValue: 'No data available' })}
       </div>
     );
   }

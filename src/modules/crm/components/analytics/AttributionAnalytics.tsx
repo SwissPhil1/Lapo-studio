@@ -11,7 +11,7 @@ interface AttributionAnalyticsProps {
 const COLORS = ['#7C3AED', '#14b8a6', '#06B6D4', '#5eead4', '#99f6e4', '#ccfbf1', '#f0fdfa'];
 
 export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
-  const { t } = useTranslation(['analytics']);
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['attribution-analytics', dateRange],
     queryFn: async () => {
@@ -104,8 +104,8 @@ export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <MousePointerClick className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">{t('analytics:noAttributionData')}</p>
-        <p className="text-sm mt-1">{t('analytics:attributionEmptyDescription')}</p>
+        <p className="font-medium">{t('analytics.noAttributionData', { defaultValue: 'No attribution data' })}</p>
+        <p className="text-sm mt-1">{t('analytics.attributionEmptyDescription', { defaultValue: 'Leads captured with UTM parameters will appear here.' })}</p>
       </div>
     );
   }
@@ -117,29 +117,29 @@ export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Users className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{data.totalLeads}</p>
-          <p className="text-sm text-muted-foreground">Total leads</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.attribution.totalLeads', { defaultValue: 'Total leads' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Target className="h-5 w-5 mx-auto text-success mb-2" />
           <p className="text-2xl font-bold">{data.convertedLeads}</p>
-          <p className="text-sm text-muted-foreground">Convertis</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.attribution.converted', { defaultValue: 'Converted' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <TrendingUp className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{data.overallRate}%</p>
-          <p className="text-sm text-muted-foreground">Taux conversion</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.attribution.conversionRate', { defaultValue: 'Conversion rate' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <MousePointerClick className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{data.trackedPatients}</p>
-          <p className="text-sm text-muted-foreground">Patients trackés</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.attribution.trackedPatients', { defaultValue: 'Tracked patients' })}</p>
         </div>
       </div>
 
       {/* Source bar chart */}
       {data.bySource.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Leads par source</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.attribution.leadsBySource', { defaultValue: 'Leads by source' })}</h4>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={data.bySource}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -152,8 +152,8 @@ export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
                   borderRadius: '8px',
                 }}
               />
-              <Bar dataKey="leads" fill="#7C3AED" name="Leads" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="converted" fill="#06B6D4" name="Convertis" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="leads" fill="#7C3AED" name={t('analytics.attribution.leads', { defaultValue: 'Leads' })} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="converted" fill="#06B6D4" name={t('analytics.attribution.convertedLabel', { defaultValue: 'Converted' })} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -162,7 +162,7 @@ export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
       {/* Medium pie chart */}
       {data.byMedium.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Répartition par canal</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.attribution.byChannel', { defaultValue: 'Distribution by channel' })}</h4>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
               <Pie data={data.byMedium} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
@@ -179,14 +179,14 @@ export function AttributionAnalytics({ dateRange }: AttributionAnalyticsProps) {
       {/* Campaign table */}
       {data.byCampaign.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Performance par campagne UTM</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.attribution.utmCampaignPerformance', { defaultValue: 'UTM campaign performance' })}</h4>
           <div className="space-y-2">
             {data.byCampaign.map((c, i) => (
               <div key={i} className="flex items-center justify-between bg-secondary/30 rounded-lg px-3 py-2">
                 <span className="text-sm font-medium truncate max-w-[200px]">{c.campaign}</span>
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="text-muted-foreground">{c.leads} leads</span>
-                  <span className="text-success">{c.converted} convertis</span>
+                  <span className="text-muted-foreground">{c.leads} {t('analytics.attribution.leads', { defaultValue: 'leads' })}</span>
+                  <span className="text-success">{c.converted} {t('analytics.attribution.convertedLabel', { defaultValue: 'converted' })}</span>
                   <span className="font-medium">{c.rate}%</span>
                 </div>
               </div>

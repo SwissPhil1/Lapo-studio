@@ -36,7 +36,7 @@ export interface Campaign {
 const CAMPAIGNS_PER_PAGE = 20;
 
 export default function Campaigns() {
-  const { t } = useTranslation(['campaigns', 'common']);
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignWithMetrics | null>(null);
@@ -112,10 +112,10 @@ export default function Campaigns() {
     onSuccess: (_, campaign) => {
       queryClient.invalidateQueries({ queryKey: ['crm-campaigns'] });
       logAction('create', 'campaign', campaign.id, { action: 'duplicate', name: campaign.name });
-      toast.success(t('campaigns:duplicateSuccess'));
+      toast.success(t('campaigns.duplicateSuccess'));
     },
     onError: () => {
-      toast.error(t('campaigns:duplicateError'));
+      toast.error(t('campaigns.duplicateError'));
     }
   });
 
@@ -131,10 +131,10 @@ export default function Campaigns() {
     onSuccess: (_, campaignId) => {
       queryClient.invalidateQueries({ queryKey: ['crm-campaigns'] });
       logAction('status_change', 'campaign', campaignId, { newStatus: 'archived' });
-      toast.success(t('campaigns:archiveSuccess'));
+      toast.success(t('campaigns.archiveSuccess'));
     },
     onError: () => {
-      toast.error(t('campaigns:archiveError'));
+      toast.error(t('campaigns.archiveError'));
     }
   });
 
@@ -167,15 +167,15 @@ export default function Campaigns() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{t('campaigns:title')}</h1>
-            <p className="text-muted-foreground">{t('campaigns:description')}</p>
+            <h1 className="text-2xl font-bold text-foreground">{t('campaigns.title')}</h1>
+            <p className="text-muted-foreground">{t('campaigns.description')}</p>
           </div>
           <Button
             onClick={() => navigate('/crm/patients')}
             className="gap-2"
           >
             <Plus className="h-4 w-4" />
-            {t('campaigns:newCampaign')}
+            {t('campaigns.newCampaign')}
           </Button>
         </div>
 
@@ -193,7 +193,7 @@ export default function Campaigns() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={t('campaigns:searchPlaceholder')}
+              placeholder={t('campaigns.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -201,16 +201,16 @@ export default function Campaigns() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Statut" />
+              <SelectValue placeholder={t('common.status', { defaultValue: 'Status' })} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('campaigns:allStatuses')}</SelectItem>
-              <SelectItem value="draft">{t('campaigns:draft')}</SelectItem>
-              <SelectItem value="scheduled">{t('campaigns:scheduled')}</SelectItem>
-              <SelectItem value="sending">{t('campaigns:sending')}</SelectItem>
-              <SelectItem value="sent">{t('campaigns:sent')}</SelectItem>
-              <SelectItem value="completed">{t('campaigns:completed')}</SelectItem>
-              <SelectItem value="archived">{t('campaigns:archived')}</SelectItem>
+              <SelectItem value="all">{t('campaigns.allStatuses')}</SelectItem>
+              <SelectItem value="draft">{t('campaigns.draft')}</SelectItem>
+              <SelectItem value="scheduled">{t('campaigns.scheduled')}</SelectItem>
+              <SelectItem value="sending">{t('campaigns.sending')}</SelectItem>
+              <SelectItem value="sent">{t('campaigns.sent')}</SelectItem>
+              <SelectItem value="completed">{t('campaigns.completed')}</SelectItem>
+              <SelectItem value="archived">{t('campaigns.archived')}</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -218,7 +218,7 @@ export default function Campaigns() {
             size="icon"
             onClick={() => refetch()}
             disabled={isFetching}
-            title={t('campaigns:refresh')}
+            title={t('campaigns.refresh')}
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
@@ -230,7 +230,7 @@ export default function Campaigns() {
             <CardContent className="py-12">
               <div className="flex flex-col items-center justify-center gap-3">
                 <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
-                <p className="text-muted-foreground">{t('campaigns:loading')}</p>
+                <p className="text-muted-foreground">{t('campaigns.loading')}</p>
               </div>
             </CardContent>
           </Card>
@@ -239,16 +239,16 @@ export default function Campaigns() {
             <CardContent className="py-12">
               <div className="flex flex-col items-center justify-center gap-3">
                 <Megaphone className="h-12 w-12 text-muted-foreground/50" />
-                <p className="text-lg font-medium text-foreground">{t('campaigns:noCampaigns')}</p>
+                <p className="text-lg font-medium text-foreground">{t('campaigns.noCampaigns')}</p>
                 <p className="text-muted-foreground text-center max-w-md">
-                  {t('campaigns:emptyDescription')}
+                  {t('campaigns.emptyDescription')}
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/crm/patients')}
                   className="mt-2"
                 >
-                  {t('campaigns:goToPatients')}
+                  {t('campaigns.goToPatients')}
                 </Button>
               </div>
             </CardContent>
