@@ -46,7 +46,7 @@ export default function Campaigns() {
   const { logAction } = useAuditTrail();
 
   // Fetch campaigns with their segments
-  const { data: campaigns, isLoading, refetch, isFetching } = useQuery({
+  const { data: campaigns, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['crm-campaigns'],
     queryFn: async () => {
       const { data: campaignsData, error } = await supabase
@@ -178,6 +178,12 @@ export default function Campaigns() {
             {t('campaigns:newCampaign')}
           </Button>
         </div>
+
+        {isError && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center text-destructive">
+            {t('common:loadError', { defaultValue: 'Failed to load data. Please try again.' })}
+          </div>
+        )}
 
         {/* Metrics Dashboard */}
         <CampaignMetrics />

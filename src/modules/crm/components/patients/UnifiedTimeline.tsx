@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { useTranslation } from 'react-i18next';
@@ -370,7 +371,7 @@ function TimelineItem({ event, isExpanded, onToggleExpand, t, dateLocale }: Time
           <div className="mt-3 p-3 bg-muted/30 rounded-lg border border-border/50">
             <div
               className="text-sm prose prose-sm max-w-none dark:prose-invert"
-              dangerouslySetInnerHTML={{ __html: event?.metadata?.full_message }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event?.metadata?.full_message ?? '') }}
             />
           </div>
         )}

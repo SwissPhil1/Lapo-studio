@@ -323,7 +323,7 @@ export default function StatisticsPage() {
   // -----------------------------------------------------------------------
 
   // 1. All bookings in current + previous period
-  const { data: bookingsData, isLoading: bookingsLoading } = useQuery({
+  const { data: bookingsData, isLoading: bookingsLoading, isError: isBookingsError } = useQuery({
     queryKey: ['stats-bookings', period],
     queryFn: async () => {
       const { data } = await supabase
@@ -337,7 +337,7 @@ export default function StatisticsPage() {
   });
 
   // 2. All patients
-  const { data: patientsData, isLoading: patientsLoading } = useQuery({
+  const { data: patientsData, isLoading: patientsLoading, isError: isPatientsError } = useQuery({
     queryKey: ['stats-patients', period],
     queryFn: async () => {
       const { data } = await supabase
@@ -764,6 +764,7 @@ export default function StatisticsPage() {
   }, [bookingsData, patientsData, pipelineData, stagesData, commsData, campaignsData, tasksData, referralsData, referrerPerfData, commissionsData, referredBookingsData, range, period]);
 
   const isLoading = bookingsLoading || patientsLoading;
+  const hasError = isBookingsError || isPatientsError;
 
   // -----------------------------------------------------------------------
   // Render
@@ -771,6 +772,12 @@ export default function StatisticsPage() {
 
   return (
     <div className="space-y-8 p-6 max-w-7xl mx-auto">
+      {hasError && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center text-destructive">
+          {t('common:loadError', { defaultValue: 'Failed to load data. Please try again.' })}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

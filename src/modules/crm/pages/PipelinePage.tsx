@@ -102,7 +102,7 @@ export default function Pipeline() {
     useSensor(KeyboardSensor)
   );
 
-  const { data: stages = [], isLoading: stagesLoading } = useQuery({
+  const { data: stages = [], isLoading: stagesLoading, isError: isStagesError } = useQuery({
     queryKey: ['pipeline-stages'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -116,7 +116,7 @@ export default function Pipeline() {
     },
   });
 
-  const { data: pipelinePatients = [], isLoading: patientsLoading } = useQuery({
+  const { data: pipelinePatients = [], isLoading: patientsLoading, isError: isPatientsError } = useQuery({
     queryKey: ['pipeline-patients'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -199,6 +199,7 @@ export default function Pipeline() {
   });
 
   const isLoading = stagesLoading || patientsLoading;
+  const hasError = isStagesError || isPatientsError;
 
   const getPatientsByStage = (stageId: string) => {
     return pipelinePatients.filter((pp) => pp.stage_id === stageId && pp.patients);
@@ -352,6 +353,12 @@ export default function Pipeline() {
 
   return (
     <div className="space-y-6">
+      {hasError && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center text-destructive">
+          {t('common:loadError', { defaultValue: 'Failed to load data. Please try again.' })}
+        </div>
+      )}
+
       {/* Metrics Bar */}
       <PipelineMetrics
         totalPatients={metrics.totalPatients}

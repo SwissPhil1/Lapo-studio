@@ -98,7 +98,7 @@ export function LapoCashTransactionDialog({
           };
 
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL || "https://dcrlaoudqcfbauxalbgs.supabase.co"}/functions/v1/${endpoint}`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${endpoint}`,
         {
           method: "POST",
           headers: {

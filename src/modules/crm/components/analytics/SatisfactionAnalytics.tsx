@@ -28,7 +28,7 @@ interface SurveyResponse {
 }
 
 export function SatisfactionAnalytics() {
-  const { t } = useTranslation(['analytics']);
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['satisfaction-analytics'],
     queryFn: async () => {
@@ -153,9 +153,9 @@ export function SatisfactionAnalytics() {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <ThumbsUp className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">{t('analytics:noSatisfactionData')}</p>
+        <p className="font-medium">{t('analytics.noSatisfactionData', { defaultValue: 'No satisfaction responses' })}</p>
         <p className="text-sm mt-1">
-          Les r\u00e9ponses aux enqu\u00eates NPS et CSAT appara\u00eetront ici.
+          {t('analytics.satisfaction.emptyDescription', { defaultValue: 'NPS and CSAT survey responses will appear here.' })}
         </p>
       </div>
     );
@@ -168,28 +168,28 @@ export function SatisfactionAnalytics() {
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Users className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{data.totalResponses}</p>
-          <p className="text-sm text-muted-foreground">R\u00e9ponses totales</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.satisfaction.totalResponses', { defaultValue: 'Total responses' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <TrendingUp className="h-5 w-5 mx-auto text-emerald-600 mb-2" />
           <p className="text-2xl font-bold">{data.npsScore}</p>
-          <p className="text-sm text-muted-foreground">Score NPS</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.satisfaction.npsScore', { defaultValue: 'NPS Score' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <ThumbsUp className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{data.csatAvg}/5</p>
-          <p className="text-sm text-muted-foreground">CSAT moyen</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.satisfaction.avgCsat', { defaultValue: 'Average CSAT' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <MessageSquare className="h-5 w-5 mx-auto text-muted-foreground mb-2" />
           <p className="text-2xl font-bold">{data.responseRate}%</p>
-          <p className="text-sm text-muted-foreground">Taux de r\u00e9ponse</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.satisfaction.responseRate', { defaultValue: 'Response rate' })}</p>
         </div>
       </div>
 
       {/* NPS Breakdown bar */}
       <div>
-        <h4 className="text-sm font-medium text-muted-foreground mb-3">R\u00e9partition NPS</h4>
+        <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.satisfaction.npsBreakdown', { defaultValue: 'NPS Breakdown' })}</h4>
         <div className="flex h-4 rounded-full overflow-hidden">
           {data.npsBreakdown.promotersPct > 0 && (
             <div
@@ -212,13 +212,13 @@ export function SatisfactionAnalytics() {
         </div>
         <div className="flex justify-between text-xs mt-2">
           <span className="text-emerald-600">
-            Promoteurs: {data.npsBreakdown.promoters} ({data.npsBreakdown.promotersPct}%)
+            {t('analytics.satisfaction.promoters', { defaultValue: 'Promoters' })}: {data.npsBreakdown.promoters} ({data.npsBreakdown.promotersPct}%)
           </span>
           <span className="text-amber-600">
-            Passifs: {data.npsBreakdown.passives} ({data.npsBreakdown.passivesPct}%)
+            {t('analytics.satisfaction.passives', { defaultValue: 'Passives' })}: {data.npsBreakdown.passives} ({data.npsBreakdown.passivesPct}%)
           </span>
           <span className="text-red-600">
-            D\u00e9tracteurs: {data.npsBreakdown.detractors} ({data.npsBreakdown.detractorsPct}%)
+            {t('analytics.satisfaction.detractors', { defaultValue: 'Detractors' })}: {data.npsBreakdown.detractors} ({data.npsBreakdown.detractorsPct}%)
           </span>
         </div>
       </div>
@@ -227,7 +227,7 @@ export function SatisfactionAnalytics() {
       {data.trendData.length > 1 && (
         <div>
           <h4 className="text-sm font-medium text-muted-foreground mb-3">
-            \u00c9volution du NPS
+            {t('analytics.satisfaction.npsTrend', { defaultValue: 'NPS Trend' })}
           </h4>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={data.trendData}>
@@ -267,7 +267,7 @@ export function SatisfactionAnalytics() {
       {/* Score distribution bar chart */}
       <div>
         <h4 className="text-sm font-medium text-muted-foreground mb-3">
-          Distribution des scores
+          {t('analytics.satisfaction.scoreDistribution', { defaultValue: 'Score Distribution' })}
         </h4>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data.distributionData}>
@@ -289,7 +289,7 @@ export function SatisfactionAnalytics() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: any) => [`${value}`, 'R\u00e9ponses']}
+              formatter={(value: any) => [`${value}`, t('analytics.satisfaction.responses', { defaultValue: 'Responses' })]}
             />
             <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
           </BarChart>

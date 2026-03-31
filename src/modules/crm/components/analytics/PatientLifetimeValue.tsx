@@ -14,7 +14,7 @@ const AGE_GROUPS = [
 ];
 
 export function PatientLifetimeValue() {
-  const { t } = useTranslation(['analytics']);
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['patient-ltv'],
     queryFn: async () => {
@@ -132,7 +132,7 @@ export function PatientLifetimeValue() {
   if (!data) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        {t('analytics:noDataAvailable')}
+        {t('analytics.noDataAvailable', { defaultValue: 'No data available' })}
       </div>
     );
   }
@@ -142,9 +142,9 @@ export function PatientLifetimeValue() {
       {/* Overall LTV */}
       <div className="bg-primary/10 rounded-lg p-4 flex items-center justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">LTV moyen par patient</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.ltv.avgLtvPerPatient', { defaultValue: 'Average LTV per patient' })}</p>
           <p className="text-3xl font-bold text-foreground">{formatCurrency(data.avgLTV)}</p>
-          <p className="text-xs text-muted-foreground">{data.totalPatients} patients analysés</p>
+          <p className="text-xs text-muted-foreground">{data.totalPatients} {t('analytics.ltv.patientsAnalyzed', { defaultValue: 'patients analyzed' })}</p>
         </div>
         <TrendingUp className="h-10 w-10 text-primary" />
       </div>
@@ -152,7 +152,7 @@ export function PatientLifetimeValue() {
       <div className="grid grid-cols-2 gap-4">
         {/* By Gender */}
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">LTV par genre</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.ltv.ltvByGender', { defaultValue: 'LTV by gender' })}</h4>
           <ResponsiveContainer width="100%" height={150}>
             <BarChart data={data.genderData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -173,7 +173,7 @@ export function PatientLifetimeValue() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value: any) => [formatCurrency(value), 'LTV moyen']}
+                formatter={(value: any) => [formatCurrency(value), t('analytics.ltv.avgLtvLabel', { defaultValue: 'Avg LTV' })]}
               />
               <Bar dataKey="ltv" radius={[4, 4, 0, 0]}>
                 {data.genderData.map((entry, index) => (
@@ -186,7 +186,7 @@ export function PatientLifetimeValue() {
 
         {/* By Age */}
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">LTV par âge</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.ltv.ltvByAge', { defaultValue: 'LTV by age' })}</h4>
           <ResponsiveContainer width="100%" height={150}>
             <BarChart data={data.ageData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -207,7 +207,7 @@ export function PatientLifetimeValue() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value: any) => [formatCurrency(value), 'LTV moyen']}
+                formatter={(value: any) => [formatCurrency(value), t('analytics.ltv.avgLtvLabel', { defaultValue: 'Avg LTV' })]}
               />
               <Bar dataKey="ltv" radius={[4, 4, 0, 0]}>
                 {data.ageData.map((entry, index) => (

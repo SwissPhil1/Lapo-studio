@@ -53,7 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile = emailProfile
     }
 
-    console.log('[Auth] Profile loaded:', profile?.first_name, profile?.last_name, 'role:', profile?.role)
 
     const firstName = profile?.first_name ?? ''
     const lastName = profile?.last_name ?? ''

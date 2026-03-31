@@ -211,7 +211,7 @@ export default function ReferrerDetail() {
       if (!session?.access_token) throw new Error("Not authenticated");
 
       const response = await fetch(
-        `https://dcrlaoudqcfbauxalbgs.supabase.co/functions/v1/delete-referrer`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-referrer`,
         {
           method: "POST",
           headers: {

@@ -15,17 +15,17 @@ import {
   getNPSLabel,
   type SatisfactionRating,
   type TriggerType,
-} from './SatisfactionWidget';
+} from '../components/satisfaction/SatisfactionWidget';
 
 // Lazy-loaded chart components
 const NPSTrendChart = lazy(() =>
-  import('./NPSTrendChart').then(m => ({ default: m.NPSTrendChart }))
+  import('../components/satisfaction/NPSTrendChart').then(m => ({ default: m.NPSTrendChart }))
 );
 const RatingDistributionChart = lazy(() =>
-  import('./RatingDistributionChart').then(m => ({ default: m.RatingDistributionChart }))
+  import('../components/satisfaction/RatingDistributionChart').then(m => ({ default: m.RatingDistributionChart }))
 );
 const TriggerAnalysisChart = lazy(() =>
-  import('./TriggerAnalysisChart').then(m => ({ default: m.TriggerAnalysisChart }))
+  import('../components/satisfaction/TriggerAnalysisChart').then(m => ({ default: m.TriggerAnalysisChart }))
 );
 
 function ChartLoader() {

@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -232,7 +233,7 @@ function EmailPreview({ blocks }: { blocks: TemplateBlock[] }) {
   const html = blocksToHtml(blocks);
   return (
     <div className="rounded-lg border border-border bg-white p-6 text-left">
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />
     </div>
   );
 }

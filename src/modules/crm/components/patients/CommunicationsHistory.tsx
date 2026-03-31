@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/shared/lib/supabase';
 import { Mail, Phone, MessageSquare, CheckCircle, Eye, Clock } from 'lucide-react';
@@ -211,7 +212,7 @@ export function CommunicationsHistory({ patientId }: CommunicationsHistoryProps)
                 {safeString(selectedMessage.full_message) ? (
                   <div
                     className="prose prose-sm max-w-none text-foreground"
-                    dangerouslySetInnerHTML={{ __html: safeString(selectedMessage.full_message) }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(safeString(selectedMessage.full_message)) }}
                   />
                 ) : (
                   <p className="text-muted-foreground">{safeString(selectedMessage.message_preview) || t('communications:noContentShort')}</p>
