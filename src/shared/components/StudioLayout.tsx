@@ -41,6 +41,24 @@ export function StudioLayout() {
     () => localStorage.getItem('sidebar-collapsed') === 'true'
   )
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [hoverExpanded, setHoverExpanded] = useState(false)
+
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleMouseEnter = useCallback(() => {
+    if (!collapsed) return
+    hoverTimerRef.current = setTimeout(() => {
+      setHoverExpanded(true)
+    }, 200)
+  }, [collapsed])
+
+  const handleMouseLeave = useCallback(() => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current)
+      hoverTimerRef.current = null
+    }
+    setHoverExpanded(false)
+  }, [])
 
   const toggleCollapsed = useCallback(() => {
     setCollapsed((prev) => {
@@ -69,7 +87,7 @@ export function StudioLayout() {
   }, [collapsed])
 
   function renderSidebarContent(isMobile: boolean) {
-    const isCollapsed = isMobile ? false : collapsed
+    const isCollapsed = isMobile ? false : (collapsed && !hoverExpanded)
 
     return (
       <>
@@ -281,14 +299,23 @@ export function StudioLayout() {
           {t('common.accessibility.skipToContent')}
         </a>
 
-        {/* Desktop Sidebar — animated width on collapse */}
+        {/* Desktop Sidebar — animated width on collapse, expands on hover */}
         <motion.aside
-          animate={{ width: collapsed ? 64 : 256 }}
+          animate={{ width: (collapsed && !hoverExpanded) ? 64 : 256 }}
           transition={{ type: 'spring', stiffness: 350, damping: 35 }}
-          className="hidden lg:flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar overflow-hidden"
+          className={cn(
+            'hidden lg:flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar overflow-hidden',
+            hoverExpanded && 'absolute inset-y-0 left-0 z-40 shadow-xl'
+          )}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           {renderSidebarContent(false)}
         </motion.aside>
+        {/* Spacer to preserve layout when sidebar is collapsed + hover-expanded (absolute) */}
+        {collapsed && (
+          <div className="hidden lg:block shrink-0" style={{ width: 64 }} />
+        )}
 
         {/* Mobile Sidebar Overlay */}
         <AnimatePresence>

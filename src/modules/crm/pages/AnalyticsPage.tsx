@@ -44,8 +44,21 @@ const CACAnalysis = lazy(() => import('@/modules/crm/components/analytics/CACAna
 
 function ChartLoader() {
   return (
-    <div className="flex h-48 items-center justify-center">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    <div className="space-y-3 animate-pulse p-4">
+      <div className="flex items-end gap-2 h-36">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex-1 bg-muted rounded-t-sm"
+            style={{ height: `${20 + ((i * 37) % 60)}%` }}
+          />
+        ))}
+      </div>
+      <div className="flex justify-between">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="h-2 w-8 bg-muted rounded" />
+        ))}
+      </div>
     </div>
   );
 }

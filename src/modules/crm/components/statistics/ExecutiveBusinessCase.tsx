@@ -386,6 +386,37 @@ export default function ExecutiveBusinessCase({
       ? (allCompletedBookings.reduce((s, b) => s + (b.booking_value || 0), 0) / allCompletedBookings.length) * metrics.appointments.current
       : 0;
 
+    // --- 9. Scenario Modeling (Bull / Base / Bear) ---
+    const baseGrowth = monthlyGrowthRate;
+    const scenarios = (['bear', 'base', 'bull'] as const).map(scenario => {
+      const growthMultiplier = scenario === 'bull' ? 1.5 : scenario === 'bear' ? 0.4 : 1;
+      const growth = baseGrowth * growthMultiplier;
+      let cum = 0;
+      const months = Array.from({ length: 12 }, (_, i) => {
+        const rev = monthlyRefRevenue * Math.pow(1 + growth / 12, i + 1);
+        const comm = rev * (effectiveCommissionRate / 100);
+        const net = rev - comm - appMonthlyCost;
+        cum += net;
+        return { month: `M${i + 1}`, revenue: Math.round(rev), net: Math.round(net), cumulative: Math.round(cum) };
+      });
+      return {
+        scenario,
+        growthRate: growth * 100,
+        year1Revenue: months.reduce((s, m) => s + m.revenue, 0),
+        year1Net: months[11]?.cumulative || 0,
+        months,
+      };
+    });
+
+    // --- 10. Industry Benchmarks ---
+    const benchmarks = {
+      avgClinicCAC: benchmarkCAC,
+      avgClinicLTV: 800, // CHF — typical aesthetic clinic
+      avgRetentionRate: 35, // %
+      avgReferralShare: 15, // % of revenue from referrals
+      avgCommissionRate: 10, // %
+    };
+
     return {
       // 1. ROI & Payback
       totalAppCost,
@@ -430,6 +461,10 @@ export default function ExecutiveBusinessCase({
       pipelineValue,
       totalSent,
       totalClicked,
+      // 9. Scenarios
+      scenarios,
+      // 10. Benchmarks
+      benchmarks,
     };
   }, [metrics, range, period, appMonthlyCost, benchmarkCAC, bookingsData, referredBookingsData, referrerPerfData, commissionsData, referralsData, commsData, patientsData]);
 
@@ -463,6 +498,58 @@ export default function ExecutiveBusinessCase({
             />
           </div>
         </MotionItem>
+      </MotionList>
+
+      {/* Hero KPIs — 5 key numbers at a glance */}
+      <MotionList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {[
+          {
+            label: t('analytics:exec.heroROI', { defaultValue: 'App ROI' }),
+            value: `${exec.appROI.toFixed(1)}x`,
+            sub: t('analytics:exec.heroROISub', { defaultValue: 'return on app cost' }),
+            highlight: exec.appROI > 1,
+          },
+          {
+            label: t('analytics:exec.heroKFactor', { defaultValue: 'Viral Coefficient' }),
+            value: exec.kFactor.toFixed(2),
+            sub: exec.kFactor >= 1
+              ? t('analytics:exec.kSelfSustaining', { defaultValue: 'Self-sustaining' })
+              : t('analytics:exec.kGrowing', { defaultValue: 'Growing' }),
+            highlight: exec.kFactor >= 1,
+          },
+          {
+            label: t('analytics:exec.heroLTVCAC', { defaultValue: 'LTV:CAC' }),
+            value: exec.ltvCacRatio > 0 ? `${exec.ltvCacRatio.toFixed(1)}x` : '—',
+            sub: t('analytics:exec.heroLTVCACSub', { defaultValue: 'referred patients' }),
+            highlight: exec.ltvCacRatio >= 3,
+          },
+          {
+            label: t('analytics:exec.heroPayback', { defaultValue: 'Payback' }),
+            value: exec.paybackDays === Infinity ? '—' : `${exec.paybackDays}d`,
+            sub: t('analytics:exec.heroPaybackSub', { defaultValue: 'to break even' }),
+            highlight: exec.paybackDays < 90,
+          },
+          {
+            label: t('analytics:exec.heroNetProfit', { defaultValue: 'Net Profit' }),
+            value: formatCurrency(exec.netProfit),
+            sub: t('analytics:exec.heroNetProfitSub', { defaultValue: 'after all costs' }),
+            highlight: exec.netProfit > 0,
+          },
+        ].map((kpi) => (
+          <MotionItem key={kpi.label}>
+            <div className={cn(
+              'rounded-xl border p-4 text-center',
+              kpi.highlight ? 'border-primary/30 bg-primary/5' : 'border-border bg-card'
+            )}>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{kpi.label}</div>
+              <div className={cn(
+                'text-xl font-bold tabular-nums',
+                kpi.highlight ? 'text-primary' : 'text-foreground'
+              )}>{kpi.value}</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">{kpi.sub}</div>
+            </div>
+          </MotionItem>
+        ))}
       </MotionList>
 
       {/* Sections 1-3 */}
@@ -1031,6 +1118,141 @@ export default function ExecutiveBusinessCase({
                 defaultValue: 'The CRM consolidates patient management, communications, and analytics into a single platform — reducing operational overhead and enabling data-driven decisions.',
               })}
             </p>
+          </Section>
+        </MotionItem>
+      </MotionList>
+
+      {/* Section 9: Scenario Modeling */}
+      <MotionList className="grid grid-cols-1 gap-6">
+        <MotionItem>
+          <Section
+            title={t('analytics:exec.scenarioTitle', { defaultValue: 'Scenario Modeling — 12-Month Outlook' })}
+            subtitle={t('analytics:exec.scenarioSubtitle', { defaultValue: 'Bull / Base / Bear projections based on current trends' })}
+            icon={TrendingUp}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {exec.scenarios.map((s) => {
+                const isBull = s.scenario === 'bull';
+                const isBear = s.scenario === 'bear';
+                const label = isBull
+                  ? t('analytics:exec.bull', { defaultValue: 'Bull Case' })
+                  : isBear
+                    ? t('analytics:exec.bear', { defaultValue: 'Bear Case' })
+                    : t('analytics:exec.base', { defaultValue: 'Base Case' });
+                const color = isBull ? 'text-success' : isBear ? 'text-destructive' : 'text-primary';
+                const borderColor = isBull ? 'border-success/30' : isBear ? 'border-destructive/30' : 'border-primary/30';
+                const bgColor = isBull ? 'bg-success/5' : isBear ? 'bg-destructive/5' : 'bg-primary/5';
+
+                return (
+                  <div key={s.scenario} className={cn('rounded-lg border p-4 space-y-3', borderColor, bgColor)}>
+                    <div className="flex items-center justify-between">
+                      <span className={cn('text-xs font-semibold uppercase tracking-wider', color)}>{label}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {s.growthRate > 0 ? '+' : ''}{s.growthRate.toFixed(1)}% {t('analytics:exec.momGrowth', { defaultValue: 'MoM' })}
+                      </span>
+                    </div>
+                    <div>
+                      <div className={cn('text-lg font-bold tabular-nums', color)}>
+                        {formatCurrency(s.year1Revenue)}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {t('analytics:exec.year1Revenue', { defaultValue: 'Year 1 referral revenue' })}
+                      </div>
+                    </div>
+                    <div>
+                      <div className={cn('text-sm font-semibold tabular-nums', s.year1Net > 0 ? 'text-success' : 'text-destructive')}>
+                        {formatCurrency(s.year1Net)}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {t('analytics:exec.cumulativeNetProfit', { defaultValue: 'Cumulative net profit' })}
+                      </div>
+                    </div>
+                    {/* Mini sparkline of cumulative */}
+                    <div className="flex items-end gap-px h-8">
+                      {s.months.map((m, i) => (
+                        <div
+                          key={i}
+                          className={cn('flex-1 rounded-t-sm', m.cumulative >= 0 ? (isBull ? 'bg-success/60' : isBear ? 'bg-destructive/40' : 'bg-primary/50') : 'bg-destructive/30')}
+                          style={{
+                            height: `${Math.max(Math.abs(m.cumulative) / Math.max(...s.months.map(x => Math.abs(x.cumulative)), 1) * 100, 4)}%`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Section>
+        </MotionItem>
+      </MotionList>
+
+      {/* Section 10: Industry Benchmarking */}
+      <MotionList className="grid grid-cols-1 gap-6">
+        <MotionItem>
+          <Section
+            title={t('analytics:exec.benchmarkTitle', { defaultValue: 'Industry Benchmarking' })}
+            subtitle={t('analytics:exec.benchmarkSubtitle', { defaultValue: 'How your clinic compares to aesthetic industry averages' })}
+            icon={Target}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {[
+                {
+                  label: t('analytics:exec.benchCAC', { defaultValue: 'CAC' }),
+                  yours: exec.referralCAC > 0 ? formatCurrency(exec.referralCAC) : '—',
+                  industry: formatCurrency(exec.benchmarks.avgClinicCAC),
+                  good: exec.referralCAC > 0 && exec.referralCAC < exec.benchmarks.avgClinicCAC,
+                },
+                {
+                  label: t('analytics:exec.benchLTV', { defaultValue: 'Patient LTV' }),
+                  yours: formatCurrency(exec.referredLTV),
+                  industry: formatCurrency(exec.benchmarks.avgClinicLTV),
+                  good: exec.referredLTV >= exec.benchmarks.avgClinicLTV,
+                },
+                {
+                  label: t('analytics:exec.benchRetention', { defaultValue: 'Retention' }),
+                  yours: `${metrics.referral.referredRetentionRate.toFixed(0)}%`,
+                  industry: `${exec.benchmarks.avgRetentionRate}%`,
+                  good: metrics.referral.referredRetentionRate >= exec.benchmarks.avgRetentionRate,
+                },
+                {
+                  label: t('analytics:exec.benchRefShare', { defaultValue: 'Referral Share' }),
+                  yours: `${metrics.referral.revenueShare.toFixed(0)}%`,
+                  industry: `${exec.benchmarks.avgReferralShare}%`,
+                  good: metrics.referral.revenueShare >= exec.benchmarks.avgReferralShare,
+                },
+                {
+                  label: t('analytics:exec.benchCommRate', { defaultValue: 'Commission Rate' }),
+                  yours: `${exec.effectiveCommissionRate.toFixed(1)}%`,
+                  industry: `${exec.benchmarks.avgCommissionRate}%`,
+                  good: exec.effectiveCommissionRate <= exec.benchmarks.avgCommissionRate,
+                },
+              ].map((b) => (
+                <div key={b.label} className="rounded-lg border border-border bg-card p-3 space-y-2">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{b.label}</div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] text-muted-foreground">{t('analytics:exec.yours', { defaultValue: 'Yours' })}</div>
+                      <div className={cn('text-sm font-bold tabular-nums', b.good ? 'text-success' : 'text-foreground')}>
+                        {b.yours}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] text-muted-foreground">{t('analytics:exec.industry', { defaultValue: 'Industry' })}</div>
+                      <div className="text-sm font-medium text-muted-foreground tabular-nums">{b.industry}</div>
+                    </div>
+                  </div>
+                  <div className={cn(
+                    'text-[10px] font-medium',
+                    b.good ? 'text-success' : 'text-muted-foreground'
+                  )}>
+                    {b.good
+                      ? t('analytics:exec.aboveBench', { defaultValue: 'Above benchmark' })
+                      : t('analytics:exec.belowBench', { defaultValue: 'Below benchmark' })}
+                  </div>
+                </div>
+              ))}
+            </div>
           </Section>
         </MotionItem>
       </MotionList>
