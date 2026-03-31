@@ -1,17 +1,27 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="LAPO Studio — Unified backoffice for referral management, payouts, and clinic CRM" />
-    <meta name="theme-color" content="#0F0F10" />
+    <meta name="theme-color" content="#FFFFFF" />
     <meta property="og:title" content="LAPO Studio" />
     <meta property="og:description" content="Unified backoffice for referral management, payouts, and clinic CRM" />
     <meta property="og:type" content="website" />
     <title>LAPO Studio</title>
+    <script>
+      (function() {
+        var t = localStorage.getItem('lapo-theme');
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute('content', '#0F0F10');
+        }
+      })();
+    </script>
   </head>
-  <body class="dark bg-background text-foreground">
+  <body class="bg-background text-foreground">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

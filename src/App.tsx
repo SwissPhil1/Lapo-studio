@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import { StudioLayout } from '@/shared/components/StudioLayout'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary'
@@ -88,6 +89,7 @@ function RoleBasedRedirect() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
       <TooltipProvider>
       <BrowserRouter>
         <AuthProvider>
@@ -338,6 +340,7 @@ export default function App() {
         </AuthProvider>
       </BrowserRouter>
       </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }

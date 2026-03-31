@@ -95,6 +95,84 @@
   --radius: 0.5rem;
 }
 
+/* ═══════════════════════════════════════════════
+   Studio Light Theme — overrides @theme defaults
+   Active when .dark is NOT on <html>
+   ═══════════════════════════════════════════════ */
+:root:not(.dark) {
+  /* Base */
+  --color-background: #FFFFFF;
+  --color-foreground: #0F172A;
+
+  /* Card */
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0F172A;
+
+  /* Popover */
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #0F172A;
+
+  /* Primary — same violet */
+  --color-primary: #7C3AED;
+  --color-primary-foreground: #FFFFFF;
+
+  /* Secondary */
+  --color-secondary: #F1F5F9;
+  --color-secondary-foreground: #0F172A;
+
+  /* Muted */
+  --color-muted: #F1F5F9;
+  --color-muted-foreground: #64748B;
+
+  /* Accent */
+  --color-accent: #F1F5F9;
+  --color-accent-foreground: #0F172A;
+
+  /* Destructive */
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FFFFFF;
+
+  /* Border / Input / Ring */
+  --color-border: #E2E8F0;
+  --color-input: #E2E8F0;
+  --color-ring: #7C3AED;
+
+  /* Sidebar */
+  --color-sidebar: #F8FAFC;
+  --color-sidebar-foreground: #0F172A;
+  --color-sidebar-border: #E2E8F0;
+  --color-sidebar-accent: #F1F5F9;
+  --color-sidebar-accent-foreground: #0F172A;
+  --color-sidebar-ring: #7C3AED;
+
+  /* Studio surface tokens */
+  --color-studio-bg: #FFFFFF;
+  --color-studio-sidebar: #F8FAFC;
+  --color-studio-card: #FFFFFF;
+  --color-studio-surface: #F1F5F9;
+  --color-studio-border: #E2E8F0;
+  --color-studio-text: #0F172A;
+  --color-studio-muted: #64748B;
+  --color-studio-hover: #F1F5F9;
+  --color-studio-active: #E2E8F0;
+  --color-studio-input: #FFFFFF;
+
+  /* Semantic */
+  --color-success: #16A34A;
+  --color-success-foreground: #FFFFFF;
+  --color-warning: #D97706;
+  --color-warning-foreground: #FFFFFF;
+  --color-error: #DC2626;
+  --color-info: #2563EB;
+
+  /* Chart palette — same brand colors */
+  --color-chart-1: #7C3AED;
+  --color-chart-2: #DB2777;
+  --color-chart-3: #0891B2;
+  --color-chart-4: #EF4444;
+  --color-chart-5: #65A30D;
+}
+
 :root {
   --gradient-sunset: linear-gradient(135deg, #FF6B6B, #FF2E93, #7C3AED);
   --gradient-electric: linear-gradient(135deg, #7C3AED, #06B6D4);
@@ -187,4 +265,21 @@ body {
 }
 .glow-pink {
   box-shadow: 0 0 20px color-mix(in srgb, var(--color-wow-pink) 30%, transparent);
+}
+
+/* Light mode: softer glows */
+:root:not(.dark) .glow-violet {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-wow-violet) 12%, transparent);
+}
+:root:not(.dark) .glow-coral {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-wow-coral) 12%, transparent);
+}
+:root:not(.dark) .glow-pink {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-wow-pink) 12%, transparent);
+}
+
+/* Light mode: glass-card */
+:root:not(.dark) .glass-card {
+  background: color-mix(in srgb, var(--color-card) 92%, transparent);
+  border: 1px solid var(--color-border);
 }
