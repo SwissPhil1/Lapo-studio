@@ -36,11 +36,15 @@ import {
   HelpCircle,
   ListTodo,
   Inbox,
+  Sun,
+  Moon,
 } from 'lucide-react'
+import { useTheme } from '@/contexts/ThemeContext'
 
 export function StudioLayout() {
   const { isAdmin, isCRM } = useAuth()
   const { t } = useTranslation()
+  const { resolvedTheme, setTheme } = useTheme()
   const [collapsed, setCollapsed] = useState(
     () => localStorage.getItem('sidebar-collapsed') === 'true'
   )
@@ -412,6 +416,13 @@ export function StudioLayout() {
               <Breadcrumb />
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                aria-label={resolvedTheme === 'dark' ? t('theme.switchToLight', { defaultValue: 'Switch to light mode' }) : t('theme.switchToDark', { defaultValue: 'Switch to dark mode' })}
+              >
+                {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
               <Link to="/guide" className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground">
                 <HelpCircle className="h-5 w-5" />
               </Link>

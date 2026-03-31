@@ -2290,6 +2290,14 @@
       "hideDetails": "Hide details"
     }
   },
+  "theme": {
+    "title": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
   "guide": {
     "title": "Staff Guide",
     "subtitle": "Step-by-step instructions for your daily tasks",
