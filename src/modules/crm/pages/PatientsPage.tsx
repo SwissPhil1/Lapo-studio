@@ -347,7 +347,7 @@ export default function Patients() {
       // Fetch patients with count
       let query = supabase
         .from('patients')
-        .select('id, first_name, last_name, email, phone, date_of_birth, tags, created_at', { count: 'exact', head: false })
+        .select('id, first_name, last_name, full_name, email, phone, date_of_birth, tags, created_at', { count: 'exact', head: false })
         .order(sortBy, { ascending: sortOrder === 'asc' });
 
       // If AI search is active, filter by those IDs
@@ -364,7 +364,13 @@ export default function Patients() {
 
       // Only apply text search if NOT using AI search results
       if (debouncedSearch && !aiSearchResults) {
-        query = query.or(`first_name.ilike.%${debouncedSearch}%,last_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%,phone.ilike.%${debouncedSearch}%,date_of_birth.ilike.%${debouncedSearch}%`);
+        const q = debouncedSearch.trim();
+        const digitsOnly = q.replace(/\D/g, '');
+        let orConditions = `first_name.ilike.%${q}%,last_name.ilike.%${q}%,full_name.ilike.%${q}%,email.ilike.%${q}%`;
+        if (digitsOnly.length >= 3) {
+          orConditions += `,phone.ilike.%${digitsOnly}%,normalized_phone.ilike.%${digitsOnly}%`;
+        }
+        query = query.or(orConditions);
       }
 
       // Apply server-side pagination when possible
