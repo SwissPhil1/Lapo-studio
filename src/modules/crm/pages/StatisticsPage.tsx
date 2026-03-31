@@ -882,7 +882,7 @@ export default function StatisticsPage() {
                   value={metrics.referral.roi > 0 ? `${metrics.referral.roi.toFixed(1)}x` : '—'}
                 />
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  {formatCurrency(metrics.referral.revenue)} {t('analytics:revenueVs', { defaultValue: 'revenue vs' })} {formatCurrency(metrics.referral.commissionsPaid)} {t('analytics:commissions', { defaultValue: 'commissions' })}
+                  {formatCurrency(metrics.referral.revenue)} {t('analytics:revenueVs', { defaultValue: 'revenue vs' })} {formatCurrency(metrics.referral.commissionsPaid)} {t('analytics:commissionsLabel', { defaultValue: 'commissions' })}
                 </p>
               </div>
             </MotionItem>
@@ -1100,41 +1100,6 @@ export default function StatisticsPage() {
             </MotionItem>
           </MotionList>
         </motion.div>
-      )}
-
-      {/* Executive Business Case Toggle + Section */}
-      {metrics && (
-        <div>
-          <Button
-            variant={showBusinessCase ? 'default' : 'outline'}
-            size="sm"
-            className="gap-2 text-xs"
-            onClick={() => setShowBusinessCase(v => !v)}
-          >
-            <Briefcase className="h-3.5 w-3.5" />
-            {showBusinessCase
-              ? t('analytics:exec.hide', { defaultValue: 'Hide Business Case' })
-              : t('analytics:exec.show', { defaultValue: 'Executive Business Case' })}
-          </Button>
-          {showBusinessCase && (
-            <Suspense fallback={<div className="mt-6 text-sm text-muted-foreground">{t('common:loading', { defaultValue: 'Loading...' })}</div>}>
-              <div className="mt-6">
-                <ExecutiveBusinessCase
-                  metrics={metrics}
-                  range={range}
-                  period={period}
-                  bookingsData={bookingsData || []}
-                  referredBookingsData={referredBookingsData || []}
-                  referrerPerfData={referrerPerfData || []}
-                  commissionsData={commissionsData || []}
-                  referralsData={referralsData || []}
-                  commsData={commsData || []}
-                  patientsData={patientsData || []}
-                />
-              </div>
-            </Suspense>
-          )}
-        </div>
       )}
 
       {/* Main Grid — 2 columns on desktop */}
@@ -1373,6 +1338,43 @@ export default function StatisticsPage() {
           </Section>
         </MotionItem>
       </MotionList>
+
+      {/* Executive Business Case — bottom section */}
+      {metrics && (
+        <motion.div variants={fadeIn} initial="hidden" animate="visible">
+          <div className="pt-2 border-t border-border">
+            <Button
+              variant={showBusinessCase ? 'default' : 'outline'}
+              size="sm"
+              className="gap-2 text-xs"
+              onClick={() => setShowBusinessCase(v => !v)}
+            >
+              <Briefcase className="h-3.5 w-3.5" />
+              {showBusinessCase
+                ? t('analytics:exec.hide', { defaultValue: 'Hide Business Case' })
+                : t('analytics:exec.show', { defaultValue: 'Executive Business Case' })}
+            </Button>
+          </div>
+          {showBusinessCase && (
+            <Suspense fallback={<div className="mt-6 text-sm text-muted-foreground">{t('common:loading', { defaultValue: 'Loading...' })}</div>}>
+              <div className="mt-6">
+                <ExecutiveBusinessCase
+                  metrics={metrics}
+                  range={range}
+                  period={period}
+                  bookingsData={bookingsData || []}
+                  referredBookingsData={referredBookingsData || []}
+                  referrerPerfData={referrerPerfData || []}
+                  commissionsData={commissionsData || []}
+                  referralsData={referralsData || []}
+                  commsData={commsData || []}
+                  patientsData={patientsData || []}
+                />
+              </div>
+            </Suspense>
+          )}
+        </motion.div>
+      )}
     </div>
   );
 }
