@@ -1,10 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/shared/lib/format';
 import { cn } from '@/shared/lib/utils';
 import { motion, MotionList, MotionItem, fadeIn } from '@/shared/components/motion';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 import { parseISO, isWithinInterval, differenceInDays } from 'date-fns';
+const ReferrerCohortRetention = lazy(() => import('./ReferrerCohortRetention').then(m => ({ default: m.ReferrerCohortRetention })));
+
 import {
   TrendingUp,
   DollarSign,
@@ -1187,7 +1189,22 @@ export default function ExecutiveBusinessCase({
         </MotionItem>
       </MotionList>
 
-      {/* Section 10: Industry Benchmarking */}
+      {/* Section 10: Referrer Cohort Retention */}
+      <MotionList className="grid grid-cols-1 gap-6">
+        <MotionItem>
+          <Section
+            title={t('analytics:exec.cohortTitle', { defaultValue: 'Referrer Cohort Retention' })}
+            subtitle={t('analytics:exec.cohortSubtitle', { defaultValue: 'What % of referrers from each cohort remain active over time' })}
+            icon={Users}
+          >
+            <Suspense fallback={<div className="h-48 flex items-center justify-center"><div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
+              <ReferrerCohortRetention />
+            </Suspense>
+          </Section>
+        </MotionItem>
+      </MotionList>
+
+      {/* Section 11: Industry Benchmarking */}
       <MotionList className="grid grid-cols-1 gap-6">
         <MotionItem>
           <Section

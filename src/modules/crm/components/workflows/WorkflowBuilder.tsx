@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Save, X, Loader2 } from 'lucide-react';
+import { Plus, Save, X, Loader2, GitBranch } from 'lucide-react';
 import { toast } from 'sonner';
 import { TriggerConfigPanel } from './TriggerConfigPanel';
 import { WorkflowStepCard, type WorkflowStep } from './WorkflowStepCard';
@@ -113,16 +113,27 @@ export function WorkflowBuilder({ workflow, existingSteps, onClose }: WorkflowBu
   );
 
   const addStep = useCallback(
-    (atIndex?: number) => {
+    (atIndex?: number, actionType = 'send_email') => {
       const newStep: WorkflowStep = {
         id: `temp-${++tempIdCounter}`,
-        action_type: 'send_email',
+        action_type: actionType,
         template_id: null,
         delay_days: 0,
         delay_hours: 0,
         message_override: null,
         subject_override: null,
         step_order: 0,
+        ...(actionType === 'condition'
+          ? {
+              condition_config: {
+                field: 'booking_value' as const,
+                operator: '>' as const,
+                value: 0,
+                true_action: 'send_email',
+                false_action: 'send_notification',
+              },
+            }
+          : {}),
       };
 
       setSteps((prev) => {
@@ -313,10 +324,16 @@ export function WorkflowBuilder({ workflow, existingSteps, onClose }: WorkflowBu
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">{t('workflows:steps')}</CardTitle>
-            <Button variant="outline" size="sm" onClick={() => addStep()}>
-              <Plus className="h-4 w-4 mr-1" />
-              {t('workflows:addStep')}
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => addStep()}>
+                <Plus className="h-4 w-4 mr-1" />
+                {t('workflows:addStep')}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => addStep(undefined, 'condition')}>
+                <GitBranch className="h-4 w-4 mr-1" />
+                {t('workflows:addCondition', { defaultValue: 'Add Condition' })}
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

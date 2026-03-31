@@ -9,7 +9,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useReactivationTaskCounts, useReactivationTasks } from '@/shared/hooks/useReactivationTasks';
 import { ReactivationTaskCard } from '@/modules/crm/components/tasks/ReactivationTaskCard';
 import { CreateTaskDialog } from '@/modules/crm/components/tasks/CreateTaskDialog';
+import { TaskAssignmentDialog } from '@/modules/crm/components/tasks/TaskAssignmentDialog';
 import { ActivityFeedWidget } from '@/modules/crm/components/dashboard/ActivityFeedWidget';
+import { SatisfactionWidget } from '@/modules/crm/components/satisfaction/SatisfactionWidget';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, subMonths, subWeeks } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
@@ -393,6 +395,7 @@ export default function Dashboard() {
                 </span>
               )}
             </div>
+            <TaskAssignmentDialog />
             <CreateTaskDialog />
           </div>
         </div>
@@ -477,11 +480,14 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Activity Feed */}
-      <ActivityFeedWidget 
-        limit={20} 
-        collapsedLimit={5} 
+      <ActivityFeedWidget
+        limit={20}
+        collapsedLimit={5}
         showHeader={true}
       />
+
+      {/* NPS / Satisfaction */}
+      <SatisfactionWidget />
 
     </div>
   );

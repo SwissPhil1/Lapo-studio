@@ -13,8 +13,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Mail, CheckSquare, ArrowRight, Clock, Bell, Trash2, GripVertical } from 'lucide-react';
+import { Mail, CheckSquare, ArrowRight, Clock, Bell, Trash2, GripVertical, GitBranch } from 'lucide-react';
 import { forwardRef } from 'react';
+import { cn } from '@/shared/lib/utils';
+
+export type ConditionField = 'booking_value' | 'days_since_last_visit' | 'referral_count' | 'patient_age';
+export type ConditionOperator = '>' | '<' | '==' | '>=' | '<=' | '!=';
+
+export interface ConditionConfig {
+  field: ConditionField;
+  operator: ConditionOperator;
+  value: number;
+  true_action: string;
+  false_action: string;
+}
 
 export interface WorkflowStep {
   id: string;
@@ -25,6 +37,7 @@ export interface WorkflowStep {
   message_override: string | null;
   subject_override: string | null;
   step_order: number;
+  condition_config?: ConditionConfig;
 }
 
 interface WorkflowStepCardProps {
@@ -34,7 +47,7 @@ interface WorkflowStepCardProps {
   dragHandleProps?: Record<string, unknown>;
 }
 
-const ACTION_TYPES = ['send_email', 'create_task', 'update_stage', 'wait', 'send_notification'] as const;
+const ACTION_TYPES = ['send_email', 'create_task', 'update_stage', 'wait', 'send_notification', 'condition'] as const;
 
 const ACTION_ICONS: Record<string, typeof Mail> = {
   send_email: Mail,
@@ -42,7 +55,12 @@ const ACTION_ICONS: Record<string, typeof Mail> = {
   update_stage: ArrowRight,
   wait: Clock,
   send_notification: Bell,
+  condition: GitBranch,
 };
+
+const CONDITION_FIELDS: ConditionField[] = ['booking_value', 'days_since_last_visit', 'referral_count', 'patient_age'];
+const CONDITION_OPERATORS: ConditionOperator[] = ['>', '<', '==', '>=', '<=', '!='];
+const BRANCH_ACTIONS = ['send_email', 'send_notification', 'create_task'] as const;
 
 export const WorkflowStepCard = forwardRef<HTMLDivElement, WorkflowStepCardProps>(
   function WorkflowStepCard({ step, onChange, onDelete, dragHandleProps }, ref) {
@@ -170,6 +188,116 @@ export const WorkflowStepCard = forwardRef<HTMLDivElement, WorkflowStepCardProps
                     value={step.message_override || ''}
                     onChange={(e) => onChange({ ...step, message_override: e.target.value || null })}
                   />
+                </div>
+              )}
+
+              {step.action_type === 'condition' && (
+                <div className="space-y-3">
+                  {/* Condition row */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className="text-xs">{t('workflows:conditionField', { defaultValue: 'Field' })}</Label>
+                      <Select
+                        value={step.condition_config?.field || 'booking_value'}
+                        onValueChange={(v) => onChange({
+                          ...step,
+                          condition_config: { ...step.condition_config!, field: v as ConditionField },
+                        })}
+                      >
+                        <SelectTrigger className="mt-1 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CONDITION_FIELDS.map((f) => (
+                            <SelectItem key={f} value={f}>
+                              {t(`workflows:fields.${f}`, { defaultValue: f.replace(/_/g, ' ') })}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">{t('workflows:operator', { defaultValue: 'Operator' })}</Label>
+                      <Select
+                        value={step.condition_config?.operator || '>'}
+                        onValueChange={(v) => onChange({
+                          ...step,
+                          condition_config: { ...step.condition_config!, operator: v as ConditionOperator },
+                        })}
+                      >
+                        <SelectTrigger className="mt-1 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CONDITION_OPERATORS.map((op) => (
+                            <SelectItem key={op} value={op}>{op}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">{t('workflows:value', { defaultValue: 'Value' })}</Label>
+                      <Input
+                        type="number"
+                        className="mt-1 h-8 text-xs"
+                        value={step.condition_config?.value ?? 0}
+                        onChange={(e) => onChange({
+                          ...step,
+                          condition_config: { ...step.condition_config!, value: Number(e.target.value) },
+                        })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Branches */}
+                  <div className="space-y-2">
+                    <div className={cn('ml-4 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3')}>
+                      <Label className="text-xs font-semibold text-emerald-600">
+                        {t('workflows:ifTrue', { defaultValue: 'If true →' })}
+                      </Label>
+                      <Select
+                        value={step.condition_config?.true_action || 'send_email'}
+                        onValueChange={(v) => onChange({
+                          ...step,
+                          condition_config: { ...step.condition_config!, true_action: v },
+                        })}
+                      >
+                        <SelectTrigger className="mt-1 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {BRANCH_ACTIONS.map((a) => (
+                            <SelectItem key={a} value={a}>
+                              {t(`workflows:action_${a}`, { defaultValue: a.replace(/_/g, ' ') })}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className={cn('ml-4 rounded-md border border-destructive/30 bg-destructive/5 p-3')}>
+                      <Label className="text-xs font-semibold text-destructive">
+                        {t('workflows:ifFalse', { defaultValue: 'If false →' })}
+                      </Label>
+                      <Select
+                        value={step.condition_config?.false_action || 'send_notification'}
+                        onValueChange={(v) => onChange({
+                          ...step,
+                          condition_config: { ...step.condition_config!, false_action: v },
+                        })}
+                      >
+                        <SelectTrigger className="mt-1 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {BRANCH_ACTIONS.map((a) => (
+                            <SelectItem key={a} value={a}>
+                              {t(`workflows:action_${a}`, { defaultValue: a.replace(/_/g, ' ') })}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
               )}
 

@@ -237,16 +237,26 @@ function Section({ title, subtitle, children, className }: {
 // Big Number Card (Linear-style hero metric)
 // ---------------------------------------------------------------------------
 
-function BigNumber({ label, value, change, sparkline, loading }: {
+function BigNumber({ label, value, change, sparkline, loading, onClick }: {
   label: string;
   value: string;
   change?: number;
   sparkline?: number[];
   loading?: boolean;
+  onClick?: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+    <div
+      className={cn('flex flex-col gap-1 group', onClick && 'cursor-pointer hover:bg-accent/30 rounded-xl p-2 -m-2 transition-colors')}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
+    >
+      <div className="flex items-center gap-1">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+        {onClick && <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />}
+      </div>
       {loading ? (
         <div className="h-8 w-24 rounded bg-muted animate-pulse" />
       ) : (
@@ -791,6 +801,7 @@ export default function StatisticsPage() {
               change={metrics?.revenue.change}
               sparkline={metrics?.revenue.sparkline}
               loading={isLoading}
+              onClick={() => navigate('/crm/analytics')}
             />
           </div>
         </MotionItem>
@@ -802,6 +813,7 @@ export default function StatisticsPage() {
               change={metrics?.appointments.change}
               sparkline={metrics?.appointments.sparkline}
               loading={isLoading}
+              onClick={() => navigate('/crm/appointments')}
             />
           </div>
         </MotionItem>
@@ -813,6 +825,7 @@ export default function StatisticsPage() {
               change={metrics?.newPatients.change}
               sparkline={metrics?.newPatients.sparkline}
               loading={isLoading}
+              onClick={() => navigate('/crm/patients?filter=new')}
             />
           </div>
         </MotionItem>
@@ -823,6 +836,7 @@ export default function StatisticsPage() {
               value={metrics ? formatCurrency(metrics.avgValue.current) : '—'}
               change={metrics?.avgValue.change}
               loading={isLoading}
+              onClick={() => navigate('/crm/analytics')}
             />
           </div>
         </MotionItem>
@@ -852,6 +866,7 @@ export default function StatisticsPage() {
                   value={formatCurrency(metrics.referral.revenue)}
                   change={metrics.referral.revenueChange}
                   sparkline={metrics.referral.revenueSparkline}
+                  onClick={() => navigate('/crm/analytics')}
                 />
               </div>
             </MotionItem>
@@ -892,6 +907,7 @@ export default function StatisticsPage() {
                   label={t('analytics:totalReferralsLabel', { defaultValue: 'Referrals' })}
                   value={String(metrics.referral.totalReferrals)}
                   change={metrics.referral.referralChange}
+                  onClick={() => navigate('/admin/referrals')}
                 />
               </div>
             </MotionItem>
@@ -1170,22 +1186,22 @@ export default function StatisticsPage() {
                   label: t('analytics:completionRateLabel', { defaultValue: 'Completion Rate' }),
                   value: `${metrics.completionRate.current.toFixed(1)}%`,
                   change: metrics.completionRate.change,
-                }} />
+                }} onClick={() => navigate('/crm/patients?filter=completed')} />
                 <StatRow metric={{
                   label: t('analytics:noShowRateLabel', { defaultValue: 'No-show Rate' }),
                   value: `${metrics.noShowRate.current.toFixed(1)}%`,
                   change: metrics.noShowRate.change,
-                }} />
+                }} onClick={() => navigate('/crm/patients?filter=no_show')} />
                 <StatRow metric={{
                   label: t('analytics:retentionRateLabel', { defaultValue: 'Patient Retention' }),
                   value: `${metrics.retentionRate.toFixed(1)}%`,
-                }} />
+                }} onClick={() => navigate('/crm/patients?filter=returning')} />
                 <StatRow metric={{
                   label: t('analytics:revenuePerAppointment', { defaultValue: 'Revenue / Appointment' }),
                   value: formatCurrency(metrics.appointments.current > 0
                     ? metrics.revenue.current / metrics.appointments.current
                     : 0),
-                }} />
+                }} onClick={() => navigate('/crm/appointments')} />
               </MotionList>
             )}
           </Section>
