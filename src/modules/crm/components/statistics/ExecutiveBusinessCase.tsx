@@ -4,17 +4,14 @@ import { formatCurrency } from '@/shared/lib/format';
 import { cn } from '@/shared/lib/utils';
 import { motion, MotionList, MotionItem, fadeIn } from '@/shared/components/motion';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
-import { parseISO, isWithinInterval, differenceInDays, differenceInMonths } from 'date-fns';
+import { parseISO, isWithinInterval, differenceInDays } from 'date-fns';
 import {
   TrendingUp,
-  TrendingDown,
-  Minus,
   DollarSign,
   Users,
   Target,
   Zap,
   LineChart,
-  BarChart3,
   Calculator,
   MessageSquare,
 } from 'lucide-react';
@@ -384,10 +381,6 @@ export default function ExecutiveBusinessCase({
     const totalClicked = currentComms.filter(c => c.clicked_at).length;
     const clickRate = totalSent > 0 ? (totalClicked / totalSent) * 100 : 0;
 
-    // Patients who received comms and then booked
-    const commsPatientIds = new Set(
-      commsData.filter(c => c.clicked_at).map(() => 'unknown') // we don't have patient_id in our type
-    );
     const reactivationRate = metrics.tasks.completionRate;
     const pipelineValue = allCompletedBookings.length > 0
       ? (allCompletedBookings.reduce((s, b) => s + (b.booking_value || 0), 0) / allCompletedBookings.length) * metrics.appointments.current
@@ -853,14 +846,17 @@ export default function ExecutiveBusinessCase({
                           borderRadius: '8px',
                           fontSize: '11px',
                         }}
-                        formatter={(value: number, name: string) => [
-                          name === 'rate' ? `${value.toFixed(1)}%` : formatCurrency(value),
-                          name === 'rate'
-                            ? t('analytics:exec.rateLabel', { defaultValue: 'Rate' })
-                            : name === 'commission'
-                              ? t('analytics:exec.commLabel', { defaultValue: 'Commission' })
-                              : t('analytics:exec.revLabel', { defaultValue: 'Revenue' }),
-                        ]}
+                        formatter={(value, name) => {
+                          const v = Number(value);
+                          return [
+                            name === 'rate' ? `${v.toFixed(1)}%` : formatCurrency(v),
+                            name === 'rate'
+                              ? t('analytics:exec.rateLabel', { defaultValue: 'Rate' })
+                              : name === 'commission'
+                                ? t('analytics:exec.commLabel', { defaultValue: 'Commission' })
+                                : t('analytics:exec.revLabel', { defaultValue: 'Revenue' }),
+                          ];
+                        }}
                       />
                       <Line type="monotone" dataKey="rate" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
                     </RechartsLineChart>
@@ -936,8 +932,8 @@ export default function ExecutiveBusinessCase({
                       borderRadius: '8px',
                       fontSize: '11px',
                     }}
-                    formatter={(value: number, name: string) => [
-                      formatCurrency(value),
+                    formatter={(value, name) => [
+                      formatCurrency(Number(value)),
                       name === 'revenue'
                         ? t('analytics:exec.projRevLabel', { defaultValue: 'Revenue' })
                         : name === 'net'
