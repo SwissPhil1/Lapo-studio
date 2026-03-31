@@ -364,7 +364,7 @@ export default function Patients() {
 
       // Only apply text search if NOT using AI search results
       if (debouncedSearch && !aiSearchResults) {
-        query = query.or(`first_name.ilike.%${debouncedSearch}%,last_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`);
+        query = query.or(`first_name.ilike.%${debouncedSearch}%,last_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%,phone.ilike.%${debouncedSearch}%,date_of_birth.ilike.%${debouncedSearch}%`);
       }
 
       // Apply server-side pagination when possible

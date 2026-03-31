@@ -542,6 +542,42 @@
       "adjustment": "Adjustment",
       "expiration": "Expiration",
       "other": "Other"
+    },
+    "patientWallet": {
+      "title": "LAPO Cash",
+      "currentBalance": "Balance",
+      "viewHistory": "History",
+      "noWalletYet": "No wallet yet",
+      "insufficientBalance": "Insufficient balance"
+    },
+    "patientTransactionTypes": {
+      "loyalty_credit": "Loyalty Credit",
+      "loyalty_debit": "Loyalty Debit",
+      "gift_received": "Gift Received",
+      "birthday_bonus": "Birthday Bonus",
+      "adjustment": "Adjustment",
+      "redemption": "Redemption",
+      "other": "Other"
+    },
+    "patientCreditDialog": {
+      "title": "Credit LAPO Cash",
+      "description": "Add LAPO Cash to {{name}}'s wallet",
+      "amountLabel": "Amount",
+      "typeLabel": "Type",
+      "descriptionLabel": "Note",
+      "descriptionPlaceholder": "Optional note",
+      "cancel": "Cancel",
+      "submit": "Credit"
+    },
+    "patientDebitDialog": {
+      "title": "Debit LAPO Cash",
+      "description": "Deduct LAPO Cash from {{name}}'s wallet",
+      "amountLabel": "Amount",
+      "typeLabel": "Type",
+      "descriptionLabel": "Note",
+      "descriptionPlaceholder": "Optional note",
+      "cancel": "Cancel",
+      "submit": "Debit"
     }
   },
   "prizes": {

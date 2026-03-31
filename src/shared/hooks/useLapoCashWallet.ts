@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 export interface LapoCashWallet {
   id: string;
   referrer_id: string;
+  patient_id?: string | null;
   balance: number;
   created_at: string;
   updated_at: string;

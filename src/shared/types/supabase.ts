@@ -3041,6 +3041,7 @@ export type Database = {
           balance: number
           created_at: string
           id: string
+          patient_id: string | null
           referrer_id: string
           updated_at: string
         }
@@ -3048,13 +3049,15 @@ export type Database = {
           balance?: number
           created_at?: string
           id?: string
-          referrer_id: string
+          patient_id?: string | null
+          referrer_id?: string
           updated_at?: string
         }
         Update: {
           balance?: number
           created_at?: string
           id?: string
+          patient_id?: string | null
           referrer_id?: string
           updated_at?: string
         }

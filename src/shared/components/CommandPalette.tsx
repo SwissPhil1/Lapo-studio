@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
+import { supabase } from '@/shared/lib/supabase'
 import { cn } from '@/shared/lib/utils'
 import {
   LayoutDashboard,
@@ -17,6 +18,7 @@ import {
   BarChart3,
   Settings,
   Search,
+  Loader2,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
@@ -27,13 +29,26 @@ interface Command {
   action: () => void
   section: string
   keywords?: string[]
+  subtitle?: string
+}
+
+interface PatientResult {
+  id: string
+  first_name: string
+  last_name: string
+  email: string | null
+  phone: string | null
+  date_of_birth: string | null
 }
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(0)
+  const [patientResults, setPatientResults] = useState<PatientResult[]>([])
+  const [searchingPatients, setSearchingPatients] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { isAdmin, isCRM } = useAuth()
@@ -148,7 +163,7 @@ export function CommandPalette() {
     },
   ]
 
-  const filtered = query
+  const filteredCommands = query
     ? commands.filter((cmd) => {
         const q = query.toLowerCase()
         return (
@@ -159,6 +174,52 @@ export function CommandPalette() {
       })
     : commands
 
+  // Convert patient results to Command items
+  const patientCommands: Command[] = patientResults.map((p) => {
+    const details = [p.email, p.phone, p.date_of_birth].filter(Boolean).join(' · ')
+    return {
+      id: `patient-${p.id}`,
+      label: `${p.first_name} ${p.last_name}`,
+      subtitle: details || undefined,
+      icon: <UserCircle className="h-4 w-4" />,
+      action: () => navigate(`/crm/patients/${p.id}`),
+      section: t('nav.patients', { defaultValue: 'Patients' }),
+    }
+  })
+
+  // All items: patient results first (when searching), then commands
+  const allItems = query.length >= 2 ? [...patientCommands, ...filteredCommands] : filteredCommands
+
+  // Search patients when query changes (debounced)
+  useEffect(() => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+
+    if (!open || query.length < 2 || !isCRM) {
+      setPatientResults([])
+      setSearchingPatients(false)
+      return
+    }
+
+    setSearchingPatients(true)
+    searchTimeoutRef.current = setTimeout(async () => {
+      const q = query.trim()
+      const { data } = await supabase
+        .from('patients')
+        .select('id, first_name, last_name, email, phone, date_of_birth')
+        .or(
+          `first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%,date_of_birth.ilike.%${q}%`
+        )
+        .limit(8)
+
+      setPatientResults(data || [])
+      setSearchingPatients(false)
+    }, 250)
+
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+    }
+  }, [query, open, isCRM])
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -166,6 +227,7 @@ export function CommandPalette() {
         setOpen((prev) => !prev)
         setQuery('')
         setSelected(0)
+        setPatientResults([])
       }
       if (e.key === 'Escape') {
         setOpen(false)
@@ -187,23 +249,24 @@ export function CommandPalette() {
     cmd.action()
     setOpen(false)
     setQuery('')
+    setPatientResults([])
   }
 
   const handleInputKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setSelected((s) => Math.min(s + 1, filtered.length - 1))
+      setSelected((s) => Math.min(s + 1, allItems.length - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setSelected((s) => Math.max(s - 1, 0))
-    } else if (e.key === 'Enter' && filtered[selected]) {
-      execute(filtered[selected])
+    } else if (e.key === 'Enter' && allItems[selected]) {
+      execute(allItems[selected])
     }
   }
 
   if (!open) return null
 
-  const sections = [...new Set(filtered.map((c) => c.section))]
+  const sections = [...new Set(allItems.map((c) => c.section))]
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]">
@@ -229,6 +292,7 @@ export function CommandPalette() {
             placeholder={t('commandPalette.placeholder')}
             className="h-14 flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none"
           />
+          {searchingPatients && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
           <kbd className="rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
             ESC
           </kbd>
@@ -236,7 +300,7 @@ export function CommandPalette() {
 
         {/* Results */}
         <div className="max-h-80 overflow-y-auto p-2">
-          {filtered.length === 0 ? (
+          {allItems.length === 0 && !searchingPatients ? (
             <p className="p-4 text-center text-sm text-muted-foreground">
               {t('commandPalette.noResults')}
             </p>
@@ -246,10 +310,10 @@ export function CommandPalette() {
                 <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {section}
                 </p>
-                {filtered
+                {allItems
                   .filter((c) => c.section === section)
                   .map((cmd) => {
-                    const idx = filtered.indexOf(cmd)
+                    const idx = allItems.indexOf(cmd)
                     return (
                       <button
                         key={cmd.id}
@@ -263,7 +327,12 @@ export function CommandPalette() {
                         )}
                       >
                         {cmd.icon}
-                        {cmd.label}
+                        <div className="min-w-0 text-left">
+                          <span>{cmd.label}</span>
+                          {cmd.subtitle && (
+                            <p className="truncate text-xs text-muted-foreground">{cmd.subtitle}</p>
+                          )}
+                        </div>
                       </button>
                     )
                   })}

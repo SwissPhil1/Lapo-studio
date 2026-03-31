@@ -26,6 +26,7 @@ import { QuickActionBar } from '@/modules/crm/components/patients/QuickActionBar
 import { StageSelector } from '@/modules/crm/components/patients/StageSelector';
 import { CommunicationsHistory } from '@/modules/crm/components/patients/CommunicationsHistory';
 import { ActiveTasksWidget } from '@/modules/crm/components/patients/ActiveTasksWidget';
+import { LapoCashPatientCard } from '@/modules/crm/components/patients/LapoCashPatientCard';
 import {
   getOverallRecallStatusWithMappings,
   getRecallDaysForService,
@@ -622,6 +623,9 @@ export default function PatientDetail() {
           <div className="text-xs text-muted-foreground">{t('patientDetail:stats.avgBetweenVisits')}</div>
         </Card>
       </div>
+
+      {/* LAPO Cash patient wallet */}
+      <LapoCashPatientCard patientId={patient.id} patientName={patientFullName} />
 
       {/* Contextual alert — single, compact */}
       {(recallStatus === 'overdue' || recallStatus === 'due_soon') && !nextAppointment && (() => {
