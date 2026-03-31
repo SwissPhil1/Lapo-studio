@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,8 @@ import { formatCurrency } from '@/shared/lib/format';
 import { BOOKING_STATUS } from '@/shared/lib/bookingStatus';
 import { cn } from '@/shared/lib/utils';
 import { motion, MotionList, MotionItem, fadeIn } from '@/shared/components/motion';
+
+const ExecutiveBusinessCase = lazy(() => import('@/modules/crm/components/statistics/ExecutiveBusinessCase'));
 import {
   format,
   subDays,
@@ -22,6 +24,7 @@ import {
   Minus,
   ArrowRight,
   Link2,
+  Briefcase,
 } from 'lucide-react';
 import {
   BarChart,
@@ -302,6 +305,7 @@ export default function StatisticsPage() {
   const { t } = useTranslation(['analytics', 'crmDashboard', 'common']);
   const navigate = useNavigate();
   const [period, setPeriod] = useState('30d');
+  const [showBusinessCase, setShowBusinessCase] = useState(false);
   const range = getDateRange(period);
 
   // -----------------------------------------------------------------------
@@ -1096,6 +1100,41 @@ export default function StatisticsPage() {
             </MotionItem>
           </MotionList>
         </motion.div>
+      )}
+
+      {/* Executive Business Case Toggle + Section */}
+      {metrics && (
+        <div>
+          <Button
+            variant={showBusinessCase ? 'default' : 'outline'}
+            size="sm"
+            className="gap-2 text-xs"
+            onClick={() => setShowBusinessCase(v => !v)}
+          >
+            <Briefcase className="h-3.5 w-3.5" />
+            {showBusinessCase
+              ? t('analytics:exec.hide', { defaultValue: 'Hide Business Case' })
+              : t('analytics:exec.show', { defaultValue: 'Executive Business Case' })}
+          </Button>
+          {showBusinessCase && (
+            <Suspense fallback={<div className="mt-6 text-sm text-muted-foreground">{t('common:loading', { defaultValue: 'Loading...' })}</div>}>
+              <div className="mt-6">
+                <ExecutiveBusinessCase
+                  metrics={metrics}
+                  range={range}
+                  period={period}
+                  bookingsData={bookingsData || []}
+                  referredBookingsData={referredBookingsData || []}
+                  referrerPerfData={referrerPerfData || []}
+                  commissionsData={commissionsData || []}
+                  referralsData={referralsData || []}
+                  commsData={commsData || []}
+                  patientsData={patientsData || []}
+                />
+              </div>
+            </Suspense>
+          )}
+        </div>
       )}
 
       {/* Main Grid — 2 columns on desktop */}
