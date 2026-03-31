@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { format } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
@@ -264,7 +265,7 @@ export function CommunicationItem({ communication, index: _index }: Communicatio
           {fullMessage ? (
             <div
               className="text-sm text-muted-foreground prose prose-sm max-w-none dark:prose-invert"
-              dangerouslySetInnerHTML={{ __html: fullMessage }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(fullMessage) }}
             />
           ) : messagePreview ? (
             <p className="text-sm text-muted-foreground">

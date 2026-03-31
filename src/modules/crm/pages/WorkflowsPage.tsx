@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { WorkflowTemplateLibrary } from '@/modules/crm/components/workflows/WorkflowTemplateLibrary';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import { Input } from '@/components/ui/input';
@@ -68,7 +69,7 @@ export default function WorkflowsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // Fetch workflows
-  const { data: workflows = [], isLoading, refetch, isFetching } = useQuery({
+  const { data: workflows = [], isLoading, isError: isWorkflowsError, refetch, isFetching } = useQuery({
     queryKey: ['crm-workflows'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -81,7 +82,7 @@ export default function WorkflowsPage() {
   });
 
   // Fetch enrollment counts
-  const { data: enrollmentCounts = {} } = useQuery({
+  const { data: enrollmentCounts = {}, isError: isEnrollmentsError } = useQuery({
     queryKey: ['workflow-enrollment-counts'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -201,6 +202,12 @@ export default function WorkflowsPage() {
 
   return (
     <div className="space-y-6">
+      {(isWorkflowsError || isEnrollmentsError) && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center text-destructive">
+          {t('common:loadError', { defaultValue: 'Failed to load data. Please try again.' })}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -356,6 +363,15 @@ export default function WorkflowsPage() {
           ))}
         </div>
       )}
+
+      {/* Template Library */}
+      <WorkflowTemplateLibrary
+        onUseTemplate={() => {
+          setEditingWorkflow(null);
+          setEditingSteps([]);
+          setBuilderOpen(true);
+        }}
+      />
 
       {/* Delete confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

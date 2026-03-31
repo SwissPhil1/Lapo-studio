@@ -34,6 +34,8 @@ import {
   Activity,
   Star,
   HelpCircle,
+  ListTodo,
+  Inbox,
 } from 'lucide-react'
 
 export function StudioLayout() {
@@ -177,6 +179,13 @@ export function StudioLayout() {
                 collapsed={isCollapsed}
                 onClick={isMobile ? closeMobile : undefined}
               />
+              <NavItem
+                to="/admin/duplicates"
+                icon={<Users className="h-4 w-4" />}
+                label={t('nav.duplicates', { defaultValue: 'Duplicates' })}
+                collapsed={isCollapsed}
+                onClick={isMobile ? closeMobile : undefined}
+              />
             </NavGroup>
           )}
 
@@ -238,6 +247,27 @@ export function StudioLayout() {
                 to="/crm/workflows"
                 icon={<Zap className="h-4 w-4" />}
                 label={t('nav.workflows')}
+                collapsed={isCollapsed}
+                onClick={isMobile ? closeMobile : undefined}
+              />
+              <NavItem
+                to="/crm/tasks"
+                icon={<ListTodo className="h-4 w-4" />}
+                label={t('nav.tasks', { defaultValue: 'Tasks' })}
+                collapsed={isCollapsed}
+                onClick={isMobile ? closeMobile : undefined}
+              />
+              <NavItem
+                to="/crm/inbox"
+                icon={<Inbox className="h-4 w-4" />}
+                label={t('nav.inbox', { defaultValue: 'Inbox' })}
+                collapsed={isCollapsed}
+                onClick={isMobile ? closeMobile : undefined}
+              />
+              <NavItem
+                to="/crm/consent-forms"
+                icon={<FileText className="h-4 w-4" />}
+                label={t('nav.consentForms', { defaultValue: 'Consent Forms' })}
                 collapsed={isCollapsed}
                 onClick={isMobile ? closeMobile : undefined}
               />

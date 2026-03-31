@@ -593,7 +593,7 @@ export default function PayoutDetail() {
     },
     {
       key: "status",
-      header: t("common:status"),
+      header: t("common:status", { defaultValue: "Status" }),
       cell: (row) => <StatusBadge status={row.status} type="commission" />,
     },
   ];
@@ -627,7 +627,7 @@ export default function PayoutDetail() {
                 </div>
               </div>
               <div className="rounded-lg border border-border bg-card p-4">
-                <div className="text-sm text-muted-foreground">Status</div>
+                <div className="text-sm text-muted-foreground">{t('common:status', { defaultValue: 'Status' })}</div>
                 <div className="mt-1">
                   <StatusBadge status={batch.status} type="batch" />
                 </div>

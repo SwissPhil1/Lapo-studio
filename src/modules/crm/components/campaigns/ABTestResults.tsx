@@ -24,7 +24,7 @@ interface VariantRow {
 }
 
 export function ABTestResults({ campaignId }: ABTestResultsProps) {
-  const { t } = useTranslation(['campaigns']);
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['ab-test-results', campaignId],
     queryFn: async () => {
@@ -65,7 +65,7 @@ export function ABTestResults({ campaignId }: ABTestResultsProps) {
         const clickRate = sent > 0 ? ((clicked / sent) * 100).toFixed(1) : '0.0';
 
         return {
-          variant_name: `Variante ${variant.variant_name}`,
+          variant_name: `${t('analytics.abTest.variant', { defaultValue: 'Variant' })} ${variant.variant_name}`,
           weight: variant.weight,
           sent,
           opened,
@@ -94,7 +94,7 @@ export function ABTestResults({ campaignId }: ABTestResultsProps) {
       <div className="h-[200px] flex items-center justify-center text-muted-foreground">
         <div className="text-center">
           <FlaskConical className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>{t('campaigns:noABVariantsConfigured')}</p>
+          <p>{t('campaigns.noABVariantsConfigured', { defaultValue: 'No A/B variants configured' })}</p>
         </div>
       </div>
     );
@@ -111,11 +111,11 @@ export function ABTestResults({ campaignId }: ABTestResultsProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Variante</TableHead>
-            <TableHead className="text-right">Envoy\u00e9s</TableHead>
-            <TableHead className="text-right">Taux d'ouverture</TableHead>
-            <TableHead className="text-right">Taux de clic</TableHead>
-            <TableHead className="text-right">R\u00e9partition</TableHead>
+            <TableHead>{t('analytics.abTest.variant', { defaultValue: 'Variant' })}</TableHead>
+            <TableHead className="text-right">{t('analytics.abTest.sent', { defaultValue: 'Sent' })}</TableHead>
+            <TableHead className="text-right">{t('analytics.abTest.openRate', { defaultValue: 'Open rate' })}</TableHead>
+            <TableHead className="text-right">{t('analytics.abTest.clickRate', { defaultValue: 'Click rate' })}</TableHead>
+            <TableHead className="text-right">{t('analytics.abTest.distribution', { defaultValue: 'Distribution' })}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -126,7 +126,7 @@ export function ABTestResults({ campaignId }: ABTestResultsProps) {
                   {variant.variant_name}
                   {variant === winner && data.some((d) => d.sent > 0) && (
                     <Badge variant="success" className="text-xs">
-                      Meilleur
+                      {t('analytics.abTest.best', { defaultValue: 'Best' })}
                     </Badge>
                   )}
                 </div>
@@ -166,8 +166,8 @@ export function ABTestResults({ campaignId }: ABTestResultsProps) {
               }}
               formatter={(value: any, name: any) => {
                 const labels: Record<string, string> = {
-                  openRateNum: "Taux d'ouverture",
-                  clickRateNum: 'Taux de clic',
+                  openRateNum: t('analytics.abTest.openRate', { defaultValue: 'Open rate' }),
+                  clickRateNum: t('analytics.abTest.clickRate', { defaultValue: 'Click rate' }),
                 };
                 return [`${value.toFixed(1)}%`, labels[name] || name];
               }}
@@ -175,8 +175,8 @@ export function ABTestResults({ campaignId }: ABTestResultsProps) {
             <Legend
               formatter={(value) => {
                 const labels: Record<string, string> = {
-                  openRateNum: "Taux d'ouverture",
-                  clickRateNum: 'Taux de clic',
+                  openRateNum: t('analytics.abTest.openRate', { defaultValue: 'Open rate' }),
+                  clickRateNum: t('analytics.abTest.clickRate', { defaultValue: 'Click rate' }),
                 };
                 return labels[value] || value;
               }}

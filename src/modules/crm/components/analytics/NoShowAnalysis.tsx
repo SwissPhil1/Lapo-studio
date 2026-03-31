@@ -16,7 +16,7 @@ interface NoShowAnalysisProps {
 const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
 export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
-  const { t } = useTranslation(['analytics']);
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['noshow-analysis', dateRange],
     queryFn: async () => {
@@ -93,7 +93,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
   if (!data) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        {t('analytics:noDataAvailable')}
+        {t('analytics.noDataAvailable', { defaultValue: 'No data available' })}
       </div>
     );
   }
@@ -105,25 +105,25 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
         <div className="bg-destructive/10 rounded-lg p-4 text-center">
           <AlertTriangle className="h-5 w-5 mx-auto text-destructive mb-2" />
           <p className="text-2xl font-bold text-foreground">{data.noShowRate}%</p>
-          <p className="text-sm text-muted-foreground">Taux no-show</p>
-          <p className="text-xs text-muted-foreground">{data.noShowCount} absences</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.noShow.noShowRate', { defaultValue: 'No-show rate' })}</p>
+          <p className="text-xs text-muted-foreground">{data.noShowCount} {t('analytics.noShow.absences', { defaultValue: 'absences' })}</p>
         </div>
         <div className="bg-warning/10 rounded-lg p-4 text-center">
           <XCircle className="h-5 w-5 mx-auto text-warning mb-2" />
           <p className="text-2xl font-bold text-foreground">{data.cancelRate}%</p>
-          <p className="text-sm text-muted-foreground">Taux annulation</p>
-          <p className="text-xs text-muted-foreground">{data.cancelCount} annulées</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.noShow.cancellationRate', { defaultValue: 'Cancellation rate' })}</p>
+          <p className="text-xs text-muted-foreground">{data.cancelCount} {t('analytics.noShow.cancelled', { defaultValue: 'cancelled' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <TrendingDown className="h-5 w-5 mx-auto text-destructive mb-2" />
           <p className="text-2xl font-bold text-foreground">{formatCurrency(data.lostRevenue)}</p>
-          <p className="text-sm text-muted-foreground">Revenus perdus</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.noShow.lostRevenue', { defaultValue: 'Lost revenue' })}</p>
         </div>
       </div>
 
       {/* By Day Chart */}
       <div>
-        <h4 className="text-sm font-medium text-muted-foreground mb-3">No-shows par jour de semaine</h4>
+        <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.noShow.byDayOfWeek', { defaultValue: 'No-shows by day of week' })}</h4>
         <ResponsiveContainer width="100%" height={120}>
           <BarChart data={data.byDayData}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -144,7 +144,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: any) => [`${value}%`, 'Taux']}
+              formatter={(value: any) => [`${value}%`, t('analytics.noShow.rate', { defaultValue: 'Rate' })]}
             />
             <Bar dataKey="rate" fill="#FF6B6B" radius={[2, 2, 0, 0]} />
           </BarChart>
@@ -153,7 +153,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
 
       {/* Monthly Trend */}
       <div>
-        <h4 className="text-sm font-medium text-muted-foreground mb-3">Tendance mensuelle</h4>
+        <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.noShow.monthlyTrend', { defaultValue: 'Monthly trend' })}</h4>
         <ResponsiveContainer width="100%" height={100}>
           <LineChart data={data.monthlyData}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -174,7 +174,7 @@ export function NoShowAnalysis({ dateRange }: NoShowAnalysisProps) {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: any) => [`${value}%`, 'Taux no-show']}
+              formatter={(value: any) => [`${value}%`, t('analytics.noShow.noShowRate', { defaultValue: 'No-show rate' })]}
             />
             <Line 
               type="monotone" 

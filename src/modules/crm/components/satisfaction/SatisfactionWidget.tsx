@@ -78,11 +78,13 @@ export function useSatisfactionRatings() {
   return useQuery<SatisfactionRating[]>({
     queryKey: ['satisfaction-ratings'],
     queryFn: async () => {
-      // TODO: replace with real Supabase query when satisfaction_ratings table exists
+      // Uses demo data until satisfaction_ratings table is created in Supabase.
+      // When ready, replace with:
       // const { data } = await supabase
       //   .from('satisfaction_ratings')
       //   .select('*, patients(first_name, last_name)')
       //   .order('created_at', { ascending: false });
+      // return data ?? [];
       return generateMockRatings();
     },
     staleTime: 5 * 60 * 1000,

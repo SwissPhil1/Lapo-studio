@@ -24,6 +24,7 @@ const PayoutDetailPage = lazy(() => import('@/modules/admin/pages/PayoutDetailPa
 const ReferralsPage = lazy(() => import('@/modules/admin/pages/ReferralsPage'))
 const ReferralDetailPage = lazy(() => import('@/modules/admin/pages/ReferralDetailPage'))
 const AuditTrailPage = lazy(() => import('@/modules/admin/pages/AuditTrailPage'))
+const DuplicatesPage = lazy(() => import('@/modules/admin/pages/DuplicatesPage'))
 
 // CRM pages
 const CRMDashboard = lazy(() => import('@/modules/crm/pages/CRMDashboard'))
@@ -36,7 +37,10 @@ const AnalyticsPage = lazy(() => import('@/modules/crm/pages/AnalyticsPage'))
 const CampaignsPage = lazy(() => import('@/modules/crm/pages/CampaignsPage'))
 const WorkflowsPage = lazy(() => import('@/modules/crm/pages/WorkflowsPage'))
 const StatisticsPage = lazy(() => import('@/modules/crm/pages/StatisticsPage'))
-const SatisfactionPage = lazy(() => import('@/modules/crm/components/satisfaction/SatisfactionPage'))
+const SatisfactionPage = lazy(() => import('@/modules/crm/pages/SatisfactionPage'))
+const TaskBoardPage = lazy(() => import('@/modules/crm/pages/TaskBoardPage'))
+const InboxPage = lazy(() => import('@/modules/crm/pages/InboxPage'))
+const ConsentFormsPage = lazy(() => import('@/modules/crm/pages/ConsentFormsPage'))
 const GuidePage = lazy(() => import('@/modules/guide/pages/GuidePage'))
 
 const queryClient = new QueryClient({
@@ -194,6 +198,14 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="admin/duplicates"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <DuplicatesPage />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* CRM routes */}
                 <Route
@@ -282,6 +294,30 @@ export default function App() {
                   element={
                     <ProtectedRoute requireCRM>
                       <SatisfactionPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="crm/tasks"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <TaskBoardPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="crm/inbox"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <InboxPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="crm/consent-forms"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <ConsentFormsPage />
                     </ProtectedRoute>
                   }
                 />

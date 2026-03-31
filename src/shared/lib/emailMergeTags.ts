@@ -48,7 +48,6 @@ export async function getPatientTreatmentInfo(patientId: string): Promise<Treatm
       .maybeSingle();
 
     if (bookingError || !lastBooking) {
-      console.log('No completed booking found for patient:', patientId);
       return null;
     }
 

@@ -18,7 +18,7 @@ interface AtRiskPatient {
 }
 
 export function ChurnPrediction() {
-  const { t } = useTranslation(['analytics']);
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [drillDown, setDrillDown] = useState<DrillDownData | null>(null);
 
@@ -93,12 +93,12 @@ export function ChurnPrediction() {
     const segmentName = entry.name;
     const patients = data.patientsByRisk[segmentName] || [];
     setDrillDown({
-      title: t('analytics:drillDown.churnTitle'),
+      title: t('analytics.drillDown.churnTitle', { defaultValue: 'Patients by Risk Level' }),
       subtitle: `${segmentName} (${patients.length} patients)`,
       columns: [
-        { key: 'name', label: t('analytics:drillDown.colPatient') },
-        { key: 'score', label: t('analytics:drillDown.colRiskScore') },
-        { key: 'lastVisit', label: t('analytics:drillDown.colLastVisit') },
+        { key: 'name', label: t('analytics.drillDown.colPatient', { defaultValue: 'Patient' }) },
+        { key: 'score', label: t('analytics.drillDown.colRiskScore', { defaultValue: 'Risk Score' }) },
+        { key: 'lastVisit', label: t('analytics.drillDown.colLastVisit', { defaultValue: 'Last Visit' }) },
       ],
       rows: patients.map(p => ({
         name: `${p.first_name} ${p.last_name}`,
@@ -122,9 +122,9 @@ export function ChurnPrediction() {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <AlertTriangle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">Aucune donn\u00e9e de pr\u00e9diction de churn</p>
+        <p className="font-medium">{t('analytics.noChurnData', { defaultValue: 'No churn prediction data' })}</p>
         <p className="text-sm mt-1">
-          Les scores de risque de churn appara\u00eetront ici lorsqu'ils seront calcul\u00e9s.
+          {t('analytics.noChurnDataDescription', { defaultValue: 'Churn risk scores will appear here once calculated.' })}
         </p>
       </div>
     );
@@ -143,24 +143,24 @@ export function ChurnPrediction() {
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Users className="h-5 w-5 mx-auto text-destructive mb-2" />
           <p className="text-2xl font-bold">{data.totalAtRisk}</p>
-          <p className="text-sm text-muted-foreground">Total \u00e0 risque</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.totalAtRisk', { defaultValue: 'Total at risk' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <TrendingDown className="h-5 w-5 mx-auto text-warning mb-2" />
           <p className="text-2xl font-bold">{data.avgRiskScore}</p>
-          <p className="text-sm text-muted-foreground">Score moyen</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.churn.avgScore', { defaultValue: 'Average score' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <RefreshCw className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold">{data.dueForReactivation}</p>
-          <p className="text-sm text-muted-foreground">\u00c0 r\u00e9activer</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.toReactivate', { defaultValue: 'To reactivate' })}</p>
         </div>
       </div>
 
       {/* Risk distribution chart */}
       <div>
         <h4 className="text-sm font-medium text-muted-foreground mb-3">
-          R\u00e9partition du risque de churn
+          {t('analytics.churnRiskDistribution', { defaultValue: 'Churn risk distribution' })}
         </h4>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data.distributionData} layout="vertical">
@@ -180,7 +180,7 @@ export function ChurnPrediction() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: any) => [`${value}`, 'Patients']}
+              formatter={(value: any) => [`${value}`, t('analytics.patients', { defaultValue: 'Patients' })]}
             />
             <Bar dataKey="count" radius={[0, 4, 4, 0]} cursor="pointer" onClick={(entry: any) => handleSegmentClick(entry)}>
               {data.distributionData.map((entry, index) => (
@@ -194,7 +194,7 @@ export function ChurnPrediction() {
       {/* Top 10 at-risk patients */}
       <div>
         <h4 className="text-sm font-medium text-muted-foreground mb-3">
-          Top 10 patients \u00e0 risque
+          {t('analytics.top10AtRisk', { defaultValue: 'Top 10 at-risk patients' })}
         </h4>
         <div className="space-y-2">
           {data.topAtRisk.map((patient) => (
@@ -216,8 +216,8 @@ export function ChurnPrediction() {
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {patient.last_visit_date
-                      ? `Derni\u00e8re visite: ${format(new Date(patient.last_visit_date), 'dd MMM yyyy', { locale: fr })}`
-                      : 'Aucune visite enregistr\u00e9e'}
+                      ? `${t('analytics.lastVisit', { defaultValue: 'Last visit' })}: ${format(new Date(patient.last_visit_date), 'dd MMM yyyy', { locale: fr })}`
+                      : t('analytics.noVisitRecorded', { defaultValue: 'No visit recorded' })}
                   </p>
                 </div>
               </div>

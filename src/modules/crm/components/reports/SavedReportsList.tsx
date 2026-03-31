@@ -8,6 +8,7 @@ import { useAuditTrail } from '@/shared/hooks/useAuditTrail';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { REPORT_SOURCES } from '@/shared/lib/reportSources';
 import {
@@ -46,6 +47,7 @@ function parseReportConfig(config: unknown): ReportConfig | null {
 }
 
 export function SavedReportsList() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { logAction } = useAuditTrail();
@@ -88,10 +90,10 @@ export function SavedReportsList() {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['custom-reports'] });
       logAction('delete', 'report', id);
-      toast.success('Rapport supprimé');
+      toast.success(t('analytics.reports.reportDeleted', { defaultValue: 'Report deleted' }));
     },
     onError: () => {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('analytics.reports.deleteError', { defaultValue: 'Error deleting report' }));
     },
   });
 
@@ -119,9 +121,9 @@ export function SavedReportsList() {
     return (
       <div className="text-center py-12">
         <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium">Aucun rapport personnalisé</h3>
+        <h3 className="text-lg font-medium">{t('analytics.reports.noCustomReports', { defaultValue: 'No custom reports' })}</h3>
         <p className="text-muted-foreground mt-1">
-          Créez votre premier rapport pour commencer
+          {t('analytics.reports.createFirstReport', { defaultValue: 'Create your first report to get started' })}
         </p>
       </div>
     );
@@ -153,11 +155,11 @@ export function SavedReportsList() {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {sourceDef?.label || 'Source inconnue'}
+                    {sourceDef?.label || t('analytics.reports.unknownSource', { defaultValue: 'Unknown source' })}
                     {config && ` • ${config.metrics.length} métrique(s)`}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Modifié {formatDistanceToNow(new Date(report.updated_at), { addSuffix: true, locale: fr })}
+                    {t('analytics.reports.modified', { defaultValue: 'Modified' })} {formatDistanceToNow(new Date(report.updated_at), { addSuffix: true, locale: fr })}
                   </p>
                 </div>
               </div>
@@ -190,18 +192,18 @@ export function SavedReportsList() {
                   </AlertDialogTrigger>
                   <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Supprimer ce rapport ?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('analytics.reports.deleteConfirmTitle', { defaultValue: 'Delete this report?' })}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Cette action est irréversible. Le rapport "{report.name}" sera définitivement supprimé.
+                        {t('analytics.reports.deleteConfirmDescription', { defaultValue: 'This action is irreversible. The report "{{name}}" will be permanently deleted.', name: report.name })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogCancel>{t('common.cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => deleteReport.mutate(report.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Supprimer
+                        {t('common.delete', { defaultValue: 'Delete' })}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

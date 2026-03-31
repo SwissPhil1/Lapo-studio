@@ -23,7 +23,7 @@ const chartIcons: Record<string, React.ElementType> = {
 };
 
 export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarProps) {
-  const { t } = useTranslation(['reports']);
+  const { t } = useTranslation();
   const sourceDef = REPORT_SOURCES[config.source];
 
   const handleSourceChange = (source: ReportSource) => {
@@ -52,7 +52,7 @@ export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarP
       <div className="p-4 space-y-6">
         {/* Source */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">{t('reports:dataSource')}</Label>
+          <Label className="text-sm font-medium">{t('reports.dataSource', { defaultValue: 'Data source' })}</Label>
           <Select value={config.source} onValueChange={(v) => handleSourceChange(v as ReportSource)}>
             <SelectTrigger>
               <SelectValue />
@@ -67,7 +67,7 @@ export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarP
 
         {/* Metrics */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">{t('reports:metricsMax3')}</Label>
+          <Label className="text-sm font-medium">{t('reports.metricsMax3', { defaultValue: 'Metrics (max 3)' })}</Label>
           <div className="space-y-2">
             {sourceDef.metrics.map((metric) => (
               <div key={metric.key} className="flex items-center space-x-2">
@@ -90,7 +90,7 @@ export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarP
 
         {/* Dimension */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Grouper par</Label>
+          <Label className="text-sm font-medium">{t('analytics.reports.groupBy', { defaultValue: 'Group by' })}</Label>
           <Select 
             value={config.dimension} 
             onValueChange={(v) => onChange({ ...config, dimension: v })}
@@ -108,7 +108,7 @@ export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarP
 
         {/* Date Range */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Période</Label>
+          <Label className="text-sm font-medium">{t('analytics.reports.period', { defaultValue: 'Period' })}</Label>
           <RadioGroup
             value={config.dateRange.value || '30d'}
             onValueChange={(v) => onChange({
@@ -129,7 +129,7 @@ export function ReportBuilderSidebar({ config, onChange }: ReportBuilderSidebarP
 
         {/* Chart Type */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Type de graphique</Label>
+          <Label className="text-sm font-medium">{t('analytics.reports.chartType', { defaultValue: 'Chart type' })}</Label>
           <ToggleGroup
             type="single"
             value={config.chartType}

@@ -110,7 +110,7 @@ export default function ReferralDetailPage() {
       if (!session?.access_token) throw new Error('Not authenticated')
 
       const response = await fetch(
-        `https://dcrlaoudqcfbauxalbgs.supabase.co/functions/v1/delete-referral`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-referral`,
         {
           method: 'POST',
           headers: {

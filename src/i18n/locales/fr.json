@@ -79,6 +79,8 @@
     "switchLanguage": "Passer en anglais",
     "all": "Tous",
     "status": "Statut",
+    "type": "Type",
+    "standardType": "Standard",
     "emptyState": {
       "noReferrers": "Aucun référent",
       "noReferrersDesc": "Les référents apparaîtront ici une fois inscrits à votre programme.",
@@ -889,7 +891,10 @@
       "colLtv": "Valeur vie client",
       "colBookings": "Réservations",
       "colSource": "Source",
-      "colJoined": "Inscrit le"
+      "colJoined": "Inscrit le",
+      "avgLtvPerPatient": "LTV moyen par patient",
+      "ltvByGender": "LTV par genre",
+      "ltvByAge": "LTV par âge"
     },
     "cac": {
       "overallCac": "CAC global",
@@ -1051,6 +1056,96 @@
       "impactAnalytics": "Analyses avancées & rapports",
       "impactRetention": "Suivi de la rétention patient",
       "crmInsight": "Le CRM consolide la gestion des patients, les communications et les analyses sur une seule plateforme — réduisant les coûts opérationnels et permettant des décisions basées sur les données."
+    },
+    "noShow": {
+      "noShowRate": "Taux no-show",
+      "absences": "absences",
+      "cancellationRate": "Taux annulation",
+      "cancelled": "annulées",
+      "lostRevenue": "Revenus perdus",
+      "byDayOfWeek": "No-shows par jour de semaine",
+      "rate": "Taux",
+      "monthlyTrend": "Tendance mensuelle"
+    },
+    "satisfaction": {
+      "totalResponses": "Réponses totales",
+      "npsScore": "Score NPS",
+      "avgCsat": "CSAT moyen",
+      "responseRate": "Taux de réponse",
+      "npsBreakdown": "Répartition NPS",
+      "promoters": "Promoteurs",
+      "passives": "Passifs",
+      "detractors": "Détracteurs",
+      "npsTrend": "Évolution du NPS",
+      "scoreDistribution": "Distribution des scores",
+      "responses": "Réponses",
+      "emptyDescription": "Les réponses aux enquêtes NPS et CSAT apparaîtront ici."
+    },
+    "workflow": {
+      "totalEnrolled": "Total inscrits",
+      "completionRate": "Taux complétion",
+      "inProgress": "En cours",
+      "avgDuration": "Durée moyenne",
+      "statusBreakdown": "Répartition par statut",
+      "byWorkflow": "Par workflow"
+    },
+    "churn": {
+      "avgScore": "Score moyen"
+    },
+    "referral": {
+      "totalReferred": "Total référés",
+      "conversionRate": "Taux conversion",
+      "referralRevenue": "Revenus parrainés",
+      "avgRevenuePerReferral": "Rev. moy / référé",
+      "conversionFunnel": "Entonnoir de conversion",
+      "top5ReferrersRoi": "Top 5 parrains — ROI",
+      "referred": "référés",
+      "refShort": "réf"
+    },
+    "attribution": {
+      "totalLeads": "Total leads",
+      "converted": "Convertis",
+      "conversionRate": "Taux conversion",
+      "trackedPatients": "Patients trackés",
+      "leadsBySource": "Leads par source",
+      "leads": "Leads",
+      "convertedLabel": "Convertis",
+      "byChannel": "Répartition par canal",
+      "utmCampaignPerformance": "Performance par campagne UTM"
+    },
+    "abTest": {
+      "variant": "Variante",
+      "sent": "Envoyés",
+      "openRate": "Taux d'ouverture",
+      "clickRate": "Taux de clic",
+      "distribution": "Répartition",
+      "best": "Meilleur"
+    },
+    "reports": {
+      "groupBy": "Grouper par",
+      "chartType": "Type de graphique",
+      "period": "Période",
+      "reportDeleted": "Rapport supprimé",
+      "deleteError": "Erreur lors de la suppression",
+      "noCustomReports": "Aucun rapport personnalisé",
+      "createFirstReport": "Créez votre premier rapport pour commencer",
+      "deleteConfirmTitle": "Supprimer ce rapport ?",
+      "deleteConfirmDescription": "Cette action est irréversible. Le rapport \"{{name}}\" sera définitivement supprimé.",
+      "unknownSource": "Source inconnue",
+      "modified": "Modifié"
+    },
+    "bulkActions": {
+      "sendQuickEmail": "Envoyer un email rapide",
+      "saveDynamicSegment": "Sauvegarder comme segment dynamique",
+      "saveSegment": "Sauvegarder comme segment",
+      "createTrackedCampaign": "Créer une campagne trackée"
+    },
+    "statusTooltip": {
+      "pending": "La commission sera ajoutée au prochain lot de paiement",
+      "paid": "Commission déjà incluse dans un lot de paiement",
+      "cancelledReversed": "Cette commission est invalide ou annulée",
+      "noCommission": "Cette réservation n'a pas généré de commission",
+      "converted": "Cette commission a été convertie en LAPO Cash"
     }
   },
   "campaigns": {

@@ -14,6 +14,7 @@ import {
 
 interface TriggerConfig {
   days?: number;
+  days_before?: number;
   booking_type?: string;
   from_stage?: string;
   to_stage?: string;
@@ -30,6 +31,7 @@ interface TriggerConfigPanelProps {
 const TRIGGER_TYPES = [
   'patient_created',
   'booking_cancelled',
+  'booking_upcoming',
   'stage_changed',
   'days_since_visit',
   'manual',
@@ -85,6 +87,29 @@ export function TriggerConfigPanel({
               onTriggerConfigChange({ ...triggerConfig, booking_type: e.target.value })
             }
           />
+        </div>
+      )}
+
+      {triggerType === 'booking_upcoming' && (
+        <div>
+          <Label>{t('workflows:daysBefore', { defaultValue: 'Days before appointment' })}</Label>
+          <Input
+            type="number"
+            className="mt-1 w-32"
+            min={1}
+            max={30}
+            value={triggerConfig.days_before || ''}
+            onChange={(e) =>
+              onTriggerConfigChange({
+                ...triggerConfig,
+                days_before: parseInt(e.target.value) || undefined,
+              })
+            }
+            placeholder="2"
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t('workflows:bookingUpcomingHint', { defaultValue: 'Workflow fires this many days before a confirmed booking.' })}
+          </p>
         </div>
       )}
 
