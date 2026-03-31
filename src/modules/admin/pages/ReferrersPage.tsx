@@ -182,7 +182,7 @@ export default function Referrers() {
     },
     {
       key: "referrer_type_name",
-      header: "Type",
+      header: t('common:type', { defaultValue: 'Type' }),
       sortable: true,
       cell: (row) => {
         const tooltipText = row.first_purchase_rate && row.repeat_purchase_rate

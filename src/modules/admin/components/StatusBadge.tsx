@@ -40,16 +40,16 @@ export function StatusBadge({ status, type = "referral", className }: StatusBadg
     
     switch (normalizedStatus) {
       case "pending":
-        return "Commission will be added to next payout batch";
+        return t('analytics.statusTooltip.pending', { defaultValue: 'Commission will be added to next payout batch' });
       case "paid":
-        return "Commission already included in a payout batch";
+        return t('analytics.statusTooltip.paid', { defaultValue: 'Commission already included in a payout batch' });
       case "cancelled":
       case "reversed":
-        return "This commission is invalid or reversed";
+        return t('analytics.statusTooltip.cancelledReversed', { defaultValue: 'This commission is invalid or reversed' });
       case "no_commission":
-        return "This booking did not generate a commission";
+        return t('analytics.statusTooltip.noCommission', { defaultValue: 'This booking did not generate a commission' });
       case "converted":
-        return "This commission was converted to LAPO Cash";
+        return t('analytics.statusTooltip.converted', { defaultValue: 'This commission was converted to LAPO Cash' });
       default:
         return null;
     }
