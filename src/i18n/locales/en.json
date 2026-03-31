@@ -2194,5 +2194,75 @@
       "showDetails": "Show details",
       "hideDetails": "Hide details"
     }
+  },
+  "guide": {
+    "title": "Staff Guide",
+    "subtitle": "Step-by-step instructions for your daily tasks",
+    "goThere": "Go there",
+    "tip": "Tip",
+    "tabs": {
+      "weekly": "Weekly",
+      "daily": "Daily",
+      "asNeeded": "As Needed"
+    },
+    "commissions": {
+      "title": "Check & Pay Referrer Commissions",
+      "step1": "Go to the **Commissions** page",
+      "tip1": "You'll see 3 tabs at the top: Payable, Blocked, and Held for LAPO Cash. The KPI cards show a quick summary of amounts.",
+      "step2": "Check the **Blocked** tab",
+      "tip2": "These referrers have missing bank info. Click \"Send Reminder\" to notify them. You can only send 1 reminder per 7 days.",
+      "step3": "Go to the **Payouts** page and click \"Close Current Batch\"",
+      "tip3": "This locks in this week's payable commissions. A new empty batch is automatically created for next week.",
+      "step4": "Open the closed batch, export, and mark as paid",
+      "tip4": "Click the batch to open it. Export CSV for your bank transfer or PDF for your records. Once the transfer is done, click \"Mark as Paid\"."
+    },
+    "reactivation": {
+      "title": "Patient Reactivation Follow-ups",
+      "step1": "Open the **CRM Dashboard**",
+      "tip1": "The task summary at the top shows counts by type: overdue recalls, dormant patients, and no-shows needing follow-up.",
+      "step2": "Click on a task to take action",
+      "tip2": "You can **Log an Attempt** (add notes + snooze for later) or **Mark Complete** (choose outcome: appointment booked, declined, no response).",
+      "step3": "Send a follow-up message from the task card",
+      "tip3": "Click the email icon on any task card. Setting a follow-up date will automatically snooze the task until that date.",
+      "step4": "For a broader view, go to **Patients** and filter",
+      "tip4": "Use the \"To Contact\" or \"Overdue\" filters to see all patients needing attention, not just those with tasks."
+    },
+    "appointments": {
+      "title": "Check Today's Appointments",
+      "step1": "Open the **CRM Dashboard** and scroll down",
+      "tip1": "Today's scheduled appointments are listed at the bottom with patient names and appointment times."
+    },
+    "sendMessage": {
+      "title": "Send a Message to a Patient",
+      "step1": "Open the patient's profile and click **\"Send Message\"**",
+      "tip1": "You can find any patient using the search bar on the Patients page.",
+      "step2": "Choose your channel and write the message",
+      "tip2": "Select Email, SMS, or log a Phone call. You can use a template or write a custom message.",
+      "step3": "Set a follow-up date (optional) and click **Send**",
+      "tip3": "The message will appear in the Communications log. If linked to a task, it will auto-snooze that task."
+    },
+    "pipeline": {
+      "title": "Manage the Patient Pipeline",
+      "step1": "Go to the **Pipeline** page",
+      "tip1": "Patients are organized in columns by stage: New Lead, Needs Follow-up, Completed, etc.",
+      "step2": "**Drag a patient card** to move them to a new stage",
+      "tip2": "Click on any card to view their full profile. The number of days in each stage is shown on the card."
+    },
+    "campaigns": {
+      "title": "Create a Campaign",
+      "step1": "Go to **Patients** and filter the ones you want to target",
+      "tip1": "Use the filters (To Contact, Overdue, etc.) or search. Then click \"Save Segment\" to save this group.",
+      "step2": "Open **Campaigns** and click \"New Campaign\"",
+      "tip2": "You can open Campaigns using the search bar (Cmd+K) and typing \"Campaigns\".",
+      "step3": "Select the segment, write your message, and send",
+      "tip3": "You can schedule it for later or send immediately. Track delivery and open rates from the campaign detail view."
+    },
+    "assignTask": {
+      "title": "Assign a Task to a Team Member",
+      "step1": "From the **CRM Dashboard**, click the **\"Assign a Task\"** button",
+      "tip1": "It's located in the task section header, next to the task count badges.",
+      "step2": "Fill in the details and assign",
+      "tip2": "Search for a patient, choose the task type (follow-up, reactivation, etc.), set priority and due date, and pick a team member."
+    }
   }
 }

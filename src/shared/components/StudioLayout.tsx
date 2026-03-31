@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { NavGroup } from './NavGroup'
@@ -33,6 +33,7 @@ import {
   ClipboardList,
   Activity,
   Star,
+  HelpCircle,
 } from 'lucide-react'
 
 export function StudioLayout() {
@@ -252,6 +253,13 @@ export function StudioLayout() {
               collapsed={isCollapsed}
               onClick={isMobile ? closeMobile : undefined}
             />
+            <NavItem
+              to="/guide"
+              icon={<HelpCircle className="h-4 w-4" />}
+              label={t('nav.guide', { defaultValue: 'Guide' })}
+              collapsed={isCollapsed}
+              onClick={isMobile ? closeMobile : undefined}
+            />
             {isAdmin && (
               <NavItem
                 to="/admin/audit-trail"
@@ -374,6 +382,9 @@ export function StudioLayout() {
               <Breadcrumb />
             </div>
             <div className="flex items-center gap-2">
+              <Link to="/guide" className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground">
+                <HelpCircle className="h-5 w-5" />
+              </Link>
               <NotificationBell />
             </div>
           </header>
