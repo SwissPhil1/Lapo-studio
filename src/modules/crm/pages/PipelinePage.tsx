@@ -374,7 +374,7 @@ export default function Pipeline() {
         onDragEnd={handleDragEnd}
       >
         <motion.div
-          className="flex gap-4 overflow-x-auto pb-4"
+          className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory lg:snap-none"
           role="region"
           aria-label={t('pipeline:board', { defaultValue: 'Pipeline board' })}
           variants={staggerContainer}
@@ -389,7 +389,7 @@ export default function Pipeline() {
             return (
               <motion.div
                 key={stage.id}
-                className="flex-shrink-0 w-80"
+                className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-80 snap-start"
                 variants={slideUp}
               >
                 {/* Stage Header */}
