@@ -523,7 +523,7 @@ export default function Commissions() {
     },
     {
       key: "status",
-      header: t("common.status", { defaultValue: "Status" }),
+      header: t("common:status", { defaultValue: "Status" }),
       cell: () => (
         <Badge variant="secondary" className="text-xs">
           {t("excludedFromBatch")}

@@ -79,6 +79,8 @@
     "switchLanguage": "Switch to French",
     "all": "All",
     "status": "Status",
+    "type": "Type",
+    "standardType": "Standard",
     "emptyState": {
       "noReferrers": "No referrers yet",
       "noReferrersDesc": "Referrers will appear here once they sign up for your program.",
@@ -889,7 +891,10 @@
       "colLtv": "Lifetime Value",
       "colBookings": "Bookings",
       "colSource": "Source",
-      "colJoined": "Joined"
+      "colJoined": "Joined",
+      "avgLtvPerPatient": "Average LTV per patient",
+      "ltvByGender": "LTV by gender",
+      "ltvByAge": "LTV by age"
     },
     "cac": {
       "overallCac": "Overall CAC",
@@ -1051,6 +1056,96 @@
       "impactAnalytics": "Advanced analytics & reporting",
       "impactRetention": "Patient retention tracking",
       "crmInsight": "The CRM consolidates patient management, communications, and analytics into a single platform — reducing operational overhead and enabling data-driven decisions."
+    },
+    "noShow": {
+      "noShowRate": "No-show rate",
+      "absences": "absences",
+      "cancellationRate": "Cancellation rate",
+      "cancelled": "cancelled",
+      "lostRevenue": "Lost revenue",
+      "byDayOfWeek": "No-shows by day of week",
+      "rate": "Rate",
+      "monthlyTrend": "Monthly trend"
+    },
+    "satisfaction": {
+      "totalResponses": "Total responses",
+      "npsScore": "NPS Score",
+      "avgCsat": "Average CSAT",
+      "responseRate": "Response rate",
+      "npsBreakdown": "NPS Breakdown",
+      "promoters": "Promoters",
+      "passives": "Passives",
+      "detractors": "Detractors",
+      "npsTrend": "NPS Trend",
+      "scoreDistribution": "Score Distribution",
+      "responses": "Responses",
+      "emptyDescription": "NPS and CSAT survey responses will appear here."
+    },
+    "workflow": {
+      "totalEnrolled": "Total enrolled",
+      "completionRate": "Completion rate",
+      "inProgress": "In progress",
+      "avgDuration": "Average duration",
+      "statusBreakdown": "Status breakdown",
+      "byWorkflow": "By workflow"
+    },
+    "churn": {
+      "avgScore": "Average score"
+    },
+    "referral": {
+      "totalReferred": "Total referred",
+      "conversionRate": "Conversion rate",
+      "referralRevenue": "Referral revenue",
+      "avgRevenuePerReferral": "Avg rev. / referral",
+      "conversionFunnel": "Conversion funnel",
+      "top5ReferrersRoi": "Top 5 referrers — ROI",
+      "referred": "referred",
+      "refShort": "ref"
+    },
+    "attribution": {
+      "totalLeads": "Total leads",
+      "converted": "Converted",
+      "conversionRate": "Conversion rate",
+      "trackedPatients": "Tracked patients",
+      "leadsBySource": "Leads by source",
+      "leads": "Leads",
+      "convertedLabel": "Converted",
+      "byChannel": "Distribution by channel",
+      "utmCampaignPerformance": "UTM campaign performance"
+    },
+    "abTest": {
+      "variant": "Variant",
+      "sent": "Sent",
+      "openRate": "Open rate",
+      "clickRate": "Click rate",
+      "distribution": "Distribution",
+      "best": "Best"
+    },
+    "reports": {
+      "groupBy": "Group by",
+      "chartType": "Chart type",
+      "period": "Period",
+      "reportDeleted": "Report deleted",
+      "deleteError": "Error deleting report",
+      "noCustomReports": "No custom reports",
+      "createFirstReport": "Create your first report to get started",
+      "deleteConfirmTitle": "Delete this report?",
+      "deleteConfirmDescription": "This action is irreversible. The report \"{{name}}\" will be permanently deleted.",
+      "unknownSource": "Unknown source",
+      "modified": "Modified"
+    },
+    "bulkActions": {
+      "sendQuickEmail": "Send a quick email",
+      "saveDynamicSegment": "Save as dynamic segment",
+      "saveSegment": "Save as segment",
+      "createTrackedCampaign": "Create a tracked campaign"
+    },
+    "statusTooltip": {
+      "pending": "Commission will be added to next payout batch",
+      "paid": "Commission already included in a payout batch",
+      "cancelledReversed": "This commission is invalid or reversed",
+      "noCommission": "This booking did not generate a commission",
+      "converted": "This commission was converted to LAPO Cash"
     }
   },
   "campaigns": {

@@ -752,7 +752,7 @@ export default function ReferrerDetail() {
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
                       <p className="text-sm">
-                        {referrer.referrer_type_name || "Standard"} · {referrerTypes?.find(t => t.id === referrer.referrer_type_id)?.first_purchase_rate || 0}% {t('referrerDetailPage:firstVisit')} · {referrerTypes?.find(t => t.id === referrer.referrer_type_id)?.repeat_purchase_rate || 0}% {t('referrerDetailPage:repeatVisits')}
+                        {referrer.referrer_type_name || t('common:standardType', { defaultValue: 'Standard' })} · {referrerTypes?.find(t => t.id === referrer.referrer_type_id)?.first_purchase_rate || 0}% {t('referrerDetailPage:firstVisit')} · {referrerTypes?.find(t => t.id === referrer.referrer_type_id)?.repeat_purchase_rate || 0}% {t('referrerDetailPage:repeatVisits')}
                       </p>
                     </TooltipContent>
                   </Tooltip>
