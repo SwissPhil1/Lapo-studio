@@ -542,6 +542,42 @@
       "adjustment": "Ajustement",
       "expiration": "Expiration",
       "other": "Autre"
+    },
+    "patientWallet": {
+      "title": "LAPO Cash",
+      "currentBalance": "Solde",
+      "viewHistory": "Historique",
+      "noWalletYet": "Pas encore de portefeuille",
+      "insufficientBalance": "Solde insuffisant"
+    },
+    "patientTransactionTypes": {
+      "loyalty_credit": "Crédit fidélité",
+      "loyalty_debit": "Débit fidélité",
+      "gift_received": "Cadeau reçu",
+      "birthday_bonus": "Bonus anniversaire",
+      "adjustment": "Ajustement",
+      "redemption": "Échange",
+      "other": "Autre"
+    },
+    "patientCreditDialog": {
+      "title": "Créditer LAPO Cash",
+      "description": "Ajouter du LAPO Cash au portefeuille de {{name}}",
+      "amountLabel": "Montant",
+      "typeLabel": "Type",
+      "descriptionLabel": "Note",
+      "descriptionPlaceholder": "Note optionnelle",
+      "cancel": "Annuler",
+      "submit": "Créditer"
+    },
+    "patientDebitDialog": {
+      "title": "Débiter LAPO Cash",
+      "description": "Retirer du LAPO Cash du portefeuille de {{name}}",
+      "amountLabel": "Montant",
+      "typeLabel": "Type",
+      "descriptionLabel": "Note",
+      "descriptionPlaceholder": "Note optionnelle",
+      "cancel": "Annuler",
+      "submit": "Débiter"
     }
   },
   "prizes": {
