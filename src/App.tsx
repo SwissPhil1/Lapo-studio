@@ -36,6 +36,8 @@ const AnalyticsPage = lazy(() => import('@/modules/crm/pages/AnalyticsPage'))
 const CampaignsPage = lazy(() => import('@/modules/crm/pages/CampaignsPage'))
 const WorkflowsPage = lazy(() => import('@/modules/crm/pages/WorkflowsPage'))
 const StatisticsPage = lazy(() => import('@/modules/crm/pages/StatisticsPage'))
+const SatisfactionPage = lazy(() => import('@/modules/crm/components/satisfaction/SatisfactionPage'))
+const GuidePage = lazy(() => import('@/modules/guide/pages/GuidePage'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -275,6 +277,17 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="crm/satisfaction"
+                  element={
+                    <ProtectedRoute requireCRM>
+                      <SatisfactionPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Guide */}
+                <Route path="guide" element={<GuidePage />} />
 
                 {/* Settings */}
                 <Route path="settings" element={<SettingsPage />} />

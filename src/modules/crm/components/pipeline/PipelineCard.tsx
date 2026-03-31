@@ -89,7 +89,7 @@ export const PipelineCard = forwardRef<HTMLDivElement, PipelineCardProps>(
         aria-roledescription={t('common.accessibility.pipelineCard')}
         aria-label={`${patientName}${priorityLabel ? `, ${priorityLabel}` : ''}, ${daysLabel}`}
         className={cn(
-          'bg-card border border-border rounded-lg p-4 cursor-pointer hover:shadow-md transition-all',
+          'bg-card border border-border rounded-lg p-4 cursor-pointer hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-200',
           'focus-within:ring-2 focus-within:ring-ring',
           isDragging && 'opacity-50 shadow-lg ring-2 ring-primary'
         )}

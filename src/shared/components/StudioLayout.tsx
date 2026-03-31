@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { NavGroup } from './NavGroup'
@@ -32,6 +32,8 @@ import {
   Zap,
   ClipboardList,
   Activity,
+  Star,
+  HelpCircle,
 } from 'lucide-react'
 
 export function StudioLayout() {
@@ -226,6 +228,13 @@ export function StudioLayout() {
                 onClick={isMobile ? closeMobile : undefined}
               />
               <NavItem
+                to="/crm/satisfaction"
+                icon={<Star className="h-4 w-4" />}
+                label={t('nav.satisfaction', { defaultValue: 'Satisfaction' })}
+                collapsed={isCollapsed}
+                onClick={isMobile ? closeMobile : undefined}
+              />
+              <NavItem
                 to="/crm/workflows"
                 icon={<Zap className="h-4 w-4" />}
                 label={t('nav.workflows')}
@@ -241,6 +250,13 @@ export function StudioLayout() {
               to="/settings"
               icon={<Settings className="h-4 w-4" />}
               label={t('nav.settings')}
+              collapsed={isCollapsed}
+              onClick={isMobile ? closeMobile : undefined}
+            />
+            <NavItem
+              to="/guide"
+              icon={<HelpCircle className="h-4 w-4" />}
+              label={t('nav.guide', { defaultValue: 'Guide' })}
               collapsed={isCollapsed}
               onClick={isMobile ? closeMobile : undefined}
             />
@@ -366,6 +382,9 @@ export function StudioLayout() {
               <Breadcrumb />
             </div>
             <div className="flex items-center gap-2">
+              <Link to="/guide" className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground">
+                <HelpCircle className="h-5 w-5" />
+              </Link>
               <NotificationBell />
             </div>
           </header>

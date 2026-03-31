@@ -9,7 +9,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useReactivationTaskCounts, useReactivationTasks } from '@/shared/hooks/useReactivationTasks';
 import { ReactivationTaskCard } from '@/modules/crm/components/tasks/ReactivationTaskCard';
 import { CreateTaskDialog } from '@/modules/crm/components/tasks/CreateTaskDialog';
+import { TaskAssignmentDialog } from '@/modules/crm/components/tasks/TaskAssignmentDialog';
 import { ActivityFeedWidget } from '@/modules/crm/components/dashboard/ActivityFeedWidget';
+import { SatisfactionWidget } from '@/modules/crm/components/satisfaction/SatisfactionWidget';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, subMonths, subWeeks } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import { enUS } from 'date-fns/locale';
@@ -39,7 +41,7 @@ function StatCard({ title, value, icon, subtitle, onClick, variant = 'default', 
 
   return (
     <div
-      className={`card-elevated p-6 ${bgClass} ${onClick ? 'cursor-pointer hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg' : ''}`}
+      className={`card-elevated p-6 ${bgClass} transition-all duration-200 ${onClick ? 'cursor-pointer hover:bg-muted/50 hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg' : 'hover:border-border/80'}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -319,7 +321,7 @@ export default function Dashboard() {
 
 
       {/* Stats Grid */}
-      <MotionList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <MotionList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MotionItem>
           <StatCard
             title={t('crmDashboard:activePatients')}
@@ -393,6 +395,7 @@ export default function Dashboard() {
                 </span>
               )}
             </div>
+            <TaskAssignmentDialog />
             <CreateTaskDialog />
           </div>
         </div>
@@ -477,11 +480,14 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Activity Feed */}
-      <ActivityFeedWidget 
-        limit={20} 
-        collapsedLimit={5} 
+      <ActivityFeedWidget
+        limit={20}
+        collapsedLimit={5}
         showHeader={true}
       />
+
+      {/* NPS / Satisfaction */}
+      <SatisfactionWidget />
 
     </div>
   );

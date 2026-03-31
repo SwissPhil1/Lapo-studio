@@ -2194,5 +2194,75 @@
       "showDetails": "Afficher les details",
       "hideDetails": "Masquer les details"
     }
+  },
+  "guide": {
+    "title": "Guide du personnel",
+    "subtitle": "Instructions etape par etape pour vos taches quotidiennes",
+    "goThere": "Y aller",
+    "tip": "Conseil",
+    "tabs": {
+      "weekly": "Hebdomadaire",
+      "daily": "Quotidien",
+      "asNeeded": "Au besoin"
+    },
+    "commissions": {
+      "title": "Verifier et payer les commissions des referents",
+      "step1": "Allez sur la page **Commissions**",
+      "tip1": "Vous verrez 3 onglets : A payer, Bloques et Retenus pour LAPO Cash. Les cartes KPI en haut montrent un resume rapide des montants.",
+      "step2": "Verifiez l'onglet **Bloques**",
+      "tip2": "Ces referents ont des informations bancaires manquantes. Cliquez sur \"Envoyer un rappel\" pour les notifier. Limite : 1 rappel par 7 jours.",
+      "step3": "Allez sur la page **Paiements** et cliquez sur \"Cloturer le lot en cours\"",
+      "tip3": "Cela verrouille les commissions payables de cette semaine. Un nouveau lot vide est automatiquement cree pour la semaine suivante.",
+      "step4": "Ouvrez le lot cloture, exportez et marquez comme paye",
+      "tip4": "Cliquez sur le lot pour l'ouvrir. Exportez en CSV pour votre virement bancaire ou en PDF pour vos archives. Une fois le virement effectue, cliquez sur \"Marquer comme paye\"."
+    },
+    "reactivation": {
+      "title": "Suivi de reactivation des patients",
+      "step1": "Ouvrez le **Tableau de bord CRM**",
+      "tip1": "Le resume des taches en haut affiche les compteurs par type : rappels en retard, patients inactifs et no-shows a suivre.",
+      "step2": "Cliquez sur une tache pour agir",
+      "tip2": "Vous pouvez **Enregistrer une tentative** (ajouter des notes + reporter a plus tard) ou **Marquer comme termine** (choisir le resultat : rendez-vous pris, refuse, pas de reponse).",
+      "step3": "Envoyez un message de suivi depuis la carte de tache",
+      "tip3": "Cliquez sur l'icone email de la carte. Definir une date de suivi reporte automatiquement la tache a cette date.",
+      "step4": "Pour une vue plus large, allez dans **Patients** et filtrez",
+      "tip4": "Utilisez les filtres \"A contacter\" ou \"En retard\" pour voir tous les patients necessitant une attention, pas seulement ceux avec des taches."
+    },
+    "appointments": {
+      "title": "Verifier les rendez-vous du jour",
+      "step1": "Ouvrez le **Tableau de bord CRM** et faites defiler vers le bas",
+      "tip1": "Les rendez-vous programmes du jour sont listes en bas avec les noms des patients et les horaires."
+    },
+    "sendMessage": {
+      "title": "Envoyer un message a un patient",
+      "step1": "Ouvrez le profil du patient et cliquez sur **\"Envoyer un message\"**",
+      "tip1": "Vous pouvez trouver n'importe quel patient en utilisant la barre de recherche sur la page Patients.",
+      "step2": "Choisissez votre canal et redigez le message",
+      "tip2": "Selectionnez Email, SMS ou enregistrez un appel telephonique. Vous pouvez utiliser un modele ou ecrire un message personnalise.",
+      "step3": "Definissez une date de suivi (optionnel) et cliquez sur **Envoyer**",
+      "tip3": "Le message apparaitra dans le journal de communications. S'il est lie a une tache, celle-ci sera automatiquement reportee."
+    },
+    "pipeline": {
+      "title": "Gerer le pipeline patient",
+      "step1": "Allez sur la page **Pipeline**",
+      "tip1": "Les patients sont organises en colonnes par etape : Nouveau lead, A suivre, Termine, etc.",
+      "step2": "**Glissez une carte patient** pour la deplacer vers une nouvelle etape",
+      "tip2": "Cliquez sur une carte pour voir le profil complet. Le nombre de jours dans chaque etape est affiche sur la carte."
+    },
+    "campaigns": {
+      "title": "Creer une campagne",
+      "step1": "Allez dans **Patients** et filtrez ceux que vous souhaitez cibler",
+      "tip1": "Utilisez les filtres (A contacter, En retard, etc.) ou la recherche. Puis cliquez sur \"Sauvegarder le segment\" pour enregistrer ce groupe.",
+      "step2": "Ouvrez **Campagnes** et cliquez sur \"Nouvelle campagne\"",
+      "tip2": "Vous pouvez ouvrir Campagnes avec la barre de recherche (Cmd+K) en tapant \"Campagnes\".",
+      "step3": "Selectionnez le segment, redigez votre message et envoyez",
+      "tip3": "Vous pouvez programmer l'envoi pour plus tard ou envoyer immediatement. Suivez les taux de livraison et d'ouverture depuis la vue detail."
+    },
+    "assignTask": {
+      "title": "Assigner une tache a un membre de l'equipe",
+      "step1": "Depuis le **Tableau de bord CRM**, cliquez sur le bouton **\"Assigner une tache\"**",
+      "tip1": "Il se trouve dans l'en-tete de la section taches, a cote des badges de comptage.",
+      "step2": "Remplissez les details et assignez",
+      "tip2": "Cherchez un patient, choisissez le type de tache (suivi, reactivation, etc.), definissez la priorite et la date d'echeance, et selectionnez un membre de l'equipe."
+    }
   }
 }
