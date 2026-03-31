@@ -10,7 +10,7 @@ interface ReferralAnalyticsProps {
 }
 
 export function ReferralAnalytics({ dateRange }: ReferralAnalyticsProps) {
-  const { t } = useTranslation(['analytics']);
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['referral-analytics', dateRange],
     queryFn: async () => {
@@ -97,7 +97,7 @@ export function ReferralAnalytics({ dateRange }: ReferralAnalyticsProps) {
   if (!data) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        {t('analytics:noDataAvailable')}
+        {t('analytics.noDataAvailable', { defaultValue: 'No data available' })}
       </div>
     );
   }
@@ -109,28 +109,28 @@ export function ReferralAnalytics({ dateRange }: ReferralAnalyticsProps) {
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Users className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold text-foreground">{data.totalReferrals}</p>
-          <p className="text-sm text-muted-foreground">Total référés</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.referral.totalReferred', { defaultValue: 'Total referred' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <TrendingUp className="h-5 w-5 mx-auto text-success mb-2" />
           <p className="text-2xl font-bold text-foreground">{data.conversionRate}%</p>
-          <p className="text-sm text-muted-foreground">Taux conversion</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.referral.conversionRate', { defaultValue: 'Conversion rate' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Banknote className="h-5 w-5 mx-auto text-primary mb-2" />
           <p className="text-2xl font-bold text-foreground">{formatCurrency(data.referralRevenue)}</p>
-          <p className="text-sm text-muted-foreground">Revenus parrainés</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.referral.referralRevenue', { defaultValue: 'Referral revenue' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-4 text-center">
           <Banknote className="h-5 w-5 mx-auto text-success mb-2" />
           <p className="text-2xl font-bold text-foreground">{formatCurrency(data.avgRevenuePerReferral)}</p>
-          <p className="text-sm text-muted-foreground">Rev. moy / référé</p>
+          <p className="text-sm text-muted-foreground">{t('analytics.referral.avgRevenuePerReferral', { defaultValue: 'Avg rev. / referral' })}</p>
         </div>
       </div>
 
       {/* Funnel Chart */}
       <div>
-        <h4 className="text-sm font-medium text-muted-foreground mb-3">Entonnoir de conversion</h4>
+        <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.referral.conversionFunnel', { defaultValue: 'Conversion funnel' })}</h4>
         <ResponsiveContainer width="100%" height={150}>
           <BarChart data={data.funnelData} layout="vertical">
             <XAxis type="number" hide />
@@ -160,15 +160,15 @@ export function ReferralAnalytics({ dateRange }: ReferralAnalyticsProps) {
       {/* Top Referrers with ROI */}
       {data.topReferrers.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Top 5 parrains — ROI</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.referral.top5ReferrersRoi', { defaultValue: 'Top 5 referrers — ROI' })}</h4>
           <div className="space-y-2">
             {data.topReferrers.map((ref, i) => (
               <div key={i} className="flex items-center justify-between bg-secondary/30 rounded-lg px-3 py-2">
                 <span className="text-sm font-medium text-foreground">{ref.code}</span>
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="text-muted-foreground">{ref.count} référés</span>
+                  <span className="text-muted-foreground">{ref.count} {t('analytics.referral.referred', { defaultValue: 'referred' })}</span>
                   <span className="text-success font-medium">{formatCurrency(ref.revenue)}</span>
-                  <span className="text-xs text-muted-foreground">~{formatCurrency(ref.avgValue)}/réf</span>
+                  <span className="text-xs text-muted-foreground">~{formatCurrency(ref.avgValue)}/{t('analytics.referral.refShort', { defaultValue: 'ref' })}</span>
                 </div>
               </div>
             ))}

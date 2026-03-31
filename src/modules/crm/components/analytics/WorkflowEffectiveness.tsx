@@ -10,7 +10,7 @@ interface WorkflowEffectivenessProps {
 }
 
 export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps) {
-  const { t } = useTranslation(['analytics']);
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['workflow-effectiveness', dateRange],
     queryFn: async () => {
@@ -99,7 +99,7 @@ export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps)
   if (!data || data.total === 0) {
     return (
       <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        {t('analytics:noActiveWorkflows')}
+        {t('analytics.noActiveWorkflows', { defaultValue: 'No active workflows' })}
       </div>
     );
   }
@@ -111,29 +111,29 @@ export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps)
         <div className="bg-secondary/50 rounded-lg p-3 text-center">
           <Zap className="h-4 w-4 mx-auto text-primary mb-1" />
           <p className="text-xl font-bold text-foreground">{data.total}</p>
-          <p className="text-xs text-muted-foreground">Total inscrits</p>
+          <p className="text-xs text-muted-foreground">{t('analytics.workflow.totalEnrolled', { defaultValue: 'Total enrolled' })}</p>
         </div>
         <div className="bg-success/10 rounded-lg p-3 text-center">
           <CheckCircle className="h-4 w-4 mx-auto text-success mb-1" />
           <p className="text-xl font-bold text-foreground">{data.completionRate}%</p>
-          <p className="text-xs text-muted-foreground">Taux complétion</p>
+          <p className="text-xs text-muted-foreground">{t('analytics.workflow.completionRate', { defaultValue: 'Completion rate' })}</p>
         </div>
         <div className="bg-primary/10 rounded-lg p-3 text-center">
           <Clock className="h-4 w-4 mx-auto text-primary mb-1" />
           <p className="text-xl font-bold text-foreground">{data.activeCount}</p>
-          <p className="text-xs text-muted-foreground">En cours</p>
+          <p className="text-xs text-muted-foreground">{t('analytics.workflow.inProgress', { defaultValue: 'In progress' })}</p>
         </div>
         <div className="bg-secondary/50 rounded-lg p-3 text-center">
           <Clock className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
           <p className="text-xl font-bold text-foreground">{data.avgCompletionDays}j</p>
-          <p className="text-xs text-muted-foreground">Durée moyenne</p>
+          <p className="text-xs text-muted-foreground">{t('analytics.workflow.avgDuration', { defaultValue: 'Average duration' })}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         {/* Status Pie */}
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Répartition par statut</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.workflow.statusBreakdown', { defaultValue: 'Status breakdown' })}</h4>
           <ResponsiveContainer width="100%" height={150}>
             <PieChart>
               <Pie
@@ -170,7 +170,7 @@ export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps)
 
         {/* By Workflow */}
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Par workflow</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{t('analytics.workflow.byWorkflow', { defaultValue: 'By workflow' })}</h4>
           {data.workflowData.length > 0 ? (
             <div className="space-y-2">
               {data.workflowData.map((wf, i) => (
@@ -189,7 +189,7 @@ export function WorkflowEffectiveness({ dateRange }: WorkflowEffectivenessProps)
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">{t('analytics:noWorkflows')}</p>
+            <p className="text-sm text-muted-foreground">{t('analytics.noWorkflows', { defaultValue: 'No workflows' })}</p>
           )}
         </div>
       </div>
