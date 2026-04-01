@@ -128,12 +128,21 @@ SET balance = lapo_cash_wallets.balance + EXCLUDED.balance;
 DROP TABLE IF EXISTS patient_lapo_cash_transactions;
 DROP TABLE IF EXISTS patient_lapo_cash_balances;
 
--- 6. Update RLS policies (adjust to your existing policy names)
-CREATE POLICY "staff_full_access" ON lapo_cash_wallets
-  FOR ALL TO authenticated
-  USING (current_actor_type() = 'staff');
+-- 6. RLS policies — restored original has_role() pattern
+-- (current_actor_type() GUC is not set by Supabase client, so we use has_role instead)
+CREATE POLICY "Admins can view all wallets" ON lapo_cash_wallets
+  FOR SELECT TO authenticated
+  USING (has_role(auth.uid(), 'admin'));
 
-CREATE POLICY "referrer_read_own" ON lapo_cash_wallets
+CREATE POLICY "Admins can create wallets" ON lapo_cash_wallets
+  FOR INSERT TO authenticated
+  WITH CHECK (has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can update wallets" ON lapo_cash_wallets
+  FOR UPDATE TO authenticated
+  USING (has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Referrers can view own wallet" ON lapo_cash_wallets
   FOR SELECT TO authenticated
   USING (referrer_id = current_referrer_id());
 
