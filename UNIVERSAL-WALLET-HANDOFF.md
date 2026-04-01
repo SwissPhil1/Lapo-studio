@@ -69,11 +69,11 @@ Unified the LAPO Cash wallet system from a dual-table architecture (referrer wal
 
 ---
 
-## What Still Needs to Happen (BEFORE deployment)
+## Database Migration — COMPLETED
 
-### Phase 0: Database Migration (Supabase Dashboard)
+### Phase 0: Database Migration (Supabase Dashboard) — DONE
 
-These SQL changes must run BEFORE deploying the frontend:
+All steps below have been executed successfully. Kept here for reference:
 
 ```sql
 -- 1. Add patient_id column (nullable first so we can backfill)
