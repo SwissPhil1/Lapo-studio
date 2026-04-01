@@ -76,7 +76,11 @@ Unified the LAPO Cash wallet system from a dual-table architecture (referrer wal
 These SQL changes must run BEFORE deploying the frontend:
 
 ```sql
--- 1. Backfill patient_id on existing wallets
+-- 1. Add patient_id column (nullable first so we can backfill)
+ALTER TABLE lapo_cash_wallets
+  ADD COLUMN IF NOT EXISTS patient_id uuid REFERENCES patients(id);
+
+-- 2. Backfill patient_id on existing wallets from referrers table
 UPDATE lapo_cash_wallets w
 SET patient_id = r.patient_id
 FROM referrers r
@@ -84,7 +88,7 @@ WHERE w.referrer_id = r.id
   AND w.patient_id IS NULL
   AND r.patient_id IS NOT NULL;
 
--- 2. Make referrer_id nullable, patient_id required + unique
+-- 3. Make referrer_id nullable, patient_id required + unique
 ALTER TABLE lapo_cash_wallets
   ALTER COLUMN referrer_id DROP NOT NULL;
 
@@ -94,7 +98,7 @@ ALTER TABLE lapo_cash_wallets
 ALTER TABLE lapo_cash_wallets
   ADD CONSTRAINT lapo_cash_wallets_patient_id_key UNIQUE (patient_id);
 
--- 3. Auto-populate trigger for Edge Function compatibility
+-- 4. Auto-populate trigger for Edge Function compatibility
 CREATE OR REPLACE FUNCTION populate_wallet_patient_id()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -111,7 +115,7 @@ CREATE TRIGGER trg_wallet_patient_id
   FOR EACH ROW
   EXECUTE FUNCTION populate_wallet_patient_id();
 
--- 4. Migrate patient_lapo_cash_balances data (if table exists)
+-- 5. Migrate patient_lapo_cash_balances data (if table exists)
 INSERT INTO lapo_cash_wallets (patient_id, balance)
 SELECT patient_id, balance
 FROM patient_lapo_cash_balances
@@ -124,7 +128,7 @@ SET balance = lapo_cash_wallets.balance + EXCLUDED.balance;
 DROP TABLE IF EXISTS patient_lapo_cash_transactions;
 DROP TABLE IF EXISTS patient_lapo_cash_balances;
 
--- 5. Update RLS policies (adjust to your existing policy names)
+-- 6. Update RLS policies (adjust to your existing policy names)
 CREATE POLICY "staff_full_access" ON lapo_cash_wallets
   FOR ALL TO authenticated
   USING (current_actor_type() = 'staff');
@@ -133,7 +137,7 @@ CREATE POLICY "referrer_read_own" ON lapo_cash_wallets
   FOR SELECT TO authenticated
   USING (referrer_id = current_referrer_id());
 
--- 6. Update create_referrer_account() to use ON CONFLICT pattern
+-- 7. Update create_referrer_account() to use ON CONFLICT pattern
 -- instead of transferring balance between tables:
 --   IF wallet exists for patient_id: UPDATE SET referrer_id = new_referrer_id
 --   IF wallet does not exist: INSERT (patient_id, referrer_id, balance=0)
