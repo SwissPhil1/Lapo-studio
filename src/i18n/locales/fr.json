@@ -548,9 +548,7 @@
       "currentBalance": "Solde",
       "viewHistory": "Historique",
       "noWalletYet": "Pas encore de portefeuille",
-      "insufficientBalance": "Solde insuffisant",
-      "ambassadorAccount": "Ambassadeur",
-      "patientAccount": "Patient"
+      "insufficientBalance": "Solde insuffisant"
     },
     "patientTransactionTypes": {
       "loyalty_credit": "Crédit fidélité",

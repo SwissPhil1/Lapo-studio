@@ -548,9 +548,7 @@
       "currentBalance": "Balance",
       "viewHistory": "History",
       "noWalletYet": "No wallet yet",
-      "insufficientBalance": "Insufficient balance",
-      "ambassadorAccount": "Ambassador",
-      "patientAccount": "Patient"
+      "insufficientBalance": "Insufficient balance"
     },
     "patientTransactionTypes": {
       "loyalty_credit": "Loyalty Credit",

@@ -5,12 +5,21 @@ import { useTranslation } from "react-i18next";
 
 export interface LapoCashWallet {
   id: string;
-  referrer_id: string;
-  patient_id?: string | null;
+  referrer_id: string | null;
+  patient_id: string;
   balance: number;
   created_at: string;
   updated_at: string;
 }
+
+export type PatientTransactionType =
+  | "loyalty_credit"
+  | "loyalty_debit"
+  | "gift_received"
+  | "birthday_bonus"
+  | "adjustment"
+  | "redemption"
+  | "other";
 
 export interface LapoCashTransaction {
   id: string;
@@ -56,6 +65,26 @@ export function useLapoCashWallet(referrerId: string | undefined) {
   });
 }
 
+// Fetch wallet for a specific patient (universal wallet lookup)
+export function useLapoCashWalletByPatient(patientId: string | undefined) {
+  return useQuery({
+    queryKey: ["lapo-cash-wallet", patientId],
+    queryFn: async () => {
+      if (!patientId) return null;
+
+      const { data, error } = await supabase
+        .from("lapo_cash_wallets")
+        .select("*")
+        .eq("patient_id", patientId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as LapoCashWallet | null;
+    },
+    enabled: !!patientId,
+  });
+}
+
 // Fetch all wallets with referrer info
 export function useAllLapoCashWallets() {
   return useQuery({
@@ -65,7 +94,8 @@ export function useAllLapoCashWallets() {
         .from("lapo_cash_wallets")
         .select(`
           *,
-          referrers(referrer_code, email, patient_id, patients(first_name, last_name))
+          patients!lapo_cash_wallets_patient_id_fkey(first_name, last_name),
+          referrers(referrer_code, email)
         `)
         .gt("balance", 0)
         .order("balance", { ascending: false });
@@ -107,20 +137,22 @@ export function useAllLapoCashTransactions(limit = 50) {
           *,
           lapo_cash_wallets(
             referrer_id,
-            referrers(referrer_code, patient_id, patients!referrers_patient_id_fkey(first_name, last_name))
+            patient_id,
+            patients!lapo_cash_wallets_patient_id_fkey(first_name, last_name),
+            referrers(referrer_code)
           )
         `)
         .order("created_at", { ascending: false })
         .limit(limit);
-      
+
       if (error) throw error;
-      
+
       // Transform to include referrer info at top level
       return data.map((tx: any) => ({
         ...tx,
         referrer_id: tx.lapo_cash_wallets?.referrer_id,
-        referrer_name: tx.lapo_cash_wallets?.referrers?.patients 
-          ? `${tx.lapo_cash_wallets.referrers.patients.first_name} ${tx.lapo_cash_wallets.referrers.patients.last_name}`
+        referrer_name: tx.lapo_cash_wallets?.patients
+          ? `${tx.lapo_cash_wallets.patients.first_name} ${tx.lapo_cash_wallets.patients.last_name}`
           : null,
         referrer_code: tx.lapo_cash_wallets?.referrers?.referrer_code,
       })) as LapoCashTransaction[];
@@ -311,6 +343,98 @@ export function useLapoCashMutation() {
       queryClient.invalidateQueries({ queryKey: ["lapo-cash-stats"] });
       
       toast.success(variables.amount > 0 ? t("toast.creditSuccess") : t("toast.debitSuccess"));
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t("toast.error"));
+    },
+  });
+}
+
+// Credit/Debit LAPO Cash for a patient (universal wallet, direct Supabase)
+export function useLapoCashMutationByPatient() {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation("lapoCash");
+
+  return useMutation({
+    mutationFn: async ({
+      patientId,
+      amount,
+      type,
+      description,
+      existingWalletId,
+    }: {
+      patientId: string;
+      amount: number;
+      type: PatientTransactionType;
+      description?: string;
+      existingWalletId?: string;
+    }) => {
+      let wallet: { id: string; balance: number } | null = null;
+
+      if (existingWalletId) {
+        const { data } = await supabase
+          .from("lapo_cash_wallets")
+          .select("id, balance")
+          .eq("id", existingWalletId)
+          .single();
+        wallet = data;
+      }
+
+      if (!wallet) {
+        const { data: newWallet, error: createError } = await supabase
+          .from("lapo_cash_wallets")
+          .insert({ patient_id: patientId, balance: 0 })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        wallet = newWallet;
+      }
+
+      const newBalance = (wallet!.balance || 0) + amount;
+
+      if (newBalance < 0) {
+        throw new Error("Insufficient LAPO Cash balance");
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const { error: txError } = await supabase
+        .from("lapo_cash_transactions")
+        .insert({
+          wallet_id: wallet!.id,
+          amount,
+          type,
+          description: description || null,
+          performed_by: user?.id || null,
+        });
+
+      if (txError) throw txError;
+
+      const { error: updateError } = await supabase
+        .from("lapo_cash_wallets")
+        .update({ balance: newBalance, updated_at: new Date().toISOString() })
+        .eq("id", wallet!.id);
+
+      if (updateError) throw updateError;
+
+      return { newBalance };
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["lapo-cash-wallet", variables.patientId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["lapo-cash-wallets-all"] });
+      queryClient.invalidateQueries({
+        queryKey: ["lapo-cash-transactions-all"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["lapo-cash-stats"] });
+
+      toast.success(
+        variables.amount > 0 ? t("toast.creditSuccess") : t("toast.debitSuccess")
+      );
     },
     onError: (error: Error) => {
       toast.error(error.message || t("toast.error"));
