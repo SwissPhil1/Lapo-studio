@@ -49,7 +49,7 @@ import { usePayoutProfileStatus } from "@/shared/hooks/usePayoutProfileStatus";
 import { formatDate as formatDateSimple } from "date-fns";
 import { getTierBadgeStyles } from "@/shared/lib/referrerTierBadge";
 import { LapoCashReferrerCard } from "@/modules/admin/components/LapoCashReferrerCard";
-import { useLapoCashWallet, useLapoCashTransactions } from "@/shared/hooks/useLapoCashWallet";
+import { useLapoCashWalletByPatient, useLapoCashTransactions } from "@/shared/hooks/useLapoCashWallet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "react-i18next";
 
@@ -113,20 +113,20 @@ interface LapoCashTx {
 
 // Transactions Tabs Component
 function TransactionsTabs({
-  referrerId,
+  patientId,
   referrals,
   referralsLoading,
   referralColumns,
   onReferralClick,
 }: {
-  referrerId: string;
+  patientId: string;
   referrals: ReferralRow[];
   referralsLoading: boolean;
   referralColumns: Column<ReferralRow>[];
   onReferralClick: (row: ReferralRow) => void;
 }) {
   const { t } = useTranslation(['referrerDetailPage', 'common']);
-  const { data: wallet } = useLapoCashWallet(referrerId);
+  const { data: wallet } = useLapoCashWalletByPatient(patientId);
   const { data: lapoCashTransactions, isLoading: lapoCashLoading } = useLapoCashTransactions(wallet?.id);
 
   const lapoCashColumns: Column<LapoCashTx>[] = [
@@ -953,6 +953,7 @@ export default function ReferrerDetail() {
           <LapoCashReferrerCard
             referrerId={referrer.id}
             referrerName={referrer.patient_name || referrer.email}
+            patientId={referrer.patient_id!}
           />
         </div>
         <div className="grid gap-4 md:grid-cols-4 mb-8">
@@ -1011,8 +1012,8 @@ export default function ReferrerDetail() {
         </div>
 
         {/* Transactions Tabs - Commissions & LAPO Cash */}
-        <TransactionsTabs 
-          referrerId={referrer.id}
+        <TransactionsTabs
+          patientId={referrer.patient_id!}
           referrals={referrals || []}
           referralsLoading={referralsLoading}
           referralColumns={referralColumns}

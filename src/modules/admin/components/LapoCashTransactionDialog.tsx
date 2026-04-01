@@ -32,6 +32,7 @@ interface LapoCashTransactionDialogProps {
   type: TransactionType;
   referrerId: string;
   referrerName: string;
+  patientId?: string;
   walletId?: string;
   currentBalance?: number;
 }
@@ -51,6 +52,7 @@ export function LapoCashTransactionDialog({
   type,
   referrerId,
   referrerName,
+  patientId,
   walletId,
   currentBalance = 0,
 }: LapoCashTransactionDialogProps) {
@@ -119,6 +121,10 @@ export function LapoCashTransactionDialog({
     onSuccess: () => {
       toast.success(t(isCredit ? "toast.creditSuccess" : "toast.debitSuccess"));
       queryClient.invalidateQueries({ queryKey: ["lapo-cash-wallet", referrerId] });
+      if (patientId) {
+        queryClient.invalidateQueries({ queryKey: ["lapo-cash-wallet", patientId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["lapo-cash-wallets-all"] });
       queryClient.invalidateQueries({ queryKey: ["lapo-cash-transactions"] });
       queryClient.invalidateQueries({ queryKey: ["lapo-cash-stats"] });
       onOpenChange(false);

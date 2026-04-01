@@ -4,17 +4,18 @@ import { Gift, Plus, Minus, History } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatLapoCash, formatDate } from "@/shared/lib/format";
-import { useLapoCashWallet, useLapoCashTransactions, useReferrerConversionRate } from "@/shared/hooks/useLapoCashWallet";
+import { useLapoCashWalletByPatient, useLapoCashTransactions, useReferrerConversionRate } from "@/shared/hooks/useLapoCashWallet";
 import { LapoCashTransactionDialog } from "./LapoCashTransactionDialog";
 
 interface LapoCashReferrerCardProps {
   referrerId: string;
   referrerName: string;
+  patientId: string;
 }
 
-export function LapoCashReferrerCard({ referrerId, referrerName }: LapoCashReferrerCardProps) {
+export function LapoCashReferrerCard({ referrerId, referrerName, patientId }: LapoCashReferrerCardProps) {
   const { t } = useTranslation("lapoCash");
-  const { data: wallet, isLoading } = useLapoCashWallet(referrerId);
+  const { data: wallet, isLoading } = useLapoCashWalletByPatient(patientId);
   const { data: transactions } = useLapoCashTransactions(wallet?.id);
   const { data: rateInfo } = useReferrerConversionRate(referrerId);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
@@ -126,6 +127,7 @@ export function LapoCashReferrerCard({ referrerId, referrerName }: LapoCashRefer
         type="credit"
         referrerId={referrerId}
         referrerName={referrerName}
+        patientId={patientId}
         walletId={wallet?.id}
         currentBalance={balance}
       />
@@ -136,6 +138,7 @@ export function LapoCashReferrerCard({ referrerId, referrerName }: LapoCashRefer
         type="debit"
         referrerId={referrerId}
         referrerName={referrerName}
+        patientId={patientId}
         walletId={wallet?.id}
         currentBalance={balance}
       />

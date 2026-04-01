@@ -4,8 +4,7 @@ import { Gift, Plus, Minus, History } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatLapoCash, formatDate } from "@/shared/lib/format";
-import { usePatientLapoCashWallet } from "@/shared/hooks/usePatientLapoCashWallet";
-import { useLapoCashTransactions } from "@/shared/hooks/useLapoCashWallet";
+import { useLapoCashWalletByPatient, useLapoCashTransactions } from "@/shared/hooks/useLapoCashWallet";
 import { LapoCashPatientTransactionDialog } from "./LapoCashPatientTransactionDialog";
 
 interface LapoCashPatientCardProps {
@@ -15,7 +14,7 @@ interface LapoCashPatientCardProps {
 
 export function LapoCashPatientCard({ patientId, patientName }: LapoCashPatientCardProps) {
   const { t } = useTranslation("lapoCash");
-  const { data: wallet, isLoading } = usePatientLapoCashWallet(patientId);
+  const { data: wallet, isLoading } = useLapoCashWalletByPatient(patientId);
   const { data: transactions } = useLapoCashTransactions(wallet?.id);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
   const [debitDialogOpen, setDebitDialogOpen] = useState(false);

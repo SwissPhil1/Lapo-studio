@@ -203,12 +203,15 @@ export function CommandPalette() {
     setSearchingPatients(true)
     searchTimeoutRef.current = setTimeout(async () => {
       const q = query.trim()
+      const digitsOnly = q.replace(/\D/g, '')
+      let orConditions = `first_name.ilike.%${q}%,last_name.ilike.%${q}%,full_name.ilike.%${q}%,email.ilike.%${q}%`
+      if (digitsOnly.length >= 3) {
+        orConditions += `,phone.ilike.%${digitsOnly}%,normalized_phone.ilike.%${digitsOnly}%`
+      }
       const { data } = await supabase
         .from('patients')
         .select('id, first_name, last_name, email, phone, date_of_birth')
-        .or(
-          `first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%,date_of_birth.ilike.%${q}%`
-        )
+        .or(orConditions)
         .limit(8)
 
       setPatientResults(data || [])
