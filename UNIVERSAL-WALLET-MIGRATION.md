@@ -35,7 +35,28 @@ ALTER TABLE lapo_cash_wallets
 -- 3. Add unique constraint on patient_id (one wallet per patient)
 ALTER TABLE lapo_cash_wallets
   ADD CONSTRAINT lapo_cash_wallets_patient_id_unique UNIQUE (patient_id);
+
+-- 4. CRITICAL: Trigger to auto-populate patient_id when Edge Functions
+--    create wallets with only referrer_id (so the NOT NULL / unique
+--    constraint is always satisfied)
+CREATE OR REPLACE FUNCTION populate_wallet_patient_id()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.patient_id IS NULL AND NEW.referrer_id IS NOT NULL THEN
+    SELECT patient_id INTO NEW.patient_id
+    FROM referrers WHERE id = NEW.referrer_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_wallet_patient_id
+  BEFORE INSERT ON lapo_cash_wallets
+  FOR EACH ROW
+  EXECUTE FUNCTION populate_wallet_patient_id();
 ```
+
+> **Why the trigger?** The Edge Functions (`credit-lapo-cash`, `redeem-lapo-cash`) create wallets with only `referrer_id`. Without this trigger, those inserts would fail the `patient_id NOT NULL` constraint. The trigger auto-resolves `referrer_id → patient_id` on every insert.
 
 After migration, every wallet has a `patient_id`. The `referrer_id` stays populated on existing wallets for backwards compatibility with Edge Functions.
 
