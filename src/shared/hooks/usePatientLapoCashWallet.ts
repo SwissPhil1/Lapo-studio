@@ -13,27 +13,68 @@ export type PatientTransactionType =
   | "redemption"
   | "other";
 
-// Fetch wallet for a specific patient
+export type WalletSource = "patient" | "referrer";
+
+export interface PatientWalletResult {
+  wallet: LapoCashWallet | null;
+  source: WalletSource;
+  referrerId?: string;
+}
+
+// Fetch wallet for a patient: first check patient_id, then check if patient is a referrer
 export function usePatientLapoCashWallet(patientId: string | undefined) {
   return useQuery({
     queryKey: ["lapo-cash-wallet-patient", patientId],
-    queryFn: async () => {
-      if (!patientId) return null;
+    queryFn: async (): Promise<PatientWalletResult> => {
+      if (!patientId) return { wallet: null, source: "patient" };
 
-      const { data, error } = await supabase
+      // 1. Check for a direct patient wallet (via patient_id)
+      const { data: patientWallet, error: patientError } = await supabase
         .from("lapo_cash_wallets")
         .select("*")
         .eq("patient_id", patientId)
         .maybeSingle();
 
-      if (error) throw error;
-      return data as LapoCashWallet | null;
+      if (patientError) throw patientError;
+      if (patientWallet) {
+        return { wallet: patientWallet as LapoCashWallet, source: "patient" };
+      }
+
+      // 2. Check if this patient is also a referrer
+      const { data: referrer, error: referrerError } = await supabase
+        .from("referrers")
+        .select("id")
+        .eq("patient_id", patientId)
+        .maybeSingle();
+
+      if (referrerError) throw referrerError;
+      if (!referrer) return { wallet: null, source: "patient" };
+
+      // 3. Check for a referrer wallet
+      const { data: referrerWallet, error: walletError } = await supabase
+        .from("lapo_cash_wallets")
+        .select("*")
+        .eq("referrer_id", referrer.id)
+        .maybeSingle();
+
+      if (walletError) throw walletError;
+      if (referrerWallet) {
+        return {
+          wallet: referrerWallet as LapoCashWallet,
+          source: "referrer",
+          referrerId: referrer.id,
+        };
+      }
+
+      // No wallet found anywhere — will create as patient wallet on first credit
+      return { wallet: null, source: "patient" };
     },
     enabled: !!patientId,
   });
 }
 
 // Credit/Debit LAPO Cash for a patient (direct Supabase operations)
+// Handles both patient wallets and referrer wallets
 export function usePatientLapoCashMutation() {
   const queryClient = useQueryClient();
   const { t } = useTranslation("lapoCash");
@@ -44,23 +85,41 @@ export function usePatientLapoCashMutation() {
       amount,
       type,
       description,
+      existingWalletId,
+      walletSource,
+      referrerId,
     }: {
       patientId: string;
       amount: number; // positive for credit, negative for debit
       type: PatientTransactionType;
       description?: string;
+      existingWalletId?: string;
+      walletSource?: WalletSource;
+      referrerId?: string;
     }) => {
-      // Get or create wallet
-      let { data: wallet } = await supabase
-        .from("lapo_cash_wallets")
-        .select("id, balance")
-        .eq("patient_id", patientId)
-        .maybeSingle();
+      let wallet: { id: string; balance: number } | null = null;
 
+      // If we already know the wallet, fetch it directly
+      if (existingWalletId) {
+        const { data } = await supabase
+          .from("lapo_cash_wallets")
+          .select("id, balance")
+          .eq("id", existingWalletId)
+          .single();
+        wallet = data;
+      }
+
+      // If no existing wallet, create a new patient wallet
       if (!wallet) {
+        // For referrer source, create via referrer_id
+        const insertPayload =
+          walletSource === "referrer" && referrerId
+            ? { referrer_id: referrerId, balance: 0 }
+            : { patient_id: patientId, balance: 0 };
+
         const { data: newWallet, error: createError } = await supabase
           .from("lapo_cash_wallets")
-          .insert({ patient_id: patientId, balance: 0 })
+          .insert(insertPayload)
           .select()
           .single();
 
@@ -106,6 +165,9 @@ export function usePatientLapoCashMutation() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["lapo-cash-wallet-patient", variables.patientId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["lapo-cash-wallet", variables.referrerId],
       });
       queryClient.invalidateQueries({
         queryKey: ["lapo-cash-wallets-all"],

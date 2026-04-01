@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   usePatientLapoCashMutation,
   type PatientTransactionType,
+  type WalletSource,
 } from "@/shared/hooks/usePatientLapoCashWallet";
 import {
   Dialog,
@@ -31,6 +32,8 @@ interface LapoCashPatientTransactionDialogProps {
   patientId: string;
   patientName: string;
   walletId?: string;
+  walletSource?: WalletSource;
+  referrerId?: string;
   currentBalance?: number;
 }
 
@@ -55,6 +58,9 @@ export function LapoCashPatientTransactionDialog({
   type,
   patientId,
   patientName,
+  walletId,
+  walletSource = "patient",
+  referrerId,
   currentBalance = 0,
 }: LapoCashPatientTransactionDialogProps) {
   const { t } = useTranslation("lapoCash");
@@ -80,6 +86,9 @@ export function LapoCashPatientTransactionDialog({
         amount: isCredit ? numAmount : -numAmount,
         type: transactionType,
         description: description || undefined,
+        existingWalletId: walletId,
+        walletSource,
+        referrerId,
       },
       {
         onSuccess: () => {

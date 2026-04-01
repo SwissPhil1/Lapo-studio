@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Gift, Plus, Minus, History } from "lucide-react";
+import { Gift, Plus, Minus, History, Crown, User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatLapoCash, formatDate } from "@/shared/lib/format";
 import { usePatientLapoCashWallet } from "@/shared/hooks/usePatientLapoCashWallet";
@@ -15,20 +16,24 @@ interface LapoCashPatientCardProps {
 
 export function LapoCashPatientCard({ patientId, patientName }: LapoCashPatientCardProps) {
   const { t } = useTranslation("lapoCash");
-  const { data: wallet, isLoading } = usePatientLapoCashWallet(patientId);
+  const { data: walletResult, isLoading } = usePatientLapoCashWallet(patientId);
+  const wallet = walletResult?.wallet ?? null;
+  const source = walletResult?.source ?? "patient";
+  const referrerId = walletResult?.referrerId;
   const { data: transactions } = useLapoCashTransactions(wallet?.id);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
   const [debitDialogOpen, setDebitDialogOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
   const balance = wallet?.balance || 0;
+  const isReferrerWallet = source === "referrer";
 
   return (
     <>
       <Card className="border-border bg-card">
         <CardContent className="py-3 px-4">
           <div className="flex items-center justify-between gap-3">
-            {/* Left: icon + title + balance */}
+            {/* Left: icon + title + account type badge + balance */}
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-6 h-6 shrink-0 rounded-full bg-gradient-to-br from-wow-coral to-wow-pink flex items-center justify-center">
                 <Gift className="h-3 w-3 text-white" />
@@ -36,6 +41,21 @@ export function LapoCashPatientCard({ patientId, patientName }: LapoCashPatientC
               <span className="text-sm font-medium text-muted-foreground">
                 {t("patientWallet.title")}
               </span>
+              {wallet && (
+                <Badge variant="outline" className="h-5 text-[10px] px-1.5 gap-0.5">
+                  {isReferrerWallet ? (
+                    <>
+                      <Crown className="h-2.5 w-2.5" />
+                      {t("patientWallet.ambassadorAccount", { defaultValue: "Ambassador" })}
+                    </>
+                  ) : (
+                    <>
+                      <User className="h-2.5 w-2.5" />
+                      {t("patientWallet.patientAccount", { defaultValue: "Patient" })}
+                    </>
+                  )}
+                </Badge>
+              )}
               <span className="text-xl font-bold text-foreground">
                 {isLoading ? "..." : formatLapoCash(balance)}
               </span>
@@ -120,6 +140,8 @@ export function LapoCashPatientCard({ patientId, patientName }: LapoCashPatientC
         patientId={patientId}
         patientName={patientName}
         walletId={wallet?.id}
+        walletSource={source}
+        referrerId={referrerId}
         currentBalance={balance}
       />
 
@@ -130,6 +152,8 @@ export function LapoCashPatientCard({ patientId, patientName }: LapoCashPatientC
         patientId={patientId}
         patientName={patientName}
         walletId={wallet?.id}
+        walletSource={source}
+        referrerId={referrerId}
         currentBalance={balance}
       />
     </>
